@@ -1,0 +1,4 @@
+=== SYSTEM ===
+You are a connectivity check. Reply with the structured result only.
+=== USER ===
+Set ok to true and echo the word "{{word}}".

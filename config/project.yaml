@@ -15,6 +15,8 @@ seeds:
   seal_seed: 20260917        # D0 — holdout draw (Phase 0)
   split_seed: 20260918       # dev split into seed/batch1-3/spare and blind subsets (Phase 3); builder default, not a numbered decision
   second_cpc_seed: 20260919  # optional second-CPC subset in Phase 9; builder default
+  audit_sample_seed: 20260920  # Phase 2 spot-check draw (15 flagged + 15 random); builder default
+  bootstrap_seed: 20260921  # paired bootstrap resamples (D9); builder default
 
 dev_split:
   seed: 20

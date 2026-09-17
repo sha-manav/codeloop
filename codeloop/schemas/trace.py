@@ -11,15 +11,23 @@ from codeloop.schemas.package import CodingPackage
 
 class LLMCallTrace(BaseModel):
     prompt_name: str
-    prompt_hash: str
+    prompt_hash: str  # sha256 of the prompt file
+    rendered_sha256: str = ""  # sha256 of the rendered system+user text
     response_hash: str
-    model: str
+    model: str  # pinned model id
+    served_model: str = ""  # model reported by the provider
+    effort: str | None = None
     tokens_in: int = 0
     tokens_out: int = 0
+    cache_read_tokens: int = 0
+    cache_creation_tokens: int = 0
     latency_ms: int = 0
-    seed: int | None = None
+    seed: int | None = None  # provider-side seed; null when the provider has no seed parameter
+    requested_seed: int | None = None  # run discriminator used in the cache key
     cache_hit: bool = False
     validation_retries: int = 0
+    stop_reason: str = ""
+    request_id: str | None = None
 
 
 class StageTrace(BaseModel):

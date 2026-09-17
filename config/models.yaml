@@ -1,0 +1,26 @@
+# Pinned model configuration (spec §3, invariant I7). Frozen per version by `codeloop version freeze`.
+# Model ID verified against the Claude API model table on 2026-09-17: claude-opus-5 (1M context).
+# claude-opus-5 rejects sampling parameters (temperature/top_p/top_k return 400) and the API has no
+# seed parameter, so both are recorded as null. Run-to-run variance is measured by issuing the same
+# prompt under requested seeds 1..3 (distinct cache keys); the provider seed in traces is null.
+
+default:
+  provider: anthropic
+  model: "claude-opus-5"
+  temperature: null          # not accepted by claude-opus-5; recorded as null
+  seeds: [1, 2, 3]           # requested seeds (cache-key discriminators); provider does not support seeding
+  max_tokens: 16000
+  effort: high               # output_config.effort: low | medium | high | xhigh | max
+  thinking: adaptive         # adaptive thinking (on by default for claude-opus-5)
+  fallbacks: none            # server-side refusal fallbacks disabled so the served model stays pinned; "default" to enable
+  cache_system_prompt: true  # cache_control on the stable system block (min cacheable prefix 512 tokens on claude-opus-5)
+
+call_sites:                  # optional overrides per prompt file
+  audit: {}
+  extract: {}
+  map_dx: {}
+  map_lines: {}
+  cluster_findings: {effort: medium}
+
+pricing:                     # USD per 1M tokens, Claude API list prices as of 2026-09-17; estimates only
+  claude-opus-5: {input: 5.0, output: 25.0, cache_read: 0.5, cache_write: 6.25}

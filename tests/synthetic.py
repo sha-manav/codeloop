@@ -150,6 +150,11 @@ def make_repo(tmp_path: Path) -> tuple[Paths, ProjectConfig]:
     paths = Paths(root)
     paths.ensure_layout()
     shutil.copy2(REAL_ROOT / "config" / "project.yaml", paths.project_yaml)
+    shutil.copy2(REAL_ROOT / "config" / "models.yaml", paths.models_yaml)
+    shutil.copy2(REAL_ROOT / "config" / "scope.yaml", paths.scope_yaml)
+    (root / "prompts").mkdir(exist_ok=True)
+    for prompt in (REAL_ROOT / "prompts").glob("*.txt"):
+        shutil.copy2(prompt, root / "prompts" / prompt.name)
     (root / "pyproject.toml").write_text('[project]\nname = "codeloop"\n', encoding="utf-8")
     (root / "codeloop").mkdir(exist_ok=True)
     (paths.raw / ".gitkeep").write_text("", encoding="utf-8")

@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import typer
+from pydantic import BaseModel
 
 from codeloop import __version__
 from codeloop.config import load_project_config
@@ -174,6 +175,175 @@ def score(
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(report.model_dump_json(indent=2), encoding="utf-8")
         typer.echo(f"wrote {out}")
+
+
+class _Ping(BaseModel):
+    ok: bool
+    echo: str
+
+
+def _require_provider(client) -> None:
+    """One tiny live request (bypassing the cache) so missing credentials fail before any work starts."""
+    from codeloop.llm.providers import LLMProviderError
+
+    try:
+        resp = client.provider.generate(
+            "You are a connectivity check. Reply with the structured result only.",
+            'Set ok to true and echo the word "codeloop".', _Ping, client.config.params_for("ping"),
+        )
+    except (LLMProviderError, Exception) as e:  # noqa: BLE001 - the SDK raises its own class when no credentials resolve
+        _fail(
+            f"LLM provider unavailable: {type(e).__name__}: {e}\n"
+            "Set ANTHROPIC_API_KEY in the shell (or log in with `ant auth login`) and retry."
+        )
+    if resp.stop_reason == "refusal" or not resp.parsed:
+        _fail(f"LLM connectivity check did not return a structured result (stop_reason={resp.stop_reason})")
+
+
+audit_app = typer.Typer(no_args_is_help=True, help="Phase 2 prevalence audit over the dev encounters.")
+app.add_typer(audit_app, name="audit")
+
+
+def _dev_encounters(paths: Paths):
+    from codeloop.schemas.encounter import load_encounters_jsonl
+
+    if not paths.dev_encounters.exists():
+        _fail("data/dev/encounters.jsonl missing; run `make data`")
+    return load_encounters_jsonl(paths.dev_encounters)
+
+
+@audit_app.command("run")
+def audit_run(
+    root: Path | None = typer.Option(None, help="repository root"),
+    limit: int | None = typer.Option(None, help="audit only the first N dev encounters (by id)"),
+    concurrency: int = typer.Option(4, help="parallel LLM calls"),
+    seed: int = typer.Option(1, help="requested seed (cache-key discriminator)"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="bypass the LLM cache"),
+) -> None:
+    """One structured LLM call per dev encounter flagging candidate services (never the holdout)."""
+    from codeloop.audit.run import run_audit
+    from codeloop.ledger import append_entry
+    from codeloop.llm.client import build_client
+
+    paths = _paths(root)
+    encounters = _dev_encounters(paths)
+    holdout = set(paths.holdout_ids.read_text().split()) if paths.holdout_ids.exists() else set()
+    if any(e.id in holdout for e in encounters):
+        _fail("dev encounters contain holdout ids; refusing")
+    if limit:
+        encounters = encounters[:limit]
+    client = build_client(paths.root, cache_enabled=not no_cache)
+    _require_provider(client)
+    typer.echo(
+        f"auditing {len(encounters)} dev encounters with {client.config.default.model} (concurrency {concurrency}) ..."
+    )
+    summary = run_audit(paths, client, encounters, seed=seed, concurrency=concurrency)
+    pricing = client.config.pricing.get(summary.model)
+    cost = (
+        pricing.cost(summary.tokens_in, summary.tokens_out, summary.cache_read_tokens, summary.cache_creation_tokens)
+        if pricing
+        else None
+    )
+    typer.echo(
+        f"audited {summary.n_encounters} encounters, {summary.n_flags} flags {summary.per_category_flags}; "
+        f"tokens in/out {summary.tokens_in}/{summary.tokens_out} (cache read {summary.cache_read_tokens}); "
+        f"cache hits {summary.cache_hits}; validation retries {summary.validation_retries}; "
+        f"failures {len(summary.failures)}"
+        + (f"; est. cost ${cost:.2f}" if cost is not None else "")
+    )
+    for f in summary.failures[:20]:
+        typer.echo(f"  failure: {f}", err=True)
+    append_entry(
+        paths.ledger, "audit run",
+        {"run_id": summary.run_id, "model": summary.model, "prompt_hash": summary.prompt_hash,
+         "models_yaml_sha256": client.models_hash, "encounters": summary.n_encounters, "flags": summary.n_flags,
+         "per_category_flags": summary.per_category_flags, "tokens_in": summary.tokens_in,
+         "tokens_out": summary.tokens_out, "cache_hits": summary.cache_hits, "failures": len(summary.failures),
+         "estimated_cost_usd": round(cost, 2) if cost is not None else None},
+    )
+    if summary.failures:
+        raise typer.Exit(1)
+
+
+@audit_app.command("sample")
+def audit_sample(
+    n: int = typer.Option(30, help="sample size: half flagged, half random"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Draw the CPC spot-check sample (seeded; recorded in the ledger)."""
+    from codeloop.audit.sample import write_spot_check_sample
+    from codeloop.ledger import append_entry
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    seed = int(config.seeds.get("audit_sample_seed", config.seal_seed))
+    try:
+        sample = write_spot_check_sample(paths, n=n, seed=seed)
+    except (RuntimeError, ValueError) as e:
+        _fail(str(e))
+    typer.echo(
+        f"drew {len(sample['arms']['flagged'])} flagged + {len(sample['arms']['random'])} random encounters "
+        f"(seed {seed}) -> runs/audit/spot_check_sample.json"
+    )
+    append_entry(paths.ledger, "audit sample", {"seed": seed, "n": n, "population": sample["population"],
+                 "population_flagged": sample["population_flagged"], "encounter_ids": sample["arms"]})
+
+
+@audit_app.command("report")
+def audit_report(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Write reports/audit.md with per-category precision, evaluable_n_est and D10 module decisions."""
+    from codeloop.audit.report import write_report
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        write_report(paths, config)
+    except RuntimeError as e:
+        _fail(str(e))
+    typer.echo("wrote reports/audit.md, runs/audit/flag_counts.json, runs/audit/module_decisions.json")
+
+
+@audit_app.command("serve")
+def audit_serve(
+    reviewer: str = typer.Option(..., help="reviewer id recorded on every response (e.g. cpc1)"),
+    port: int = typer.Option(8765, help="port"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Serve the spot-check page for the CPC at http://127.0.0.1:<port>/ ."""
+    import uvicorn
+
+    from codeloop.audit.ui import create_app
+
+    paths = _paths(root)
+    try:
+        ui = create_app(paths, reviewer)
+    except RuntimeError as e:
+        _fail(str(e))
+    typer.echo(f"spot-check UI at http://127.0.0.1:{port}/ (reviewer {reviewer}); Ctrl-C to stop")
+    uvicorn.run(ui, host="127.0.0.1", port=port, log_level="warning")
+
+
+llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
+app.add_typer(llm_app, name="llm")
+
+
+@llm_app.command("ping")
+def llm_ping(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Send one tiny structured request with the pinned model to verify credentials and settings."""
+    from codeloop.llm.client import LLMError, build_client
+    from codeloop.llm.providers import LLMProviderError
+
+    paths = _paths(root)
+    client = build_client(paths.root, cache_enabled=False)
+    try:
+        c = client.complete("ping", {"word": "codeloop"}, _Ping, seed=0)
+    except (LLMError, LLMProviderError) as e:
+        _fail(str(e))
+    t = c.trace
+    typer.echo(
+        f"ok={c.parsed.ok} echo={c.parsed.echo!r} model={t.served_model} "
+        f"tokens in/out={t.tokens_in}/{t.tokens_out} latency={t.latency_ms}ms stop={t.stop_reason}"
+    )
 
 
 @app.command("check-leakage")
