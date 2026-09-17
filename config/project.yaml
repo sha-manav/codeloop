@@ -28,7 +28,9 @@ decisions:
     name: Seal seed
     value: 20260917
     change_before: Phase 0
-    status: default
+    status: confirmed
+    confirmed_on: "2026-09-17"
+    confirmed_by: owner
     rationale: >-
       Any fixed integer works; the value is recorded in the ledger together with the ID-list hash
       so the draw can be reproduced. Chosen as the project start date.

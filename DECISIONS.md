@@ -6,7 +6,7 @@ Edit the YAML, not this file. Status: `default` = builder default awaiting the o
 
 | ID | Decision | Value | Status | Change before |
 |---|---|---|---|---|
-| D0 | Seal seed | `20260917` | default | Phase 0 |
+| D0 | Seal seed | `20260917` | confirmed | Phase 0 |
 | D1 | Evidence policy for billable fields | `note_only` | default | Phase 3 |
 | D2 | Coder-facing reason taxonomy | `["missed", "unsupported", "specificity", "wrong_value", "guideline", "query_needed", "judgment"]` | default | Phase 3 |
 | D3 | Minimum occurrences for a finding | `{"if_seen_in_prior_batch": 2, "in_batch": 3}` | default | Phase 3 |
