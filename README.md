@@ -48,11 +48,43 @@ license considerations for redistributing those subsets.
 
 ```bash
 make install                     # uv sync (Python 3.12)
-make test                        # pytest, including the holdout leakage test
+make test                        # pytest, including the holdout leakage and frozen-scorer tests
 export CODELOOP_SEAL_KEY='...'   # owner only; at least 16 characters; never stored in the repo
-make seal                        # Phase 0, exactly once
-make data                        # later: rebuild data/dev from upstream using the committed IDs
+export ANTHROPIC_API_KEY='...'   # LLM provider credential (never stored in the repo)
+make tables                      # download pinned CMS/CDC tables and build data/tables/tables.sqlite
+make data                        # rebuild data/dev from upstream using the committed holdout IDs
 ```
+
+Key commands (see `codeloop --help` and `CODELOOP_SPEC.md` Appendix A):
+
+```bash
+codeloop run --version v0 --batch batch1            # draft packages for a batch (code must match the tag)
+codeloop review serve --batch batch1 --version v0 --coder-id cpc1   # CPC review UI (blind subset first)
+codeloop labels build --batch batch1 --version v0   # replay events into data/labels/batch1.jsonl
+codeloop findings extract --batch batch1            # candidate findings (D3 thresholds)
+codeloop findings package FIND-DX-0001              # dataset + suites + task folder for the improvement agent
+make gate TASK=FIND-DX-0001                          # merge gate (D5) -> tasks/FIND-DX-0001/GATE.md
+codeloop version freeze v1                          # VERSION.md, tag, sealed holdout predictions (D7)
+codeloop review serve --holdout-labeling --coder-id cpc1   # Phase 9 blind labeling of the sealed holdout
+codeloop holdout verify-scorer && codeloop holdout score  # single-shot holdout scoring
+codeloop report                                     # regenerate reports/
+```
+
+## Status
+
+| Phase | State |
+|---|---|
+| 0 Seal | done (seed 20260917 confirmed by the owner) |
+| 1 Contract and scorer | done |
+| 2 Audit | run over the 167 with claude-opus-5; spot-check graded by a **provisional machine stand-in**, CPC grades pending (they override automatically) |
+| 3 Freeze | done (`freeze` tag); scope provisional: core_lines = in-office imaging, optional modules off |
+| 4 v0 agent | done on `seed` and `spare` (`reports/calibration_dev_seed.md`) |
+| 5 Scrubber and compliance | done (NCCI 2026Q4, MUE, MPFS RVU26D, ICD-10-CM FY2027) |
+| 6 Review UI | done; pilot on `spare` by the owner pending |
+| 7 Harness | done; `v0` frozen with sealed holdout predictions |
+| 8 Cycles | v0 drafts for batch1 produced; **CPC review of batch1 is the next human step** |
+| 9 Holdout | blind labeling and single-shot scoring await the CPC after v3 |
+| 10 Reports | `codeloop report` regenerates everything that exists |
 
 ## Phases
 
