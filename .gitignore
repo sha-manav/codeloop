@@ -1,0 +1,26 @@
+# environments and caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.DS_Store
+
+# raw downloads: deleted by `codeloop seal` / `codeloop ingest` after filtering; never committed
+data/raw/*
+!data/raw/.gitkeep
+
+# normalized dev encounters: rebuilt by `make data`; committing is an owner decision (ACI-Bench is CC BY 4.0)
+data/dev/*
+!data/dev/.gitkeep
+
+# traces are large and carry model output verbatim; predictions are committed
+runs/**/traces/
+
+# local caches and sqlite stores
+*.sqlite
+*.sqlite3
+.cache/

@@ -1,0 +1,204 @@
+# CodeLoop project configuration: decisions (D0–D10), seeds, run parameters, data sources.
+# Decisions are confirmed or changed by the owner during Phases 0–3 and locked at the freeze.
+# DECISIONS.md is rendered from this file (`make decisions`); edit here, not there.
+
+project: codeloop
+spec_version: "1.2"
+
+expected_encounter_count: 207
+
+holdout:
+  n: 40
+  stratify_on: subset   # n_s = round(40 * N_s / 207); largest subset absorbs the rounding remainder
+
+seeds:
+  seal_seed: 20260917        # D0 — holdout draw (Phase 0)
+  split_seed: 20260918       # dev split into seed/batch1-3/spare and blind subsets (Phase 3); builder default, not a numbered decision
+  second_cpc_seed: 20260919  # optional second-CPC subset in Phase 9; builder default
+
+dev_split:
+  seed: 20
+  batches: 3
+  batch_size: 45
+  spare: 12
+  blind_per_batch: 5   # D8
+
+decisions:
+  D0:
+    name: Seal seed
+    value: 20260917
+    change_before: Phase 0
+    status: default
+    rationale: >-
+      Any fixed integer works; the value is recorded in the ledger together with the ID-list hash
+      so the draw can be reproduced. Chosen as the project start date.
+  D1:
+    name: Evidence policy for billable fields
+    value: note_only
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      The signed note is the medical record; a compliant coder does not code from the transcript.
+      Dialogue-only facts become provider queries. Alternative: note_or_dialogue (coder guidelines
+      must then say the same, or every dialogue-supported field will be graded unsupported).
+  D2:
+    name: Coder-facing reason taxonomy
+    value: [missed, unsupported, specificity, wrong_value, guideline, query_needed, judgment]
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      One click per edit, describing the coding error rather than the software. Pipeline causes
+      (extraction_miss, mapper_gap, tool_data_gap, rule_bug, grader_bug, model_reasoning) are
+      assigned at triage, never by the coder.
+  D3:
+    name: Minimum occurrences for a finding
+    value: {in_batch: 3, if_seen_in_prior_batch: 2}
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      A candidate becomes eligible at >=3 encounters in the batch, or >=2 if the same grouping key
+      appeared in a prior batch; below that it stays a candidate and is re-checked next batch.
+  D4:
+    name: Eval runs per candidate
+    value: {runs: 3, temperature: 0, seeds: [1, 2, 3]}
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      Three runs at temperature 0 with fixed seeds where the provider supports them; report mean,
+      per-run values and run-to-run variance.
+  D5:
+    name: Gate thresholds
+    value:
+      targeted_relative_error_reduction_min: 0.25
+      targeted_no_run_may_rise: true
+      regression_mean_agreement_drop_max_pp: 1.0
+      regression_per_type_recall_drop_max_pp: 2.0
+      scrubber_errors: non_increasing
+      compliance_escalation_check: required
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      Targeted error rate must fall by at least 25% relative (mean over runs) without rising on any
+      run; regression agreement may drop at most 1.0 pp and no per-type recall more than 2.0 pp;
+      scrubber error count may not increase; the escalation check must pass for every encounter.
+  D6:
+    name: Minimum evaluable n for module-level holdout reporting
+    value: 10
+    change_before: Phase 3
+    status: default
+    rationale: Below 10 evaluable encounters a module result is reported as "insufficient (n=...)".
+  D7:
+    name: When holdout predictions are generated
+    value: at_each_version_freeze_sealed
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      Sealed predictions are produced at each version freeze so a model retirement between
+      versions cannot break the final comparison; an optional re-run of all four happens after v3.
+  D8:
+    name: Blind subset size and official label
+    value: {blind_per_batch: 5, official_label: reviewed}
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      Five encounters per batch (11%) are coded blind before the draft is revealed; the reviewed
+      label is official and the blind label feeds the anchoring analysis.
+  D9:
+    name: Primary inferential metric
+    value:
+      primary: mean_per_encounter_field_agreement
+      interval: paired_bootstrap_95
+      resamples: 10000
+      tiers: [0.75, 0.90, 1.0]
+      tier_intervals: wilson
+    change_before: Phase 3
+    status: default
+    rationale: >-
+      With n = 40 a binary 100% tier has +-15 pp intervals and cannot separate versions; the
+      continuous mean with paired bootstrap CIs can. Tier shares are headline descriptives.
+  D10:
+    name: Module activation rule
+    value: {evaluable_n_est_min: 15, spot_check_confirmed_min: 5}
+    change_before: Phase 2
+    status: default
+    rationale: >-
+      A module is on iff evaluable_n_est = flagged x spot-check precision >= 15 and at least five
+      flags were confirmed in the spot-check.
+
+# External datasets. URLs are pinned (figshare version, git commit, Zenodo record); hashes are
+# verified on download and recorded in the ledger and data/splits/source_manifest.json.
+sources:
+  aci_bench:
+    title: ACI-Bench corpus (figshare release v1)
+    citation: >-
+      Yim W, Fu Y, Ben Abacha A, Snider N, Lin T, Yetisgen M. ACI-BENCH: a Novel Ambient Clinical
+      Intelligence Dataset for Benchmarking Automatic Visit Note Generation. Sci Data 10, 586 (2023).
+      https://doi.org/10.1038/s41597-023-02487-3
+    license: CC BY 4.0
+    landing_url: https://doi.org/10.6084/m9.figshare.22494601.v1
+    code_url: https://github.com/wyim/aci-bench
+    pinned_commit: b909b2bb9cf1d19de08df15cddde7bd0179665e4
+    files:
+      - name: aci-bench-2023.zip
+        url: https://ndownloader.figshare.com/files/41498793
+        kind: zip
+        expected_md5: e3e2456f1e84cdae844f122890c9340c
+        members:
+          - {member: aci-bench-corpus/challenge_data/train.csv, split_orig: train}
+          - {member: aci-bench-corpus/challenge_data/valid.csv, split_orig: valid}
+          - {member: aci-bench-corpus/challenge_data/clinicalnlp_taskB_test1.csv, split_orig: test1}
+          - {member: aci-bench-corpus/challenge_data/clinicalnlp_taskC_test2.csv, split_orig: test2}
+          - {member: aci-bench-corpus/challenge_data/clef_taskC_test3.csv, split_orig: test3}
+  amazon_labels:
+    title: >-
+      ICD-10-CM annotations from "Toward Reliable Clinical Coding with Language Models:
+      Verification and Lightweight Adaptation" (amazon-science)
+    citation: >-
+      Yuan Z, Shing H-C, Strong M, Shivade C. Toward Reliable Clinical Coding with Language Models:
+      Verification and Lightweight Adaptation. EMNLP 2025 Industry Track.
+    license: CC BY-NC 4.0
+    landing_url: https://github.com/amazon-science/toward-clinical-coding-verification-adaptation
+    pinned_commit: 311f4afea6e6697f748ad23b62e8a0d70772736b
+    files:
+      - name: code_train.csv
+        url: https://raw.githubusercontent.com/amazon-science/toward-clinical-coding-verification-adaptation/311f4afea6e6697f748ad23b62e8a0d70772736b/annotation/code_train.csv
+        split_orig: train
+      - name: code_valid.csv
+        url: https://raw.githubusercontent.com/amazon-science/toward-clinical-coding-verification-adaptation/311f4afea6e6697f748ad23b62e8a0d70772736b/annotation/code_valid.csv
+        split_orig: valid
+      - name: code_test.csv
+        url: https://raw.githubusercontent.com/amazon-science/toward-clinical-coding-verification-adaptation/311f4afea6e6697f748ad23b62e8a0d70772736b/annotation/code_test.csv
+        split_orig: test
+  medcoder:
+    title: Dataset for MedCodER, A Generative AI Assistant for Medical Coding (Zenodo record 13308316)
+    citation: >-
+      Deloitte & Touche LLP (2024). Dataset for MedCodER: A Generative AI Assistant for Medical
+      Coding. Zenodo. https://doi.org/10.5281/zenodo.13308316
+    license: CC BY-NC-ND 4.0
+    landing_url: https://doi.org/10.5281/zenodo.13308316
+    files:
+      - name: text.csv
+        url: https://zenodo.org/api/records/13308316/files/text.csv/content
+        expected_md5: f389aeac1abce0fac28a319058ab5c6f
+        role: text
+        partition: test
+      - name: diagnosis.csv
+        url: https://zenodo.org/api/records/13308316/files/diagnosis.csv/content
+        expected_md5: 6fab815448536b58a3315253fd32f0b5
+        role: diagnosis
+        partition: test
+      - name: supporting_evidence.csv
+        url: https://zenodo.org/api/records/13308316/files/supporting_evidence.csv/content
+        expected_md5: ec45bd77804bd8ee7ae756d73809c360
+        role: evidence
+        partition: test
+      - name: text_holdout.csv
+        url: https://zenodo.org/api/records/13308316/files/text_holdout.csv/content
+        expected_md5: b216c317f917b7b3dda99a9ff1fe38f2
+        role: text
+        partition: holdout   # MedCodER's own user-study partition; unrelated to the CodeLoop holdout
+      - name: diagnosis_holdout.csv
+        url: https://zenodo.org/api/records/13308316/files/diagnosis_holdout.csv/content
+        expected_md5: 36eefd666e977fafbb5160b0027f2aeb
+        role: diagnosis
+        partition: holdout
