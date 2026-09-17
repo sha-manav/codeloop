@@ -342,6 +342,117 @@ def freeze(root: Path | None = typer.Option(None, help="repository root")) -> No
         typer.echo(f"  {name}: n={s['n']} mean difficulty={s['mean_difficulty']:.3f} subsets={s['subsets']}")
 
 
+tables_app = typer.Typer(no_args_is_help=True, help="Pinned external tables (ICD-10-CM, HCPCS, NCCI, MPFS, ASP, CVX).")
+app.add_typer(tables_app, name="tables")
+
+
+@tables_app.command("fetch")
+def tables_fetch(
+    root: Path | None = typer.Option(None, help="repository root"),
+    only: list[str] = typer.Option([], help="fetch only these table names"),
+    update: bool = typer.Option(False, help="re-pin hashes when upstream files changed"),
+) -> None:
+    """Download every pinned file into data/tables/raw/ and record sha256/bytes/date in config/tables.yaml."""
+    from codeloop.tables.fetch import TableFetchError, fetch_tables
+
+    paths = _paths(root)
+    try:
+        records = fetch_tables(paths.root, paths.tables_yaml, only=set(only) or None, update=update)
+    except TableFetchError as e:
+        _fail(str(e))
+    for r in records:
+        typer.echo(f"  {r.table}/{r.name}: {r.bytes} bytes sha256={r.sha256[:16]}… {r.status}")
+    typer.echo(f"{len(records)} files; config/tables.yaml updated")
+
+
+@tables_app.command("build")
+def tables_build(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Parse the fetched files into data/tables/tables.sqlite (FTS5 index over ICD-10-CM)."""
+    from codeloop.ledger import append_entry
+    from codeloop.tables.build import build_tables
+    from codeloop.util.hashing import sha256_file
+
+    paths = _paths(root)
+    try:
+        stats = build_tables(paths.root, paths.tables_yaml, paths.tables_sqlite)
+    except FileNotFoundError as e:
+        _fail(str(e))
+    typer.echo(f"built {paths.tables_sqlite.relative_to(paths.root)}: {stats.counts}")
+    append_entry(
+        paths.ledger, "tables build",
+        {"tables_yaml_sha256": sha256_file(paths.tables_yaml), "row_counts": stats.counts,
+         "tables_sqlite_sha256": sha256_file(paths.tables_sqlite)},
+    )
+
+
+@app.command()
+def run(
+    version: str = typer.Option(..., help="vK (checked out at that tag) or dev (seed/spare only)"),
+    batch: str = typer.Option(..., help="seed | batch1 | batch2 | batch3 | spare"),
+    limit: int | None = typer.Option(None, help="run only the first N encounters of the batch"),
+    seeds: str = typer.Option("1", help="comma-separated requested seeds, e.g. 1,2,3"),
+    concurrency: int = typer.Option(4, help="parallel encounters"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="bypass the LLM cache"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Run the agent pipeline over a batch; writes runs/<version>/<batch>/predictions.jsonl and traces."""
+    from codeloop.agent.runner import RunError, check_version_state, run_batch
+    from codeloop.llm.client import build_client
+    from codeloop.tables import open_tables
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        commit = check_version_state(paths, version, batch)
+        tables = open_tables(paths.tables_sqlite)
+    except (RunError, FileNotFoundError) as e:
+        _fail(str(e))
+    seed_list = [int(x) for x in seeds.split(",") if x.strip()]
+    client = build_client(paths.root, cache_enabled=not no_cache)
+    _require_provider(client)
+    typer.echo(f"running {version} on {batch} (seeds {seed_list}, concurrency {concurrency}) ...")
+    try:
+        s = run_batch(paths, config, version=version, batch=batch, llm=client, tables=tables, seeds=seed_list,
+                      limit=limit, concurrency=concurrency, commit=commit)
+    except RunError as e:
+        _fail(str(e))
+    typer.echo(
+        f"run {s.run_id}: {s.n_encounters} encounters x {len(s.seeds)} seed(s); llm calls {s.llm_calls} "
+        f"(cache hits {s.cache_hits}); tokens in/out {s.tokens_in}/{s.tokens_out}; failures {len(s.failures)}"
+        + (f"; est. cost ${s.estimated_cost_usd:.2f}" if s.estimated_cost_usd is not None else "")
+    )
+    typer.echo(f"  scrubber rule counts {s.scrubber_rule_counts}; compliance failed {s.compliance_failed}; "
+               f"data gaps {s.data_gaps}; provider queries {s.provider_queries}")
+    for p in s.predictions.values():
+        typer.echo(f"  predictions: {p}")
+    for f in s.failures[:20]:
+        typer.echo(f"  failure: {f}", err=True)
+    if s.failures:
+        raise typer.Exit(1)
+
+
+@app.command()
+def calibration(
+    version: str = typer.Option(..., help="run version, e.g. dev or v0"),
+    batch: str = typer.Option(..., help="batch name"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Compare a run's diagnoses with the public ICD label sets (reference only) -> reports/calibration_<v>_<b>.md."""
+    from codeloop.agent.runner import predictions_path
+    from codeloop.ingest.report import write_text
+    from codeloop.reporting.calibration import calibration_report
+
+    paths = _paths(root)
+    pred = predictions_path(paths, version, batch)
+    if not pred.exists():
+        _fail(f"{pred.relative_to(paths.root)} missing; run `codeloop run` first")
+    text = calibration_report(paths, pred, title=f"{version} on {batch}")
+    out = paths.reports / f"calibration_{version}_{batch}.md"
+    write_text(out, text)
+    typer.echo(f"wrote {out.relative_to(paths.root)}")
+    typer.echo("\n".join(line for line in text.splitlines() if line.startswith("- ") or line.startswith("## ")))
+
+
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
 app.add_typer(llm_app, name="llm")
 

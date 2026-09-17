@@ -24,3 +24,7 @@ runs/**/traces/
 *.sqlite
 *.sqlite3
 .cache/
+
+# external table downloads and the built sqlite are rebuilt by `make tables`
+data/tables/raw/
+data/tables/*.building

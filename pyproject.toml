@@ -48,3 +48,4 @@ select = ["E", "F", "I", "B", "UP"]
 "codeloop/audit/ui.py" = ["E501"]       # HTML template strings
 "codeloop/audit/report.py" = ["E501"]   # Markdown report template
 "tests/*" = ["E501"]
+"codeloop/reporting/*" = ["E501"]  # Markdown report templates

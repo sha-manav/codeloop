@@ -1,0 +1,140 @@
+# Pinned external tables (spec §2.1, §3). `codeloop tables fetch` downloads every file into
+# data/tables/raw/ (gitignored), verifies or records sha256/bytes/downloaded_at here, and
+# `codeloop tables build` parses them into data/tables/tables.sqlite (gitignored, rebuilt on demand).
+# CPT descriptor text (AMA-licensed) is discarded at parse time wherever a file carries it (I6).
+parser_version: '1'
+tables:
+  icd10cm:
+    release: FY2027
+    effective: '2026-10-01'
+    license: public domain (CMS/CDC)
+    parser: icd10cm_order_v1
+    note: ''
+    files:
+    - name: 2027-code-descriptions-tabular-order.zip
+      url: https://www.cms.gov/files/zip/2027-code-descriptions-tabular-order.zip
+      members:
+      - Code Descriptions/icd10cm_order_2027.txt
+      sha256: 91c6c9d1117764ce72375a0f3a5493b1725dafbc1ab283b55799076c9e194965
+      bytes: 2208022
+      downloaded_at: '2026-09-17T13:44:09Z'
+  icd10cm_index:
+    release: FY2026
+    effective: '2025-10-01'
+    license: public domain (CMS/CDC)
+    parser: icd10cm_index_xml_v1
+    note: FY2027 index XML was not posted as of 2026-09-17; FY2026 index terms are used for retrieval only, existence checks
+      use the FY2027 code set.
+    files:
+    - name: 2026-code-tables-tabular-and-index.zip
+      url: https://www.cms.gov/files/zip/2026-code-tables-tabular-and-index.zip
+      members:
+      - Table and Index/icd10cm_index_2026.xml
+      sha256: abfc45a54e4edc215cbaa2f0d18b30112db2bf9141857c9f8902390a495e6696
+      bytes: 22074209
+      downloaded_at: '2026-09-17T13:44:10Z'
+  hcpcs:
+    release: October 2026 (HCPC2026_OCT_ANWEB_v2)
+    effective: '2026-10-01'
+    license: public domain (CMS) for Level II codes and descriptions
+    parser: hcpcs_fixed_width_v1
+    note: ''
+    files:
+    - name: october-2026-alpha-numeric-hcpcs-file.zip
+      url: https://www.cms.gov/files/zip/october-2026-alpha-numeric-hcpcs-file.zip
+      members:
+      - HCPC2026_OCT_ANWEB_v2.txt
+      - HCPC2026_recordlayout.txt
+      sha256: e98e5f006e3f9e90fb48279fa8c3c1e988232703a772d804d650e7216cc53680
+      bytes: 2519833
+      downloaded_at: '2026-09-17T13:44:11Z'
+  ncci_ptp_practitioner:
+    release: 2026Q4 (ccipra v323r0)
+    effective: '2026-10-01'
+    license: CMS NCCI edits; code pairs, dates and indicators only are stored (files carry an AMA CPT notice)
+    parser: ncci_ptp_txt_v1
+    note: ''
+    files:
+    - name: medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f1.zip
+      url: https://www.cms.gov/files/zip/medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f1.zip
+      members:
+      - ccipra-v323r0-f1.TXT
+      sha256: 40adc15de0b5cf9470f874b4a0183a2edb285783f2c1c3db35ab27e1a0b032e2
+      bytes: 20238121
+      downloaded_at: '2026-09-17T13:44:12Z'
+    - name: medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f2.zip
+      url: https://www.cms.gov/files/zip/medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f2.zip
+      members:
+      - ccipra-v323r0-f2.TXT
+      sha256: e0c916cc5b0bf1b7d1dea454a02f024fa1f8b8c819da0f86f144ab1d6ff5343d
+      bytes: 19186336
+      downloaded_at: '2026-09-17T13:44:14Z'
+    - name: medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f3.zip
+      url: https://www.cms.gov/files/zip/medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f3.zip
+      members:
+      - ccipra-v323r0-f3.TXT
+      sha256: 79024324e5f2ac9666a5183c9b256a79cd217f1c495d0f69d53c2a1b9d98b208
+      bytes: 19812296
+      downloaded_at: '2026-09-17T13:44:15Z'
+    - name: medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f4.zip
+      url: https://www.cms.gov/files/zip/medicare-ncci-2026q4-practitioner-ptp-edits-ccipra-v323r0-f4.zip
+      members:
+      - ccipra-v323r0-f4.TXT
+      sha256: 028a6d91e27ab177a70f125db22f3f3e898f66345852e7f5470e2065796ef545
+      bytes: 17884951
+      downloaded_at: '2026-09-17T13:44:17Z'
+  ncci_mue_practitioner:
+    release: 2026Q4 (effective 2026-10-01)
+    effective: '2026-10-01'
+    license: CMS NCCI MUE table; codes, MUE values and adjudication indicators only are stored
+    parser: ncci_mue_csv_v1
+    note: ''
+    files:
+    - name: medicare-ncci-2026-q4-practitioner-services-mue-table.zip
+      url: https://www.cms.gov/files/zip/medicare-ncci-2026-q4-practitioner-services-mue-table.zip
+      members:
+      - MCR_MUE_PractitionerServices_Eff_10-01-2026.csv
+      sha256: 4574336755ba4e49b7c8ec07de5b74d3f0b8593e3e6192013631724981180d00
+      bytes: 407831
+      downloaded_at: '2026-09-17T13:44:17Z'
+  mpfs_rvu:
+    release: RVU26D (October 2026 release, released 2026-08-26)
+    effective: '2026-10-01'
+    license: CMS; only HCPCS, modifier, status, global days and bilateral-surgery indicator are stored (CPT descriptions discarded)
+    parser: mpfs_rvu_csv_v1
+    note: ''
+    files:
+    - name: rvu26d.zip
+      url: https://www.cms.gov/files/zip/rvu26d.zip
+      members:
+      - PPRRVU2026_Oct_nonQPP.csv
+      sha256: 521ff0f4ecbf13b5d99dc1dc04d9f82e5361e55c6b4b6b3033043598bf8406e6
+      bytes: 6181360
+      downloaded_at: '2026-09-17T13:44:18Z'
+  asp_ndc_hcpcs:
+    release: July 2026 (effective 2026-07-01 through 2026-09-30)
+    effective: '2026-07-01'
+    license: CMS; short-description column discarded (contains CPT text for vaccine product codes)
+    parser: asp_crosswalk_csv_v1
+    note: ''
+    files:
+    - name: july-2026-ndc-hcpcs-crosswalk.zip
+      url: https://www.cms.gov/files/zip/july-2026-ndc-hcpcs-crosswalk.zip
+      members:
+      - section 508 version of July 2026 ASP NDC-HCPCS Crosswalk 061726.csv
+      sha256: 66fbc5c993b989d968c89d96cba77a01b6fa8a424d6643ae542aa80607f480d4
+      bytes: 577948
+      downloaded_at: '2026-09-17T13:44:18Z'
+  cvx:
+    release: CDC CVX code set as downloaded
+    license: public domain (CDC)
+    parser: cvx_pipe_v1
+    note: the CDC NDC-to-CVX crosswalk is served as HTML only (no file download as of 2026-09-17); vaccines resolve by CVX
+      name. The vaccine_admin module is off in this project.
+    files:
+    - name: cvx.txt
+      url: https://www2a.cdc.gov/vaccines/iis/iisstandards/downloads/cvx.txt
+      members: []
+      sha256: ab472bab236832c47919609fce4b52714b868c635c13486d7a58f9b35a7b0ead
+      bytes: 55005
+      downloaded_at: '2026-09-17T13:44:19Z'

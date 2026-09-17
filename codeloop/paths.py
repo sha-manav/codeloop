@@ -132,6 +132,14 @@ class Paths:
     def tables(self) -> Path:
         return self.data / "tables"
 
+    @property
+    def tables_sqlite(self) -> Path:
+        return self.tables / "tables.sqlite"
+
+    @property
+    def tables_raw(self) -> Path:
+        return self.tables / "raw"
+
     # --- other trees
     @property
     def reports(self) -> Path:

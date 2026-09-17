@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: install test lint seal data leakage decisions
+.PHONY: install test lint seal data leakage decisions tables
 
 install:            ## create .venv and install codeloop with dev tools
 	$(UV) sync --group dev
@@ -22,3 +22,7 @@ leakage:            ## scan the repo for holdout IDs or holdout content hashes
 
 decisions:          ## re-render DECISIONS.md from config/project.yaml
 	$(UV) run codeloop render-decisions
+
+tables:             ## download pinned CMS/CDC tables and build data/tables/tables.sqlite
+	$(UV) run codeloop tables fetch
+	$(UV) run codeloop tables build
