@@ -18,12 +18,13 @@ CATEGORIES: tuple[str, ...] = (
     "waived_in_office_test",
     "immunization",
     "drug_administration_with_wastage",
+    "in_office_imaging",
     "other_procedure",
 )
 Category = Literal[
     "in_office_injection", "joint_aspiration_injection", "laceration_repair", "lesion_destruction", "ecg",
     "spirometry", "nebulizer_treatment", "cerumen_removal", "waived_in_office_test", "immunization",
-    "drug_administration_with_wastage", "other_procedure",
+    "drug_administration_with_wastage", "in_office_imaging", "other_procedure",
 ]
 Source = Literal["note", "dialogue"]
 
@@ -87,5 +88,6 @@ PROPOSED_RANGES: dict[str, list[str]] = {
     ],
     "immunization": ["90460-90461", "90471-90474", "90476-90759", "91300-91322"],
     "drug_administration_with_wastage": ["96372-96379", "J0000-J9999"],
+    "in_office_imaging": ["71045-71048", "72020-72120", "73000-73140", "73501-73660", "74018-74022"],
     "other_procedure": [],
 }

@@ -14,7 +14,8 @@ Flag a service only when the documentation says it was performed at this visit (
 - waived_in_office_test: a point-of-care laboratory test run in the office (urine dipstick, urine pregnancy, rapid strep, rapid flu or COVID antigen, fingerstick glucose or A1c, mono test, and similar)
 - immunization: a vaccine administered at the visit (record the product, route, whether counseling was documented and by whom, and the patient's age)
 - drug_administration_with_wastage: a drug administered at the visit where the documentation states an amount discarded or wasted
-- other_procedure: any other procedure performed at the visit that would ordinarily be billed separately
+- in_office_imaging: a radiograph or other imaging study obtained in the office at this visit and interpreted by the clinician (not imaging ordered for later, and not outside results reviewed)
+- other_procedure: any other procedure performed at the visit that would ordinarily be billed separately from the visit itself. Examination, counseling, medication management, orders, referrals and review of outside results are part of the visit and are never flagged.
 
 For every flag give a short verbatim evidence quote copied exactly from the note or the transcript (prefer the note; use the transcript only when the note has nothing), say which source the quote comes from, and rate your confidence. Fill in the facts fields when the documentation states them; leave them null otherwise. Do not infer facts that are not documented.
 
