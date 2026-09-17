@@ -1,0 +1,20 @@
+# Scope (spec §3). Decided by the Phase 2 audit and frozen in Phase 3.
+# The scorer applies this symmetrically to gold and predicted packages: only lines whose code is in
+# an *on* module's allowlist are kept; excluded modifiers and modifiers owned by *off* modules are
+# stripped; diagnoses are always kept. Until the audit fills core_lines.code_ranges, no line is in scope.
+
+icd10cm_release: null   # pinned in Phase 4 together with config/tables.yaml
+
+modules:
+  core_dx:        {on: true}
+  core_lines:     {on: true, code_ranges: []}   # filled by the audit: CPT/HCPCS ranges for confirmed service categories
+  vaccine_admin:  {on: false, threshold: 15, evaluable_n_est: null, code_ranges: ["90460-90461", "90471-90474"]}   # product range(s) added by the audit
+  distinct_59x:   {on: false, threshold: 15, evaluable_n_est: null, modifiers: ["59", "XE", "XS", "XP", "XU"]}
+  qw:             {on: false, threshold: 15, evaluable_n_est: null, modifiers: ["QW"]}
+  jw_jz:          {on: false, threshold: 15, evaluable_n_est: null, modifiers: ["JW", "JZ"]}
+
+exclusions:
+  em_code_ranges: ["99202-99205", "99211-99215", "G2211"]   # stripped from both sides before scoring
+  modifiers: ["25"]
+
+holdout_module_min_n: 10   # decision D6

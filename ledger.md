@@ -35,3 +35,11 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - holdout_ids_sha256: 844ba4470653b79740ddc20268d98cdb6f8891d69a8a2ee6021208b8d20ab66a
 - project_yaml_sha256: 2699ba284dc077f5b34dfc3ad852f5446a4363883ce321ecb389b28d56affacf
 - next_phase: 1 — contract and scorer
+
+## 2026-09-17T13:05:32Z — phase 1 accepted: contract and scorer
+
+- actor: manavshah <manavshah03@gmail.com>
+- scoring_version: 1.0
+- scoring_tree_sha256_pre_freeze: 8ac5646c3621c55d86b46de987433f46118117ffadaed942cc08cb47e8b5f02a
+- scope_yaml_sha256: fde4ce434b25714a9b6fd334fe06b03014ddde750309bc36a4e7a21411c9df49
+- note: codeloop/scoring is self-contained (stdlib + pydantic + yaml); the freeze hash is recorded at Phase 3

@@ -136,6 +136,46 @@ def ingest(
     )
 
 
+@app.command()
+def score(
+    gold: Path = typer.Option(..., help="gold JSONL (label records or packages)"),
+    pred: Path = typer.Option(..., help="prediction JSONL (CodingPackage records)"),
+    scope: Path | None = typer.Option(None, help="scope.yaml (default: config/scope.yaml)"),
+    out: Path | None = typer.Option(None, help="write the full ScoreReport JSON here"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Score predictions against gold with the canonicalizer and field-level agreement (spec §5)."""
+    from codeloop.scoring import Scope, score_files
+    from codeloop.util.hashing import sha256_file
+
+    paths = _paths(root)
+    scope_path = scope or paths.scope_yaml
+    try:
+        report = score_files(gold, pred, Scope.load(scope_path), scope_sha256=sha256_file(scope_path))
+    except (ValueError, OSError) as e:
+        _fail(str(e))
+    b = report.batch
+    typer.echo(f"scoring {report.scoring_version}; scope {scope_path} sha256={report.scope_sha256[:16]}…")
+    typer.echo(
+        f"encounters={b.n} fields={b.total_fields} correct={b.total_correct} "
+        f"no_in_scope_fields={b.no_in_scope_fields}"
+    )
+    typer.echo(f"mean agreement={b.mean_agreement:.4f} hierarchical={b.mean_hier_agreement:.4f}")
+    for name, t in b.tiers.items():
+        typer.echo(f"  {name}: {t.count}/{t.n} = {t.share:.3f} (wilson {t.wilson_low:.3f}–{t.wilson_high:.3f})")
+    for t, v in b.per_type.items():
+        cells = ", ".join(f"{k}={val:.3f}" if isinstance(val, float) else f"{k}={val}" for k, val in v.items())
+        typer.echo(f"  {t}: {cells}")
+    if report.missing_pred:
+        typer.echo(f"  gold encounters without a prediction (scored as empty): {len(report.missing_pred)}")
+    if report.unscored_pred:
+        typer.echo(f"  predictions without gold (ignored): {len(report.unscored_pred)}")
+    if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(report.model_dump_json(indent=2), encoding="utf-8")
+        typer.echo(f"wrote {out}")
+
+
 @app.command("check-leakage")
 def check_leakage(root: Path | None = typer.Option(None, help="repository root")) -> None:
     """Scan derived-data trees for holdout IDs or holdout content hashes (invariant I1)."""
