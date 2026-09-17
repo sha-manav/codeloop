@@ -69,3 +69,20 @@ def commit_all(root: Path, message: str) -> str:
 
 def tag_commit(root: Path, tag: str) -> str:
     return _git(root, "rev-list", "-n", "1", tag)
+
+
+CODE_DIRS: tuple[str, ...] = ("codeloop", "prompts", "config")
+
+
+def tree_id(root: Path, rev: str, path: str) -> str | None:
+    try:
+        return _git(root, "rev-parse", f"{rev}:{path}")
+    except GitError:
+        return None
+
+
+def code_matches_tag(root: Path, tag: str, dirs: tuple[str, ...] = CODE_DIRS) -> bool:
+    """True when HEAD's committed code directories are identical to the tag's (run outputs may differ)."""
+    if not tag_exists(root, tag):
+        return False
+    return all(tree_id(root, "HEAD", d) == tree_id(root, tag, d) for d in dirs)

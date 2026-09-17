@@ -31,6 +31,7 @@ class Finding(BaseModel):
     module: str = "core"
     code_category: str = ""
     grouping_key: str = ""
+    batches_seen: list[str] = Field(default_factory=list)
     occurrences: list[Occurrence] = Field(default_factory=list)
     count: int = 0
     hypothesis: str = ""

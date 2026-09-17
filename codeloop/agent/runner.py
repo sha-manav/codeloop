@@ -63,9 +63,17 @@ def check_version_state(paths: Paths, version: str, batch: str) -> str:
         if batch not in ("seed", "spare"):
             raise RunError("--version dev may only run on the seed or spare split")
         return git.current_commit(paths.root) if git.is_repo(paths.root) else ""
+    if not git.is_repo(paths.root):
+        raise RunError("not a git repository; versioned runs require the version tag")
     tag = git.describe_exact_tag(paths.root)
-    if tag != version:
-        raise RunError(f"working tree is at tag {tag!r}, not {version!r}; check out the version tag before running")
+    if tag == version:
+        return git.current_commit(paths.root)
+    if not git.tag_exists(paths.root, version):
+        raise RunError(f"tag {version!r} does not exist; freeze the version first")
+    if not git.is_clean(paths.root):
+        raise RunError("working tree is not clean; commit or stash before running a versioned batch")
+    if not git.code_matches_tag(paths.root, version):
+        raise RunError(f"committed code (codeloop/, prompts/, config/) differs from tag {version!r}; check out the tag")
     return git.current_commit(paths.root)
 
 

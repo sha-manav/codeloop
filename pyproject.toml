@@ -43,10 +43,14 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
-"codeloop/cli.py" = ["B008"]          # typer.Option(...) defaults are the Typer idiom
+"codeloop/cli.py" = ["B008", "E501"]  # typer.Option(...) defaults are the Typer idiom; long echo strings
+"codeloop/findings/package.py" = ["E501"]
 "codeloop/ingest/report.py" = ["E501"]  # long Markdown lines in the report template
 "codeloop/audit/ui.py" = ["E501"]       # HTML template strings
 "codeloop/review_ui/app.py" = ["E501"]  # HTML/JS template strings
 "codeloop/audit/report.py" = ["E501"]   # Markdown report template
 "tests/*" = ["E501"]
 "codeloop/reporting/*" = ["E501"]  # Markdown report templates
+"codeloop/evals/runner.py" = ["E501"]
+"codeloop/holdout/score.py" = ["E501"]
+"codeloop/gate/check.py" = ["E501"]

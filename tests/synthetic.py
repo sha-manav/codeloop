@@ -152,6 +152,7 @@ def make_repo(tmp_path: Path) -> tuple[Paths, ProjectConfig]:
     shutil.copy2(REAL_ROOT / "config" / "project.yaml", paths.project_yaml)
     shutil.copy2(REAL_ROOT / "config" / "models.yaml", paths.models_yaml)
     shutil.copy2(REAL_ROOT / "config" / "scope.yaml", paths.scope_yaml)
+    shutil.copy2(REAL_ROOT / "config" / "tables.yaml", paths.tables_yaml)
     (root / "prompts").mkdir(exist_ok=True)
     for prompt in (REAL_ROOT / "prompts").glob("*.txt"):
         shutil.copy2(prompt, root / "prompts" / prompt.name)

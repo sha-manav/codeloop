@@ -509,6 +509,223 @@ def labels_build(
     typer.echo(f"wrote {r.labels_path} ({r.approved} approved; pending {len(r.pending)}); events -> {r.events_path}")
 
 
+eval_app = typer.Typer(no_args_is_help=True, help="Eval harness (targeted and regression suites).")
+app.add_typer(eval_app, name="eval")
+
+
+@eval_app.command("run")
+def eval_run(
+    suite: Path = typer.Option(..., help="suite yaml"),
+    runs: int | None = typer.Option(None, help="number of runs (default: suite.runs, D4 = 3)"),
+    seeds: str | None = typer.Option(None, help="comma-separated seeds (default: suite seeds)"),
+    limit: int | None = typer.Option(None, help="first N encounters only"),
+    concurrency: int = typer.Option(4),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Run a suite at the current working tree; results -> evals/results/<suite>/<commit>.json + .md."""
+    from codeloop.evals.runner import run_suite
+    from codeloop.llm.client import build_client
+    from codeloop.tables import open_tables
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    client = build_client(paths.root)
+    _require_provider(client)
+    seed_list = [int(x) for x in seeds.split(",")] if seeds else None
+    try:
+        r = run_suite(paths, config, suite, llm=client, tables=open_tables(paths.tables_sqlite), runs=runs, seeds=seed_list,
+                      limit=limit, concurrency=concurrency)
+    except (RuntimeError, FileNotFoundError) as e:
+        _fail(str(e))
+    typer.echo(f"{r.suite} @ {r.commit[:12]}: n={r.n_encounters} seeds={r.seeds} mean={r.mean} variance={r.variance}")
+    for m in r.runs:
+        if m.failures:
+            typer.echo(f"  seed {m.seed}: {len(m.failures)} failures", err=True)
+
+
+findings_app = typer.Typer(no_args_is_help=True, help="Findings: extract from coder corrections; package into evals + tasks.")
+app.add_typer(findings_app, name="findings")
+
+
+@findings_app.command("extract")
+def findings_extract(batch: str = typer.Option(...), root: Path | None = typer.Option(None)) -> None:
+    """Group edit/add/remove events (reason != judgment) into candidate findings (D3 thresholds)."""
+    from codeloop.findings.extract import extract_findings
+    from codeloop.ledger import append_entry
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        out = extract_findings(paths, config, batch=batch)
+    except RuntimeError as e:
+        _fail(str(e))
+    for f in out:
+        typer.echo(f"  {f.id} [{f.status}] count={f.count} key={f.grouping_key}")
+    append_entry(paths.ledger, f"findings extract {batch}", {"findings": [(f.id, f.status, f.count) for f in out]})
+    typer.echo(f"{len(out)} finding(s) written/updated under findings/")
+
+
+@findings_app.command("package")
+def findings_package(finding: str = typer.Argument(...), root: Path | None = typer.Option(None)) -> None:
+    """Create the targeted dataset, targeted + regression suites and the task folder for a finding."""
+    from codeloop.findings.package import package_finding
+    from codeloop.ledger import append_entry
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        out = package_finding(paths, config, finding)
+    except RuntimeError as e:
+        _fail(str(e))
+    append_entry(paths.ledger, f"findings package {finding}", out)
+    for k, v in out.items():
+        typer.echo(f"  {k}: {v}")
+
+
+gate_app = typer.Typer(no_args_is_help=True, help="Merge gate (D5).")
+app.add_typer(gate_app, name="gate")
+
+
+@gate_app.command("check")
+def gate_check_cmd(
+    task: Path = typer.Option(..., help="tasks/FIND-…"),
+    base: str = typer.Option(..., help="base commit"),
+    head: str = typer.Option(..., help="head commit (must be checked out)"),
+    runs: int | None = typer.Option(None),
+    seeds: str | None = typer.Option(None),
+    concurrency: int = typer.Option(4),
+    root: Path | None = typer.Option(None),
+) -> None:
+    """Run targeted + regression suites at HEAD, compare with the base version's stored outputs, write GATE.md."""
+    from codeloop.gate.check import gate_check
+    from codeloop.llm.client import build_client
+    from codeloop.tables import open_tables
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    client = build_client(paths.root)
+    _require_provider(client)
+    seed_list = [int(x) for x in seeds.split(",")] if seeds else None
+    try:
+        r = gate_check(paths, config, task_dir=task, base=base, head=head, llm=client, tables=open_tables(paths.tables_sqlite),
+                       runs=runs, seeds=seed_list, concurrency=concurrency)
+    except (RuntimeError, FileNotFoundError) as e:
+        _fail(str(e))
+    for c in r.checks:
+        typer.echo(f"  {'pass' if c.passed else 'FAIL'} {c.name}: {c.detail}")
+    typer.secho(f"GATE {'PASS' if r.passed else 'FAIL'}{' (route to human)' if r.route_to_human else ''} -> {task}/GATE.md",
+                fg=typer.colors.GREEN if r.passed else typer.colors.RED)
+    if not r.passed:
+        raise typer.Exit(1)
+
+
+version_app = typer.Typer(no_args_is_help=True, help="Version freezes (VERSION.md, tag, sealed holdout predictions).")
+app.add_typer(version_app, name="version")
+
+
+@version_app.command("freeze")
+def version_freeze(
+    version: str = typer.Argument(..., help="v0, v1, …"),
+    concurrency: int = typer.Option(4),
+    skip_holdout: bool = typer.Option(False, "--skip-holdout", help="do not run the sealed holdout prediction (tests only)"),
+    root: Path | None = typer.Option(None),
+) -> None:
+    """Freeze vK on a clean main: VERSION.md, tag, then sealed holdout predictions (D7)."""
+    from codeloop.holdout.sealed import SealedPredictError, sealed_predict
+    from codeloop.llm.client import build_client
+    from codeloop.seal.crypto import SealKeyError, passphrase_from_env
+    from codeloop.tables import open_tables
+    from codeloop.versioning.versions import VersionError, freeze_version
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        passphrase = None if skip_holdout else passphrase_from_env()
+        tables = None if skip_holdout else open_tables(paths.tables_sqlite)
+    except (SealKeyError, FileNotFoundError) as e:
+        _fail(str(e))
+
+    def do_predict(v: str) -> str | None:
+        if skip_holdout:
+            return None
+        client = build_client(paths.root, cache_enabled=False)
+        _require_provider(client)
+        return sealed_predict(paths, config, v, llm=client, tables=tables, passphrase=passphrase, concurrency=concurrency)
+
+    try:
+        r = freeze_version(paths, version, sealed_predict=do_predict)
+    except (VersionError, SealedPredictError) as e:
+        _fail(str(e))
+    typer.secho(f"{version} frozen at {r.tag_commit[:12]}; sealed predictions sha256={r.sealed_predictions_sha256}", fg=typer.colors.GREEN)
+
+
+holdout_app = typer.Typer(no_args_is_help=True, help="Holdout protocol (spec §15).")
+app.add_typer(holdout_app, name="holdout")
+
+
+@holdout_app.command("predict")
+def holdout_predict(
+    version: str = typer.Option(...), sealed: bool = typer.Option(False, "--sealed", help="required"),
+    concurrency: int = typer.Option(4), root: Path | None = typer.Option(None),
+) -> None:
+    """Sealed prediction for a frozen version (normally run by `version freeze`)."""
+    from codeloop.holdout.sealed import SealedPredictError, sealed_predict
+    from codeloop.llm.client import build_client
+    from codeloop.seal.crypto import SealKeyError, passphrase_from_env
+    from codeloop.tables import open_tables
+
+    if not sealed:
+        _fail("holdout predictions are only produced sealed (--sealed)")
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        client = build_client(paths.root, cache_enabled=False)
+        _require_provider(client)
+        digest = sealed_predict(paths, config, version, llm=client, tables=open_tables(paths.tables_sqlite),
+                                passphrase=passphrase_from_env(), concurrency=concurrency)
+    except (SealKeyError, SealedPredictError, FileNotFoundError) as e:
+        _fail(str(e))
+    typer.echo(f"sealed predictions written; sha256={digest}")
+
+
+@holdout_app.command("verify-scorer")
+def holdout_verify_scorer(root: Path | None = typer.Option(None)) -> None:
+    """Confirm codeloop/scoring hashes to the freeze hash and record it again."""
+    from codeloop.holdout.score import HoldoutError, verify_scorer
+
+    paths = _paths(root)
+    try:
+        h = verify_scorer(paths)
+    except HoldoutError as e:
+        _fail(str(e))
+    typer.secho(f"scorer verified: {h}", fg=typer.colors.GREEN)
+
+
+@holdout_app.command("score")
+def holdout_score_cmd(root: Path | None = typer.Option(None)) -> None:
+    """Reveal and score the holdout exactly once (writes data/sealed/SCORED.lock)."""
+    from codeloop.holdout.score import HoldoutError, holdout_score
+    from codeloop.seal.crypto import SealKeyError, passphrase_from_env
+
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        r = holdout_score(paths, config, passphrase=passphrase_from_env())
+    except (HoldoutError, SealKeyError) as e:
+        _fail(str(e))
+    typer.secho(f"holdout scored: {[(v, round(pv['mean_agreement'], 4)) for v, pv in r['per_version'].items()]} -> reports/holdout.md", fg=typer.colors.GREEN)
+
+
+@app.command()
+def report(root: Path | None = typer.Option(None)) -> None:
+    """Regenerate reports/ (curve, version × batch table, anchoring, findings log, index)."""
+    from codeloop.reporting.report import build_reports
+
+    paths = _paths(root)
+    summary = build_reports(paths)
+    typer.echo(f"reports regenerated: {len(summary['cells'])} version×batch cells; see reports/index.md")
+
+
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
 app.add_typer(llm_app, name="llm")
 
