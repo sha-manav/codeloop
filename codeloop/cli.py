@@ -582,6 +582,50 @@ def findings_package(finding: str = typer.Argument(...), root: Path | None = typ
         typer.echo(f"  {k}: {v}")
 
 
+@findings_app.command("cluster")
+def findings_cluster(batch: str = typer.Option(...), root: Path | None = typer.Option(None)) -> None:
+    """Optional LLM pass proposing merges/splits of the batch's candidate findings -> findings/proposals/<batch>.md."""
+    from codeloop.findings.cluster import cluster_findings
+    from codeloop.ledger import append_entry
+    from codeloop.llm.client import build_client
+    from codeloop.review_ui.store import EventStore
+    from codeloop.util.jsonl import read_jsonl
+
+    paths = _paths(root)
+    labels = read_jsonl(paths.labels_file(batch)) if paths.labels_file(batch).exists() else []
+    if not labels:
+        _fail(f"no labels for {batch}")
+    store = EventStore.from_jsonl(paths.review_dir(labels[0]["version_reviewed"], batch) / "events.jsonl")
+    client = build_client(paths.root)
+    _require_provider(client)
+    out = cluster_findings(paths, client, batch=batch, store=store)
+    append_entry(paths.ledger, f"findings cluster {batch}", {"proposal": out.relative_to(paths.root).as_posix(), "model": client.config.default.model})
+    typer.echo(f"wrote {out.relative_to(paths.root)} (a proposal; apply at triage)")
+
+
+export_app = typer.Typer(no_args_is_help=True, help="Exports.")
+app.add_typer(export_app, name="export")
+
+
+@export_app.command("labels")
+def export_labels(release: bool = typer.Option(False, "--release", help="required"), root: Path | None = typer.Option(None)) -> None:
+    """Write the ACI-Bench-Claims file (codes and evidence offsets only) after a license check."""
+    from codeloop.ledger import append_entry
+    from codeloop.reporting.export import ExportError, export_release
+    from codeloop.util.hashing import sha256_file
+
+    if not release:
+        _fail("pass --release to write the export")
+    paths = _paths(root)
+    config = load_project_config(paths.project_yaml)
+    try:
+        out, n = export_release(paths, config)
+    except ExportError as e:
+        _fail(str(e))
+    append_entry(paths.ledger, "export labels --release", {"records": n, "sha256": sha256_file(out)})
+    typer.echo(f"wrote {out.relative_to(paths.root)} ({n} records)")
+
+
 gate_app = typer.Typer(no_args_is_help=True, help="Merge gate (D5).")
 app.add_typer(gate_app, name="gate")
 
