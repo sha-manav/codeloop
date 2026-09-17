@@ -110,3 +110,21 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - core_lines: in_office_imaging ranges only (11/15 provisional precision, evaluable_n_est 45.5); other categories held
 - scope_yaml_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
 - owner_action: CPC grades the spot-check via `codeloop audit serve --reviewer <id>`, then `codeloop audit report`, revise scope.yaml, re-freeze before Phase 8
+
+## 2026-09-17T13:28:55Z — freeze
+
+- actor: manavshah <manavshah03@gmail.com>
+- codeloop_version: 0.1.0
+- split_seed: 20260918
+- sizes: {"batch1": 45, "batch2": 45, "batch3": 45, "seed": 20, "spare": 12}
+- blind_per_batch: 5
+- set_summary: {"batch1": {"mean_amazon_codes": 1.8, "mean_audit_flags": 0.733, "mean_difficulty": -0.193, "mean_note_len": 2580.778, "n": 45, "subsets": {"aci": 24, "virtassist": 12, "virtscribe": 9}}, "batch2": {"mean_amazon_codes": 2.2, "mean_audit_flags": 0.578, "mean_difficulty": -0.01, "mean_note_len": 2616.911, "n": 45, "subsets": {"aci": 24, "virtassist": 12, "virtscribe": 9}}, "batch3": {"mean_amazon_codes": 2.111, "mean_audit_flags": 0.533, "mean_difficulty": -0.009, "mean_note_len": 2740.178, "n": 45, "subsets": {"aci": 25, "virtassist": 11, "virtscribe": 9}}, "seed": {"mean_amazon_codes": 2.15, "mean_audit_flags": 0.7, "mean_difficulty": 0.269, "mean_note_len": 2742.35, "n": 20, "subsets": {"aci": 12, "virtassist": 5, "virtscribe": 3}}, "spare": {"mean_amazon_codes": 2.083, "mean_audit_flags": 0.75, "mean_difficulty": 0.345, "mean_note_len": 2796.917, "n": 12, "subsets": {"aci": 6, "virtassist": 4, "virtscribe": 2}}}
+- dev_split_sha256: 8172cd79122c28eda0d4ef2b492764df3ff5fa440d5ff6cb1fc10dd79784f332
+- scope_yaml_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
+- scope_status: provisional
+- project_yaml_sha256: 8879f817b7cad164f5d3c57337448f801148b69047fd1abcb72c8adad09b4c30
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- config_tree_sha256: f81acb30d3946d8880a3b4721e7523cbdc3322eeaa07cebda119961c947f637f
+- splits_tree_sha256: 6aeb65788dc2d07ace87d838fa52de386a03edb2b0be9a3569e353306e23e17b
+- scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- decisions: D0–D10 locked

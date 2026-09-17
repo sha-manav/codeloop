@@ -6,17 +6,17 @@ Edit the YAML, not this file. Status: `default` = builder default awaiting the o
 
 | ID | Decision | Value | Status | Change before |
 |---|---|---|---|---|
-| D0 | Seal seed | `20260917` | confirmed | Phase 0 |
-| D1 | Evidence policy for billable fields | `note_only` | default | Phase 3 |
-| D2 | Coder-facing reason taxonomy | `["missed", "unsupported", "specificity", "wrong_value", "guideline", "query_needed", "judgment"]` | default | Phase 3 |
-| D3 | Minimum occurrences for a finding | `{"if_seen_in_prior_batch": 2, "in_batch": 3}` | default | Phase 3 |
-| D4 | Eval runs per candidate | `{"runs": 3, "seeds": [1, 2, 3], "temperature": 0}` | default | Phase 3 |
-| D5 | Gate thresholds | `{"compliance_escalation_check": "required", "regression_mean_agreement_drop_max_pp": 1.0, "regression_per_type_recall_drop_max_pp": 2.0, "scrubber_errors": "non_increasing", "targeted_no_run_may_rise": true, "targeted_relative_error_reduction_min": 0.25}` | default | Phase 3 |
-| D6 | Minimum evaluable n for module-level holdout reporting | `10` | default | Phase 3 |
-| D7 | When holdout predictions are generated | `at_each_version_freeze_sealed` | default | Phase 3 |
-| D8 | Blind subset size and official label | `{"blind_per_batch": 5, "official_label": "reviewed"}` | default | Phase 3 |
-| D9 | Primary inferential metric | `{"interval": "paired_bootstrap_95", "primary": "mean_per_encounter_field_agreement", "resamples": 10000, "tier_intervals": "wilson", "tiers": [0.75, 0.9, 1.0]}` | default | Phase 3 |
-| D10 | Module activation rule | `{"evaluable_n_est_min": 15, "spot_check_confirmed_min": 5}` | default | Phase 2 |
+| D0 | Seal seed | `20260917` | locked | Phase 0 |
+| D1 | Evidence policy for billable fields | `note_only` | locked | Phase 3 |
+| D2 | Coder-facing reason taxonomy | `["missed", "unsupported", "specificity", "wrong_value", "guideline", "query_needed", "judgment"]` | locked | Phase 3 |
+| D3 | Minimum occurrences for a finding | `{"if_seen_in_prior_batch": 2, "in_batch": 3}` | locked | Phase 3 |
+| D4 | Eval runs per candidate | `{"runs": 3, "seeds": [1, 2, 3], "temperature": 0}` | locked | Phase 3 |
+| D5 | Gate thresholds | `{"compliance_escalation_check": "required", "regression_mean_agreement_drop_max_pp": 1.0, "regression_per_type_recall_drop_max_pp": 2.0, "scrubber_errors": "non_increasing", "targeted_no_run_may_rise": true, "targeted_relative_error_reduction_min": 0.25}` | locked | Phase 3 |
+| D6 | Minimum evaluable n for module-level holdout reporting | `10` | locked | Phase 3 |
+| D7 | When holdout predictions are generated | `at_each_version_freeze_sealed` | locked | Phase 3 |
+| D8 | Blind subset size and official label | `{"blind_per_batch": 5, "official_label": "reviewed"}` | locked | Phase 3 |
+| D9 | Primary inferential metric | `{"interval": "paired_bootstrap_95", "primary": "mean_per_encounter_field_agreement", "resamples": 10000, "tier_intervals": "wilson", "tiers": [0.75, 0.9, 1.0]}` | locked | Phase 3 |
+| D10 | Module activation rule | `{"evaluable_n_est_min": 15, "spot_check_confirmed_min": 5}` | locked | Phase 2 |
 
 ## Rationale
 
@@ -66,6 +66,6 @@ A module is on iff evaluable_n_est = flagged x spot-check precision >= 15 and at
 
 ## Seeds and parameters (not numbered decisions)
 
-- seeds: `{"seal_seed": 20260917, "second_cpc_seed": 20260919, "split_seed": 20260918}`
+- seeds: `{"audit_sample_seed": 20260920, "bootstrap_seed": 20260921, "seal_seed": 20260917, "second_cpc_seed": 20260919, "split_seed": 20260918}`
 - holdout: `{'n': 40, 'stratify_on': 'subset'}`
 - dev split: `{'seed': 20, 'batches': 3, 'batch_size': 45, 'spare': 12, 'blind_per_batch': 5}`
