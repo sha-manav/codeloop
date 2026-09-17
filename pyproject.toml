@@ -46,6 +46,7 @@ select = ["E", "F", "I", "B", "UP"]
 "codeloop/cli.py" = ["B008"]          # typer.Option(...) defaults are the Typer idiom
 "codeloop/ingest/report.py" = ["E501"]  # long Markdown lines in the report template
 "codeloop/audit/ui.py" = ["E501"]       # HTML template strings
+"codeloop/review_ui/app.py" = ["E501"]  # HTML/JS template strings
 "codeloop/audit/report.py" = ["E501"]   # Markdown report template
 "tests/*" = ["E501"]
 "codeloop/reporting/*" = ["E501"]  # Markdown report templates

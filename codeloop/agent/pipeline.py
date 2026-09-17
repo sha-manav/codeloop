@@ -236,12 +236,11 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
                 rationale=d.rationale,
             )
         )
-    first = next((d.code for d in diagnoses if d.first_listed), None)
     merged: dict[tuple[str, tuple[str, ...]], LinePred] = {}
     for d in line_decisions:
         if not d.code:
             continue
-        pointers = d.pointers or ([first] if first else [])
+        pointers = list(d.pointers)  # no fallback: a line without a resolvable pointer surfaces as a scrubber error
         key = (d.code, tuple(sorted(d.modifiers)))
         if key in merged:
             prev = merged[key]

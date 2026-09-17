@@ -128,3 +128,90 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - splits_tree_sha256: 6aeb65788dc2d07ace87d838fa52de386a03edb2b0be9a3569e353306e23e17b
 - scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
 - decisions: D0–D10 locked
+
+## 2026-09-17T13:44:22Z — tables build
+
+- actor: manavshah <manavshah03@gmail.com>
+- tables_yaml_sha256: 47a324256764e933abb47ef82eab82f0577f18f703a2bf80e04a3385210e3b89
+- row_counts: {"asp_ndc": 7367, "cvx": 290, "hcpcs": 16320, "hcpcs_modifiers": 579, "icd10cm": 98375, "icd10cm_index": 63109, "mue": 15212, "ptp": 2637645, "rvu": 19453}
+- tables_sqlite_sha256: 7191362299a10af92cdf2fe428a4bfe7dfee50abcadedae6f302fa4f95c9c2f8
+
+## 2026-09-17T13:51:05Z — run dev seed
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: dev-seed-20260917T135105Z-06731b
+- commit: 3c2bb7e08f75383f6c2bf50fdd590f5da34ccfb8
+- seeds: [1]
+- encounters: 2
+- llm_calls: 0
+- tokens_in: 0
+- tokens_out: 0
+- cache_hits: 0
+- failures: 2
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 0.0
+
+## 2026-09-17T13:52:43Z — run dev seed
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: dev-seed-20260917T135153Z-7801bd
+- commit: 2e5b6cff6b44be7c1cf50fa7230789fe332e6769
+- seeds: [1]
+- encounters: 1
+- llm_calls: 3
+- tokens_in: 7469
+- tokens_out: 2988
+- cache_hits: 0
+- failures: 0
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "c5b3070467df39d7524ddd7af741bdb069f0a3147b1860278e705f3f98ffbf01"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 0.11
+
+## 2026-09-17T13:55:06Z — run dev seed
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: dev-seed-20260917T135305Z-2e3c12
+- commit: 2e5b6cff6b44be7c1cf50fa7230789fe332e6769
+- seeds: [1]
+- encounters: 20
+- llm_calls: 47
+- tokens_in: 114241
+- tokens_out: 46126
+- cache_hits: 3
+- failures: 0
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "e201e2a3884059f7f680d549d523a4165870d0e895f47d43122c6a74f2a6117a"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 1.72
+
+## 2026-09-17T13:59:55Z — run dev seed
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: dev-seed-20260917T135844Z-26618f
+- commit: 2e5b6cff6b44be7c1cf50fa7230789fe332e6769
+- seeds: [1]
+- encounters: 20
+- llm_calls: 47
+- tokens_in: 114241
+- tokens_out: 47494
+- cache_hits: 27
+- failures: 0
+- scrubber_rule_counts: {"STRUCTURAL:error": 1}
+- compliance_failed: 0
+- predictions_sha256: {"1": "d807ff4e44bc223f9b97e4182af42c4db2b901e4c1b3c091adb06c3a1ef575ab"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 1.76

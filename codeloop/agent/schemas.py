@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 
 Status = Literal["active", "historical", "ruled_out"]
 Laterality = Literal["right", "left", "bilateral", "unspecified", "not_applicable"]
-Source = Literal["note", "dialogue"]
 ServiceCategory = Literal[
     "in_office_injection",
     "joint_aspiration_injection",
@@ -50,16 +49,8 @@ class Administration(BaseModel):
     kind: Literal["drug", "vaccine"] = "drug"
     dose: str | None = None
     route: str | None = None
-    wastage_documented: bool | None = None
-    wastage_amount: str | None = None
-    counseling_occurred: bool | None = None
-    counseling_by: str | None = None
-    note_quotes: list[str] = Field(default_factory=list)
-    dialogue_quotes: list[str] = Field(default_factory=list)
-
-
-class InOfficeTest(BaseModel):
-    description: str
+    wastage: str | None = None  # amount discarded as documented, else null
+    counseling: str | None = None  # who provided vaccine counseling as documented, else null
     note_quotes: list[str] = Field(default_factory=list)
     dialogue_quotes: list[str] = Field(default_factory=list)
 
@@ -67,17 +58,14 @@ class InOfficeTest(BaseModel):
 class PatientFacts(BaseModel):
     age_years: int | None = None
     age_quote: str | None = None
-    age_source: Source | None = None
     sex: Literal["male", "female"] | None = None
     sex_quote: str | None = None
-    sex_source: Source | None = None
 
 
 class Extraction(BaseModel):
     problems: list[Problem] = Field(default_factory=list)
     services: list[Service] = Field(default_factory=list)
     administrations: list[Administration] = Field(default_factory=list)
-    tests: list[InOfficeTest] = Field(default_factory=list)
     patient: PatientFacts = Field(default_factory=PatientFacts)
 
 

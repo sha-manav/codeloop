@@ -453,6 +453,62 @@ def calibration(
     typer.echo("\n".join(line for line in text.splitlines() if line.startswith("- ") or line.startswith("## ")))
 
 
+review_app_cli = typer.Typer(no_args_is_help=True, help="Coder review UI (review / blind / holdout-labeling modes).")
+app.add_typer(review_app_cli, name="review")
+
+
+@review_app_cli.command("serve")
+def review_serve(
+    coder_id: str = typer.Option(..., help="coder id recorded on every event"),
+    batch: str | None = typer.Option(None, help="batch name (review mode)"),
+    version: str | None = typer.Option(None, help="version whose draft is reviewed (review mode)"),
+    holdout_labeling: bool = typer.Option(False, "--holdout-labeling", help="blind-label the sealed holdout (Phase 9)"),
+    port: int = typer.Option(8766, help="port"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Serve the review UI at http://127.0.0.1:<port>/ for one coder."""
+    import uvicorn
+
+    from codeloop.review_ui.app import ReviewSession, create_review_app
+    from codeloop.seal.crypto import SealKeyError, passphrase_from_env
+
+    paths = _paths(root)
+    try:
+        if holdout_labeling:
+            session = ReviewSession(paths, batch="holdout", version="holdout", coder_id=coder_id, holdout_labeling=True,
+                                    passphrase=passphrase_from_env())
+        else:
+            if not batch or not version:
+                _fail("--batch and --version are required in review mode")
+            session = ReviewSession(paths, batch=batch, version=version, coder_id=coder_id)
+    except (SealKeyError, RuntimeError) as e:
+        _fail(str(e))
+    what = "holdout labeling" if holdout_labeling else f"{version}/{batch}"
+    typer.echo(f"review UI at http://127.0.0.1:{port}/ (coder {coder_id}, {what}); Ctrl-C to stop")
+    uvicorn.run(create_review_app(session), host="127.0.0.1", port=port, log_level="warning")
+
+
+labels_app = typer.Typer(no_args_is_help=True, help="CPC labels from review events.")
+app.add_typer(labels_app, name="labels")
+
+
+@labels_app.command("build")
+def labels_build(
+    batch: str = typer.Option(..., help="batch name"),
+    version: str = typer.Option(..., help="version whose review events to replay"),
+    root: Path | None = typer.Option(None, help="repository root"),
+) -> None:
+    """Replay review events into data/labels/<batch>.jsonl (approved encounters only)."""
+    from codeloop.review_ui.labels import LabelsError, build_labels
+
+    paths = _paths(root)
+    try:
+        r = build_labels(paths, batch=batch, version=version)
+    except LabelsError as e:
+        _fail(str(e))
+    typer.echo(f"wrote {r.labels_path} ({r.approved} approved; pending {len(r.pending)}); events -> {r.events_path}")
+
+
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
 app.add_typer(llm_app, name="llm")
 

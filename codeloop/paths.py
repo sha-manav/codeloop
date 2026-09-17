@@ -140,6 +140,20 @@ class Paths:
     def tables_raw(self) -> Path:
         return self.tables / "raw"
 
+    @property
+    def review(self) -> Path:
+        return self.data / "review"
+
+    def review_dir(self, version: str, batch: str) -> Path:
+        return self.review / version / batch
+
+    def labels_file(self, batch: str) -> Path:
+        return self.labels / f"{batch}.jsonl"
+
+    @property
+    def holdout_labels_enc(self) -> Path:
+        return self.sealed / "holdout_labels.enc"
+
     # --- other trees
     @property
     def reports(self) -> Path:
