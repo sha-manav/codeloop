@@ -1,20 +1,35 @@
 # Scope (spec §3). Decided by the Phase 2 audit and frozen in Phase 3.
 # The scorer applies this symmetrically to gold and predicted packages: only lines whose code is in
 # an *on* module's allowlist are kept; excluded modifiers and modifiers owned by *off* modules are
-# stripped; diagnoses are always kept. Until the audit fills core_lines.code_ranges, no line is in scope.
+# stripped; diagnoses are always kept.
+#
+# PROVISIONAL (2026-09-17): the spot-check grades behind these numbers are a machine stand-in
+# (reviewer `provisional:claude-fable-5-1`, see reports/audit.md), not a CPC judgment. When the CPC
+# grades the sample, re-run `codeloop audit report`, revise this file, and re-freeze before Phase 8.
 
 icd10cm_release: null   # pinned in Phase 4 together with config/tables.yaml
 
 modules:
   core_dx:        {on: true}
-  core_lines:     {on: true, code_ranges: []}   # filled by the audit: CPT/HCPCS ranges for confirmed service categories
-  vaccine_admin:  {on: false, threshold: 15, evaluable_n_est: null, code_ranges: ["90460-90461", "90471-90474"]}   # product range(s) added by the audit
-  distinct_59x:   {on: false, threshold: 15, evaluable_n_est: null, modifiers: ["59", "XE", "XS", "XP", "XU"]}
-  qw:             {on: false, threshold: 15, evaluable_n_est: null, modifiers: ["QW"]}
-  jw_jz:          {on: false, threshold: 15, evaluable_n_est: null, modifiers: ["JW", "JZ"]}
+  # in-office imaging: 62/167 dev encounters flagged, precision 11/15 (provisional), evaluable_n_est ≈ 45.
+  # Ranges by code number only: chest, spine, pelvis, upper extremity, lower extremity/hip, abdomen radiographs.
+  core_lines:     {on: true, code_ranges: ["71045-71048", "72020-72120", "72170-72190", "73000-73140", "73501-73660", "74018-74022"]}
+  # Held out of core_lines pending CPC grades (no confirmed flags in the provisional spot-check):
+  #   ecg 9 flagged (0/2 confirmed), waived_in_office_test 8 (0/2), other_procedure 17 (0/7),
+  #   joint_aspiration_injection 3 and spirometry 3 (not sampled).
+  vaccine_admin:  {on: false, threshold: 15, evaluable_n_est: 0, code_ranges: ["90460-90461", "90471-90474", "90476-90759", "91300-91322"]}
+  distinct_59x:   {on: false, threshold: 15, evaluable_n_est: 0, modifiers: ["59", "XE", "XS", "XP", "XU"]}
+  qw:             {on: false, threshold: 15, evaluable_n_est: 0, modifiers: ["QW"]}
+  jw_jz:          {on: false, threshold: 15, evaluable_n_est: 0, modifiers: ["JW", "JZ"]}
 
 exclusions:
   em_code_ranges: ["99202-99205", "99211-99215", "G2211"]   # stripped from both sides before scoring
   modifiers: ["25"]
 
 holdout_module_min_n: 10   # decision D6
+
+audit_provenance:
+  audit_report: reports/audit.md
+  status: provisional
+  graded_by: "provisional:claude-fable-5-1"
+  cpc_spot_check: pending

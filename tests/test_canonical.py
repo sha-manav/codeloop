@@ -66,3 +66,12 @@ def test_ranges():
     assert code_in_ranges("99204", ["99202-99205"]) and not code_in_ranges("99206", ["99202-99205"])
     s = Scope.model_validate({"modules": {"m": {"on": True, "code_ranges": ["0001U-0010U"]}}})
     assert s.in_scope_line("0005U") and s.module_for_line("0005U") == "m" and s.module_for_line("99213") is None
+
+
+def test_real_scope_yaml_loads_with_on_keys():
+    from tests.synthetic import REAL_ROOT
+
+    scope = Scope.load(REAL_ROOT / "config" / "scope.yaml")
+    assert scope.modules["core_dx"].on is True and scope.modules["qw"].on is False
+    assert scope.in_scope_line("73560") and not scope.in_scope_line("99213")
+    assert not scope.allowed_modifier("25") and not scope.allowed_modifier("QW") and scope.allowed_modifier("RT")

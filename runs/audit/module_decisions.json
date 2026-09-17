@@ -1,0 +1,168 @@
+{
+  "decisions": {
+    "distinct_59x": {
+      "category": "≥2 distinct procedure categories",
+      "confirmed": 0,
+      "evaluable_n_est": 0.0,
+      "on": false
+    },
+    "jw_jz": {
+      "category": "drug_administration_with_wastage",
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "on": false
+    },
+    "qw": {
+      "category": "waived_in_office_test",
+      "confirmed": 0,
+      "evaluable_n_est": 0.0,
+      "on": false
+    },
+    "vaccine_admin": {
+      "category": "immunization",
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "on": false
+    }
+  },
+  "generated_at": "2026-09-17T13:25:48Z",
+  "multi_procedure": {
+    "confirmed": 0,
+    "evaluable_n_est": 0.0,
+    "flagged_encounters": 15,
+    "graded": 3,
+    "precision": 0.0
+  },
+  "stats": {
+    "cerumen_removal": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "drug_administration_with_wastage": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "ecg": {
+      "confirmed": 0,
+      "evaluable_n_est": 0.0,
+      "flagged_encounters": 9,
+      "flags": 9,
+      "graded": 2,
+      "precision": 0.0,
+      "precision_high": 0.6576197724933469,
+      "precision_low": 0.0
+    },
+    "immunization": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "in_office_imaging": {
+      "confirmed": 11,
+      "evaluable_n_est": 45.46666666666666,
+      "flagged_encounters": 62,
+      "flags": 64,
+      "graded": 15,
+      "precision": 0.7333333333333333,
+      "precision_high": 0.8910254667430761,
+      "precision_low": 0.4804956594401943
+    },
+    "in_office_injection": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "joint_aspiration_injection": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 3,
+      "flags": 3,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "laceration_repair": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "lesion_destruction": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "nebulizer_treatment": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 0,
+      "flags": 0,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "other_procedure": {
+      "confirmed": 0,
+      "evaluable_n_est": 0.0,
+      "flagged_encounters": 17,
+      "flags": 18,
+      "graded": 7,
+      "precision": 0.0,
+      "precision_high": 0.35433043506668743,
+      "precision_low": 5.551115123125783e-17
+    },
+    "spirometry": {
+      "confirmed": 0,
+      "evaluable_n_est": null,
+      "flagged_encounters": 3,
+      "flags": 3,
+      "graded": 0,
+      "precision": null,
+      "precision_high": null,
+      "precision_low": null
+    },
+    "waived_in_office_test": {
+      "confirmed": 0,
+      "evaluable_n_est": 0.0,
+      "flagged_encounters": 8,
+      "flags": 9,
+      "graded": 2,
+      "precision": 0.0,
+      "precision_high": 0.6576197724933469,
+      "precision_low": 0.0
+    }
+  }
+}

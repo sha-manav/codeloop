@@ -1,0 +1,71 @@
+"""Thin git helpers (subprocess). Every call is content-free."""
+
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+
+class GitError(RuntimeError):
+    pass
+
+
+def _git(root: Path, *args: str, check: bool = True) -> str:
+    proc = subprocess.run(["git", *args], cwd=str(root), capture_output=True, text=True)
+    if check and proc.returncode != 0:
+        raise GitError(f"git {' '.join(args)} failed: {proc.stderr.strip()}")
+    return proc.stdout.strip()
+
+
+def is_repo(root: Path) -> bool:
+    try:
+        return _git(root, "rev-parse", "--is-inside-work-tree") == "true"
+    except GitError:
+        return False
+
+
+def current_commit(root: Path) -> str:
+    return _git(root, "rev-parse", "HEAD")
+
+
+def current_branch(root: Path) -> str:
+    return _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+
+
+def is_clean(root: Path) -> bool:
+    return _git(root, "status", "--porcelain") == ""
+
+
+def dirty_paths(root: Path) -> list[str]:
+    out = _git(root, "status", "--porcelain")
+    return [line[3:] for line in out.splitlines() if line.strip()]
+
+
+def tag_exists(root: Path, tag: str) -> bool:
+    return _git(root, "tag", "-l", tag) == tag
+
+
+def create_tag(root: Path, tag: str, message: str) -> None:
+    _git(root, "tag", "-a", tag, "-m", message)
+
+
+def describe_exact_tag(root: Path) -> str | None:
+    try:
+        return _git(root, "describe", "--tags", "--exact-match")
+    except GitError:
+        return None
+
+
+def tags_at_head(root: Path) -> list[str]:
+    out = _git(root, "tag", "--points-at", "HEAD")
+    return [t for t in out.splitlines() if t]
+
+
+def commit_all(root: Path, message: str) -> str:
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", message)
+    return current_commit(root)
+
+
+def tag_commit(root: Path, tag: str) -> str:
+    return _git(root, "rev-list", "-n", "1", tag)

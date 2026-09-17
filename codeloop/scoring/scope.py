@@ -43,7 +43,7 @@ class Scope(BaseModel):
     def load(cls, path: Path) -> Scope:
         with open(path, encoding="utf-8") as fh:
             raw = yaml.safe_load(fh) or {}
-        return cls.model_validate(raw)
+        return cls.model_validate(_fix_yaml_bool_keys(raw))
 
     def in_scope_line(self, code: str) -> bool:
         code = code.strip().upper()
@@ -72,6 +72,16 @@ class Scope(BaseModel):
     def filter_modifiers(self, modifiers: Iterable[str]) -> tuple[str, ...]:
         kept = {m.strip().upper() for m in modifiers if m and m.strip() and self.allowed_modifier(m)}
         return tuple(sorted(kept))
+
+
+def _fix_yaml_bool_keys(obj):
+    """YAML 1.1 reads the bare keys `on`/`off`/`yes`/`no` as booleans; the spec's module shape uses `on:`.
+    Restore those keys as strings so `{on: true}` means what it says."""
+    if isinstance(obj, dict):
+        return {("on" if k is True else "off" if k is False else k): _fix_yaml_bool_keys(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_fix_yaml_bool_keys(v) for v in obj]
+    return obj
 
 
 def parse_range(spec: str) -> tuple[str, str]:

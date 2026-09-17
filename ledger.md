@@ -43,3 +43,70 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - scoring_tree_sha256_pre_freeze: 8ac5646c3621c55d86b46de987433f46118117ffadaed942cc08cb47e8b5f02a
 - scope_yaml_sha256: fde4ce434b25714a9b6fd334fe06b03014ddde750309bc36a4e7a21411c9df49
 - note: codeloop/scoring is self-contained (stdlib + pydantic + yaml); the freeze hash is recorded at Phase 3
+
+## 2026-09-17T13:15:43Z — audit run
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: audit-20260917T131543Z-bac7d8
+- model: claude-opus-5
+- prompt_hash: ffe2bd81a064447d46e310ec9943f04fffefeb097e8ca7b40b150817ed1da6b7
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- encounters: 0
+- flags: 0
+- per_category_flags: {}
+- tokens_in: 0
+- tokens_out: 0
+- cache_hits: 0
+- failures: 1
+- estimated_cost_usd: 0.0
+
+## 2026-09-17T13:17:15Z — audit run
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: audit-20260917T131701Z-1790ac
+- model: claude-opus-5
+- prompt_hash: ffe2bd81a064447d46e310ec9943f04fffefeb097e8ca7b40b150817ed1da6b7
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- encounters: 3
+- flags: 3
+- per_category_flags: {"other_procedure": 3}
+- tokens_in: 11022
+- tokens_out: 1637
+- cache_hits: 0
+- failures: 0
+- estimated_cost_usd: 0.15
+
+## 2026-09-17T13:20:59Z — audit run
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: audit-20260917T131816Z-d9a3cb
+- model: claude-opus-5
+- prompt_hash: da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- encounters: 167
+- flags: 106
+- per_category_flags: {"ecg": 9, "in_office_imaging": 64, "joint_aspiration_injection": 3, "other_procedure": 18, "spirometry": 3, "waived_in_office_test": 9}
+- tokens_in: 527313
+- tokens_out: 57618
+- cache_hits: 0
+- failures: 0
+- estimated_cost_usd: 4.43
+
+## 2026-09-17T13:21:09Z — audit sample
+
+- actor: manavshah <manavshah03@gmail.com>
+- seed: 20260920
+- n: 30
+- population: 167
+- population_flagged: 86
+- encounter_ids: {"flagged": ["D2N004", "D2N048", "D2N054", "D2N086", "D2N094", "D2N096", "D2N109", "D2N117", "D2N120", "D2N131", "D2N133", "D2N141", "D2N160", "D2N184", "D2N193"], "random": ["D2N026", "D2N067", "D2N068", "D2N078", "D2N089", "D2N113", "D2N125", "D2N136", "D2N153", "D2N166", "D2N169", "D2N174", "D2N175", "D2N182", "D2N196"]}
+
+## 2026-09-17T13:27:28Z — gate: phase 2 (provisional)
+
+- actor: manavshah <manavshah03@gmail.com>
+- audit_report_sha256: aa482264bef4840ae31521b35022206bf06a91fb2d4aa27c96c678ab434dc3bb
+- spot_check_grader: provisional:claude-fable-5-1 (machine stand-in; CPC grades pending and will override)
+- module_decisions: {"distinct_59x": false, "jw_jz": false, "qw": false, "vaccine_admin": false}
+- core_lines: in_office_imaging ranges only (11/15 provisional precision, evaluable_n_est 45.5); other categories held
+- scope_yaml_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
+- owner_action: CPC grades the spot-check via `codeloop audit serve --reviewer <id>`, then `codeloop audit report`, revise scope.yaml, re-freeze before Phase 8

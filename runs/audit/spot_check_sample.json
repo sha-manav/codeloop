@@ -1,0 +1,165 @@
+{
+  "arms": {
+    "flagged": [
+      "D2N004",
+      "D2N048",
+      "D2N054",
+      "D2N086",
+      "D2N094",
+      "D2N096",
+      "D2N109",
+      "D2N117",
+      "D2N120",
+      "D2N131",
+      "D2N133",
+      "D2N141",
+      "D2N160",
+      "D2N184",
+      "D2N193"
+    ],
+    "random": [
+      "D2N026",
+      "D2N067",
+      "D2N068",
+      "D2N078",
+      "D2N089",
+      "D2N113",
+      "D2N125",
+      "D2N136",
+      "D2N153",
+      "D2N166",
+      "D2N169",
+      "D2N174",
+      "D2N175",
+      "D2N182",
+      "D2N196"
+    ]
+  },
+  "drawn_at": "2026-09-17T13:21:09Z",
+  "encounters": [
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N004"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N048"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N054"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N086"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N094"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N096"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N109"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N117"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N120"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N131"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N133"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N141"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N160"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N184"
+    },
+    {
+      "arm": "flagged",
+      "encounter_id": "D2N193"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N026"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N067"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N068"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N078"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N089"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N113"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N125"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N136"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N153"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N166"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N169"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N174"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N175"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N182"
+    },
+    {
+      "arm": "random",
+      "encounter_id": "D2N196"
+    }
+  ],
+  "n_requested": 30,
+  "population": 167,
+  "population_flagged": 86,
+  "seed": 20260920
+}

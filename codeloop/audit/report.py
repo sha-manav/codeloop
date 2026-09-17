@@ -68,6 +68,8 @@ def decide(stat: dict[str, Any], config: ProjectConfig) -> tuple[bool | None, st
     rule = config.decisions["D10"].value
     n_min = float(rule.get("evaluable_n_est_min", 15))
     c_min = int(rule.get("spot_check_confirmed_min", 5))
+    if stat.get("flagged_encounters", 0) == 0:
+        return False, "no flagged encounters (evaluable_n_est = 0)"
     if stat.get("precision") is None:
         return None, "undecided: no graded flags in the spot-check"
     on = stat["evaluable_n_est"] >= n_min and stat["confirmed"] >= c_min
@@ -117,9 +119,22 @@ def build_report(paths: Paths, config: ProjectConfig) -> str:
         lines.append(f"Sample drawn {sample['drawn_at']} with seed {sample['seed']}: {len(sample['arms']['flagged'])} flagged-arm + {len(sample['arms']['random'])} random-arm encounters out of {sample['population']} ({sample['population_flagged']} with ≥1 flag).")
     else:
         lines.append("No spot-check sample drawn yet (`codeloop audit sample --n 30`).")
+    reviewers: dict[str, int] = defaultdict(int)
+    for g in grades.values():
+        reviewers[g.reviewer] += 1
+    provisional = [r for r in reviewers if r.startswith("provisional")]
     lines += [
         f"Grades recorded: {len(grades)} flags graded ({sum(1 for g in grades.values() if g.decision == 'confirm')} confirmed); "
-        f"missed services reported by the CPC: {len(missed_events(events))}.",
+        f"missed services reported: {len(missed_events(events))}.",
+        f"Graders (latest grade per flag): {dict(sorted(reviewers.items())) or 'none'}.",
+    ]
+    if provisional:
+        lines += [
+            "",
+            f"**Provisional:** grades from {', '.join(provisional)} are a machine stand-in, not a CPC judgment. "
+            "The CPC's grades replace them automatically (latest grade per flag wins); the module decisions below are provisional until then.",
+        ]
+    lines += [
         "",
         "## Per-category prevalence and precision",
         "",

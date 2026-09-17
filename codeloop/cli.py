@@ -323,6 +323,25 @@ def audit_serve(
     uvicorn.run(ui, host="127.0.0.1", port=port, log_level="warning")
 
 
+@app.command()
+def freeze(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Phase 3: validate scope and decisions, compute the difficulty index, write the dev split, lock
+    decisions, record hashes, commit and tag `freeze`."""
+    from codeloop.versioning.freeze import FreezeError, perform_freeze
+    from codeloop.versioning.git import GitError
+
+    paths = _paths(root)
+    try:
+        result = perform_freeze(paths)
+    except (FreezeError, GitError) as e:
+        _fail(str(e))
+    typer.secho(f"frozen at {result.commit[:12]} (tag {result.tag})", fg=typer.colors.GREEN)
+    typer.echo(f"  scoring tree sha256={result.scoring_tree_sha256}")
+    typer.echo(f"  config tree sha256={result.config_tree_sha256}; splits tree sha256={result.splits_tree_sha256}")
+    for name, s in result.summary.items():
+        typer.echo(f"  {name}: n={s['n']} mean difficulty={s['mean_difficulty']:.3f} subsets={s['subsets']}")
+
+
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
 app.add_typer(llm_app, name="llm")
 
