@@ -1,0 +1,15 @@
+{
+  "aad": "holdout_encounters",
+  "cipher": "AES-256-GCM",
+  "ciphertext_sha256": "c05c062de63e1e1aaad0c2eb2141d7617ced7daa95755fdf87da150d0a9bef4c",
+  "format": "CLSEAL01",
+  "kdf": "scrypt",
+  "kdf_params": {
+    "length": 32,
+    "n": 131072,
+    "p": 1,
+    "r": 8
+  },
+  "nonce_hex": "d005d40e5b95c36a804e48b4",
+  "salt_hex": "c3ebdf162d452326c39c8e05870129c7"
+}
