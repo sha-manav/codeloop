@@ -1,6 +1,6 @@
 # CodeLoop reports
 
-Regenerated 2026-09-17T14:20:22Z from committed data. In-scope fields: diagnoses, first-listed, and lines in the scope allowlist; E/M is excluded.
+Regenerated 2026-09-18T06:38:14Z from committed data. In-scope fields: diagnoses, first-listed, and lines in the scope allowlist; E/M is excluded.
 
 ![curve](curve.svg)
 
