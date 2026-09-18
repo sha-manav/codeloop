@@ -57,17 +57,17 @@ def load_events(paths: Paths, path: Path | None = None) -> list[SpotCheckEvent]:
     return [SpotCheckEvent.model_validate(r) for r in read_jsonl(p)]
 
 
-def latest_grades(events: list[SpotCheckEvent]) -> dict[tuple[str, int], SpotCheckEvent]:
-    """Latest grade per (encounter, flag_index)."""
+def latest_grades(events: list[SpotCheckEvent], reviewer: str | None = None) -> dict[tuple[str, int], SpotCheckEvent]:
+    """Latest grade per (encounter, flag_index); `reviewer` restricts to one reviewer's own grades (UI display)."""
     out: dict[tuple[str, int], SpotCheckEvent] = {}
     for e in events:
-        if e.type == "grade" and e.flag_index is not None:
+        if e.type == "grade" and e.flag_index is not None and (reviewer is None or e.reviewer == reviewer):
             out[(e.encounter_id, e.flag_index)] = e
     return out
 
 
-def done_encounters(events: list[SpotCheckEvent]) -> set[str]:
-    return {e.encounter_id for e in events if e.type == "done"}
+def done_encounters(events: list[SpotCheckEvent], reviewer: str | None = None) -> set[str]:
+    return {e.encounter_id for e in events if e.type == "done" and (reviewer is None or e.reviewer == reviewer)}
 
 
 def missed_events(events: list[SpotCheckEvent]) -> list[SpotCheckEvent]:

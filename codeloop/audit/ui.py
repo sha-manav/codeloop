@@ -1,5 +1,8 @@
 """Minimal spot-check page for the CPC (FastAPI + vanilla HTML/JS, no build step).
 
+Each reviewer sees only their own grades and progress (other reviewers' decisions are never displayed, to
+avoid anchoring); the report merges all reviewers with the latest grade per flag winning.
+
 Shows each sampled dev encounter (note, collapsible transcript) with the audit's flags; the CPC
 confirms or denies each flag, may report a missed service, and marks the encounter done. Every
 action is appended to runs/audit/spot_check_responses.jsonl. Holdout encounters are never loaded.
@@ -84,8 +87,8 @@ def create_app(paths: Paths, reviewer: str, *, responses_path: Path | None = Non
     @app.get("/", response_class=HTMLResponse)
     def queue() -> str:
         events = load_events(paths, store_path)
-        done = done_encounters(events)
-        grades = latest_grades(events)
+        done = done_encounters(events, reviewer)
+        grades = latest_grades(events, reviewer)
         rows = []
         for eid in order:
             n_flags = len(results.get(eid, {"result": {"flags": []}})["result"]["flags"])
@@ -109,7 +112,7 @@ def create_app(paths: Paths, reviewer: str, *, responses_path: Path | None = Non
             raise HTTPException(404, "not in the spot-check sample")
         enc = encounters[eid]
         rec = results.get(eid, {"result": {"flags": [], "patient": {}}, "flag_spans": []})
-        grades = latest_grades(load_events(paths, store_path))
+        grades = latest_grades(load_events(paths, store_path), reviewer)
         flags_html = []
         for i, f in enumerate(rec["result"]["flags"]):
             g = grades.get((eid, i))

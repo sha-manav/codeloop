@@ -124,3 +124,22 @@ def test_ui_serves_sample_and_records_events(tmp_path):
     events = load_events(paths)
     assert [e.type for e in events] == ["grade", "done"] and events[0].reviewer == "cpc1" and events[0].comment == "yes"
     assert "1/30 done" in ui.get("/").text
+
+
+def test_ui_shows_only_the_current_reviewers_grades(tmp_path):
+    paths, config, encs, client, _ = _setup(tmp_path)
+    run_audit(paths, client, encs, seed=1, run_id="t")
+    write_spot_check_sample(paths, n=30, seed=7)
+    sample = json.loads((paths.runs / "audit" / "spot_check_sample.json").read_text())
+    eid = sample["arms"]["flagged"][0]
+    # a provisional reviewer graded everything and marked encounters done
+    append_event(paths, SpotCheckEvent(reviewer="provisional:x", encounter_id=eid, type="grade", flag_index=0, decision="confirm"))
+    append_event(paths, SpotCheckEvent(reviewer="provisional:x", encounter_id=eid, type="done"))
+    ui = TestClient(create_app(paths, reviewer="cpc1"))
+    assert "0/30 done" in ui.get("/").text
+    page = ui.get(f"/encounter/{eid}").text
+    assert "flag confirm" not in page and 'id="state-0">confirm' not in page and ">confirm</span>" not in page
+    # the report still merges reviewers: the provisional grade counts until the CPC overrides it
+    assert latest_grades(load_events(paths))[(eid, 0)].reviewer == "provisional:x"
+    ui.post("/api/event", json={"encounter_id": eid, "type": "grade", "flag_index": 0, "decision": "deny"})
+    assert latest_grades(load_events(paths))[(eid, 0)].reviewer == "cpc1" and latest_grades(load_events(paths), "cpc1")[(eid, 0)].decision == "deny"
