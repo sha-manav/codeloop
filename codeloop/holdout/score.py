@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -63,7 +64,9 @@ def holdout_score(
             "the holdout has already been scored (data/sealed/SCORED.lock exists); it is scored exactly once"
         )
     versions = versions or sorted(
-        p.name[len("predictions_") : -len(".enc")] for p in paths.sealed.glob("predictions_v*.enc")
+        name
+        for name in (p.name[len("predictions_") : -len(".enc")] for p in paths.sealed.glob("predictions_v*.enc"))
+        if re.fullmatch(r"v\d+", name)
     )
     if not versions:
         raise HoldoutError("no sealed predictions found")

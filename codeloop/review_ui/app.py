@@ -19,6 +19,7 @@ from pydantic import ValidationError
 
 from codeloop.ledger import utc_now
 from codeloop.paths import Paths
+from codeloop.review_ui.auth import install_basic_auth
 from codeloop.review_ui.replay import build_blind_label, replay, status_of
 from codeloop.review_ui.store import EventStore
 from codeloop.schemas.encounter import Encounter, load_encounters_jsonl
@@ -141,7 +142,8 @@ function renderPackage(label, draft){
 }
 async function load(){
   DATA = await api('/api/encounter/' + encodeURIComponent(EID));
-  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches}`;
+  const pend = DATA.pending || {fields: [], spans: [], queries: []};
+  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields, ${pend.spans.length} passages, ${pend.queries.length} queries`;
   document.getElementById('note').dataset.source = 'note'; document.getElementById('dialogue').dataset.source = 'dialogue';
   highlight([]);
   let right = '';
@@ -166,8 +168,15 @@ class ReviewSession:
     """Server state: encounters, blind subset, lazy predictions, event store, holdout label sealing."""
 
     def __init__(
-        self, paths: Paths, *, batch: str, version: str, coder_id: str, holdout_labeling: bool = False,
-        passphrase: str | None = None, store_path: Path | None = None,
+        self,
+        paths: Paths,
+        *,
+        batch: str,
+        version: str,
+        coder_id: str,
+        holdout_labeling: bool = False,
+        passphrase: str | None = None,
+        store_path: Path | None = None,
     ):
         self.paths, self.batch, self.version, self.coder_id = paths, batch, version, coder_id
         self.holdout = holdout_labeling
@@ -219,18 +228,32 @@ class ReviewSession:
     def record(self, payload: dict[str, Any]) -> Event:
         eid = payload["encounter_id"]
         mode = self.mode(eid)
-        ev = Event.model_validate({
-            **payload, "ts": payload.get("ts") or utc_now(), "coder_id": self.coder_id, "batch": self.batch,
-            "version": self.version, "mode": mode,
-        })
+        ev = Event.model_validate(
+            {
+                **payload,
+                "ts": payload.get("ts") or utc_now(),
+                "coder_id": self.coder_id,
+                "batch": self.batch,
+                "version": self.version,
+                "mode": mode,
+            }
+        )
         self.store.append(ev)
         return ev
 
     def blind_submit(self, eid: str) -> LabelRecord:
         events = self.events(eid)
         label = build_blind_label(events)
-        ev = Event(ts=utc_now(), coder_id=self.coder_id, encounter_id=eid, batch=self.batch, version=self.version,
-                   mode=self.mode(eid), type="blind_submit", after=label.model_dump(mode="json"))
+        ev = Event(
+            ts=utc_now(),
+            coder_id=self.coder_id,
+            encounter_id=eid,
+            batch=self.batch,
+            version=self.version,
+            mode=self.mode(eid),
+            type="blind_submit",
+            after=label.model_dump(mode="json"),
+        )
         self.store.append(ev)
         record = LabelRecord(encounter_id=eid, coder_id=self.coder_id, label=label, blind_label=label)
         if self.holdout:
@@ -250,6 +273,32 @@ class ReviewSession:
         existing[f"{record.coder_id}:{record.encounter_id}"] = record.model_dump(mode="json")
         plaintext = "".join(json.dumps(existing[k], sort_keys=True) + "\n" for k in sorted(existing)).encode("utf-8")
         encrypt_to_file(plaintext, p, self._passphrase, label="holdout_labels")
+
+    def pending(self, eid: str) -> dict[str, list[str]]:
+        """What still needs a decision before approval (coder guidelines §4): every drafted field accepted,
+        edited or removed; every cited passage graded; every provider query graded."""
+        events = self.events(eid)
+        draft = self.draft(eid) or {}
+        decided = {
+            e.field_ref for e in events if e.mode == "review" and e.type in ("accept", "edit", "remove") and e.field_ref
+        }
+        fields: list[str] = [f"dx:{d['code']}" for d in draft.get("diagnoses", [])]
+        spans: list[str] = [
+            f"dx:{d['code']}#{i}" for d in draft.get("diagnoses", []) for i, _ in enumerate(d.get("evidence", []))
+        ]
+        seen: dict[str, int] = {}
+        for ln in draft.get("lines", []):
+            idx = seen.get(ln["code"], 0)
+            seen[ln["code"]] = idx + 1
+            fields.append(f"line:{ln['code']}:{idx}")
+            spans.extend(f"line:{ln['code']}:{idx}#{i}" for i, _ in enumerate(ln.get("evidence", [])))
+        queries = [f"query:{i}" for i in range(len(draft.get("provider_queries", [])))]
+        rec = replay(eid, self.coder_id, draft, events)
+        return {
+            "fields": [f for f in fields if f not in decided],
+            "spans": [x for x in spans if x not in rec.evidence_grades],
+            "queries": [q for q in queries if q not in rec.query_grades],
+        }
 
     def state(self, eid: str) -> dict[str, Any]:
         enc = self.encounters[eid]
@@ -275,22 +324,36 @@ class ReviewSession:
                 seen[ln["code"]] = idx + 1
                 spans[f"line:{ln['code']}:{idx}"] = ln.get("evidence", [])
                 rationales[f"line:{ln['code']}:{idx}"] = ln.get("rationale", "")
-            draft_view = {"spans": spans, "rationales": rationales, "queries": draft_pkg.get("provider_queries", []),
-                          "scrubber": draft_pkg.get("scrubber", []), "data_gaps": draft_pkg.get("data_gaps", [])}
+            draft_view = {
+                "spans": spans,
+                "rationales": rationales,
+                "queries": draft_pkg.get("provider_queries", []),
+                "scrubber": draft_pkg.get("scrubber", []),
+                "data_gaps": draft_pkg.get("data_gaps", []),
+            }
         return {
-            "encounter_id": eid, "subset": enc.subset, "note_text": enc.note_text, "dialogue_text": enc.dialogue_text,
-            "mode": mode, "status": status_of(events), "draft": draft_view, "label": label.model_dump(mode="json"),
+            "encounter_id": eid,
+            "subset": enc.subset,
+            "note_text": enc.note_text,
+            "dialogue_text": enc.dialogue_text,
+            "mode": mode,
+            "status": status_of(events),
+            "draft": draft_view,
+            "label": label.model_dump(mode="json"),
             "touches": rec.touches if rec else 0,
             "accepted": [e.field_ref for e in events if e.type == "accept" and e.mode == "review"],
             "touched": [e.field_ref for e in events if e.type in ("edit", "add", "remove") and e.mode == "review"],
-            "evidence_grades": rec.evidence_grades if rec else {}, "query_grades": rec.query_grades if rec else {},
+            "evidence_grades": rec.evidence_grades if rec else {},
+            "query_grades": rec.query_grades if rec else {},
             "blind_submitted": self.blind_done(eid),
+            "pending": self.pending(eid) if mode == "review" else {"fields": [], "spans": [], "queries": []},
         }
 
 
 def create_review_app(session: ReviewSession) -> FastAPI:
     app = FastAPI(title="CodeLoop review")
     app.state.session = session
+    app.state.auth = install_basic_auth(app)
 
     @app.get("/", response_class=HTMLResponse)
     def queue() -> str:
@@ -299,11 +362,15 @@ def create_review_app(session: ReviewSession) -> FastAPI:
         for eid in session.order:
             st = status_of(session.events(eid))
             done += st == "approved"
-            rows.append(f"<tr><td><a href='/encounter/{html.escape(eid)}'>{html.escape(eid)}</a></td><td>{session.mode(eid)}</td><td>{st}</td></tr>")
+            rows.append(
+                f"<tr><td><a href='/encounter/{html.escape(eid)}'>{html.escape(eid)}</a></td><td>{session.mode(eid)}</td><td>{st}</td></tr>"
+            )
         title = "Holdout blind labeling" if session.holdout else f"Review {session.version} · {session.batch}"
-        body = (f"<header><strong>CodeLoop · {html.escape(title)}</strong><span>coder: {html.escape(session.coder_id)}</span>"
-                f"<span>{done}/{len(session.order)} approved</span></header><main style='grid-template-columns:1fr'><div class='pane'>"
-                "<table><tr><th>Encounter</th><th>Mode</th><th>Status</th></tr>" + "".join(rows) + "</table></div></main>")
+        body = (
+            f"<header><strong>CodeLoop · {html.escape(title)}</strong><span>coder: {html.escape(session.coder_id)}</span>"
+            f"<span>{done}/{len(session.order)} approved</span></header><main style='grid-template-columns:1fr'><div class='pane'>"
+            "<table><tr><th>Encounter</th><th>Mode</th><th>Status</th></tr>" + "".join(rows) + "</table></div></main>"
+        )
         return _page(title, body)
 
     @app.get("/encounter/{eid}", response_class=HTMLResponse)
@@ -311,11 +378,13 @@ def create_review_app(session: ReviewSession) -> FastAPI:
         if eid not in session.encounters:
             raise HTTPException(404, "not in this batch")
         enc = session.encounters[eid]
-        body = (f"<header><a href='/'>← queue</a><strong>{html.escape(eid)}</strong><span>{enc.subset}</span>"
-                f"<span id='modebar'></span><span>coder: {html.escape(session.coder_id)}</span></header><main>"
-                f"<div class='pane'><h3>Note</h3><pre id='note'>{html.escape(enc.note_text)}</pre>"
-                f"<details><summary>Transcript</summary><pre id='dialogue'>{html.escape(enc.dialogue_text)}</pre></details></div>"
-                "<div class='pane' id='right'>loading…</div></main>")
+        body = (
+            f"<header><a href='/'>← queue</a><strong>{html.escape(eid)}</strong><span>{enc.subset}</span>"
+            f"<span id='modebar'></span><span>coder: {html.escape(session.coder_id)}</span></header><main>"
+            f"<div class='pane'><h3>Note</h3><pre id='note'>{html.escape(enc.note_text)}</pre>"
+            f"<details><summary>Transcript</summary><pre id='dialogue'>{html.escape(enc.dialogue_text)}</pre></details></div>"
+            "<div class='pane' id='right'>loading…</div></main>"
+        )
         return _page(f"{eid}", body, eid=eid)
 
     @app.get("/api/encounter/{eid}")
@@ -344,8 +413,13 @@ def create_review_app(session: ReviewSession) -> FastAPI:
         if session.mode(eid) not in ("blind", "holdout"):
             raise HTTPException(400, "encounter is not in blind mode")
         rec = session.blind_submit(eid)
-        return JSONResponse({"ok": True, "blind_label": rec.blind_label.model_dump(mode="json") if rec.blind_label else None,
-                             "mode": session.mode(eid)})
+        return JSONResponse(
+            {
+                "ok": True,
+                "blind_label": rec.blind_label.model_dump(mode="json") if rec.blind_label else None,
+                "mode": session.mode(eid),
+            }
+        )
 
     @app.post("/api/approve")
     def api_approve(payload: dict[str, Any]) -> JSONResponse:
@@ -354,6 +428,14 @@ def create_review_app(session: ReviewSession) -> FastAPI:
             raise HTTPException(400, "unknown encounter")
         if session.mode(eid) != "review":
             raise HTTPException(400, "blind label must be submitted before approval")
+        pending = session.pending(eid)
+        if any(pending.values()):
+            raise HTTPException(
+                400,
+                "not ready to approve: "
+                f"{len(pending['fields'])} field(s) without accept/edit/remove {pending['fields'][:5]}, "
+                f"{len(pending['spans'])} passage(s) ungraded, {len(pending['queries'])} query(ies) ungraded",
+            )
         session.record({"encounter_id": eid, "type": "approve"})
         return JSONResponse({"ok": True})
 

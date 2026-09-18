@@ -156,6 +156,9 @@ def test_eval_runner_reports_variance(tmp_path):
 def test_version_freeze_sealed_predict_and_single_shot_score(tmp_path, monkeypatch):
     paths, config = _repo(tmp_path)
     tables = synthetic_tables()
+    # version freeze without git: VERSION.md + ledger (the sealed prediction is stubbed here and run explicitly below)
+    r = freeze_version(paths, "v0", sealed_predict=lambda v: None, do_git=False, actor="tests")
+    assert (paths.versions / "v0" / "VERSION.md").exists() and r.hashes["scoring_tree"] and "prompt:extract" in r.hashes
     client = _client(paths.root, FakeProvider(_provider(True)), cache=False)
     digest = sealed_predict(paths, config, "v0", llm=client, tables=tables, passphrase=FAKE_KEY, concurrency=2, check_tag=False, actor="tests")
     assert (paths.sealed / "predictions_v0.enc").exists() and (paths.sealed / "predictions_v0.sha256").read_text().startswith(digest)
@@ -165,9 +168,8 @@ def test_version_freeze_sealed_predict_and_single_shot_score(tmp_path, monkeypat
 
     with pytest.raises(SealedPredictError):
         sealed_predict(paths, config, "v1", llm=_client(paths.root, FakeProvider(_provider(True)), cache=True), tables=tables, passphrase=FAKE_KEY, check_tag=False)
-    # version freeze without git: VERSION.md + ledger
-    r = freeze_version(paths, "v0", sealed_predict=lambda v: digest, do_git=False, actor="tests")
-    assert (paths.versions / "v0" / "VERSION.md").exists() and r.hashes["scoring_tree"] and "prompt:extract" in r.hashes
+    with pytest.raises(VersionError):
+        freeze_version(paths, "v0", sealed_predict=lambda v: None, do_git=False)  # sealed predictions exist
     with pytest.raises(VersionError):
         freeze_version(paths, "x1", sealed_predict=lambda v: None, do_git=False)
     assert verify_scorer(paths, actor="tests")

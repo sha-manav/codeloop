@@ -20,6 +20,7 @@ services:
       - ../codeloop/scoring:/repo/codeloop/scoring:ro
       - ../codeloop/compliance:/repo/codeloop/compliance:ro
       - ../config:/repo/config:ro
+      - ../data/dev:/repo/data/dev:ro
       - ../data/splits:/repo/data/splits:ro
       - ../data/labels:/repo/data/labels:ro
       - ../data/labels_public:/repo/data/labels_public:ro

@@ -64,12 +64,14 @@ decisions:
       appeared in a prior batch; below that it stays a candidate and is re-checked next batch.
   D4:
     name: Eval runs per candidate
-    value: {runs: 3, temperature: 0, seeds: [1, 2, 3]}
+    value: {runs: 3, seeds: [1, 2, 3], temperature: null, provider_seed: null}
     change_before: Phase 3
     status: locked
     rationale: >-
-      Three runs at temperature 0 with fixed seeds where the provider supports them; report mean,
-      per-run values and run-to-run variance.
+      Three runs per candidate, reported as mean, per-run values and run-to-run variance. The pinned
+      model (claude-opus-5, see config/models.yaml) accepts neither a temperature nor a seed parameter,
+      so both are recorded as null; the seeds 1..3 are requested-seed labels that discriminate the
+      three runs in the LLM cache key and in traces, not provider sampling controls.
   D5:
     name: Gate thresholds
     value:

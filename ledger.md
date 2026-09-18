@@ -283,3 +283,16 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - scope_sha256: d9b14f65fd43b0f0cb5ef19e5a385017324308747368407605d3e71bed60eb03
 - tables_version: tables.yaml:47a324256764e933/parser:1
 - estimated_cost_usd: 4.41
+
+## 2026-09-18T06:29:31Z — coder guidelines committed
+
+- actor: manavshah <manavshah03@gmail.com>
+- file: docs/CODER_GUIDELINES.md
+- version: 1.0
+- sha256: 101e69ddbab0080e02d273e0e1d94edd42acf118f47d281ac78458d07472631c
+- evidence_policy: note_only (matches D1)
+
+## 2026-09-18T06:31:35Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Owner-requested edits after the freeze: D4 reworded (3 runs unchanged; temperature/provider seed recorded as null, seeds are cache-key discriminators), scope.yaml icd10cm_release pinned to FY2027. Config hashes now differ from the freeze entry; run 'codeloop freeze --supersede' (and 'codeloop version freeze v0 --supersede' if v0 should reflect the new config) before batch1 review.

@@ -10,7 +10,7 @@ Edit the YAML, not this file. Status: `default` = builder default awaiting the o
 | D1 | Evidence policy for billable fields | `note_only` | locked | Phase 3 |
 | D2 | Coder-facing reason taxonomy | `["missed", "unsupported", "specificity", "wrong_value", "guideline", "query_needed", "judgment"]` | locked | Phase 3 |
 | D3 | Minimum occurrences for a finding | `{"if_seen_in_prior_batch": 2, "in_batch": 3}` | locked | Phase 3 |
-| D4 | Eval runs per candidate | `{"runs": 3, "seeds": [1, 2, 3], "temperature": 0}` | locked | Phase 3 |
+| D4 | Eval runs per candidate | `{"provider_seed": null, "runs": 3, "seeds": [1, 2, 3], "temperature": null}` | locked | Phase 3 |
 | D5 | Gate thresholds | `{"compliance_escalation_check": "required", "regression_mean_agreement_drop_max_pp": 1.0, "regression_per_type_recall_drop_max_pp": 2.0, "scrubber_errors": "non_increasing", "targeted_no_run_may_rise": true, "targeted_relative_error_reduction_min": 0.25}` | locked | Phase 3 |
 | D6 | Minimum evaluable n for module-level holdout reporting | `10` | locked | Phase 3 |
 | D7 | When holdout predictions are generated | `at_each_version_freeze_sealed` | locked | Phase 3 |
@@ -38,7 +38,7 @@ A candidate becomes eligible at >=3 encounters in the batch, or >=2 if the same 
 
 ### D4 — Eval runs per candidate
 
-Three runs at temperature 0 with fixed seeds where the provider supports them; report mean, per-run values and run-to-run variance.
+Three runs per candidate, reported as mean, per-run values and run-to-run variance. The pinned model (claude-opus-5, see config/models.yaml) accepts neither a temperature nor a seed parameter, so both are recorded as null; the seeds 1..3 are requested-seed labels that discriminate the three runs in the LLM cache key and in traces, not provider sampling controls.
 
 ### D5 — Gate thresholds
 

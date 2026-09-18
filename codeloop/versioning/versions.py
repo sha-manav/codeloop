@@ -66,6 +66,40 @@ def render_version_md(version: str, commit: str, hashes: dict[str, str], models_
     return "\n".join(lines)
 
 
+def supersede_version(
+    paths: Paths, version: str, *, reason: str, actor: str | None = None, do_git: bool = True
+) -> dict[str, str]:
+    """Retire a frozen version: tag vK -> vK-provisional, versions/vK -> versions/vK-provisional, sealed
+    predictions/traces and runs/vK renamed with the same suffix, and a correction entry in the ledger."""
+    info: dict[str, str] = {"reason": reason, "version": version}
+    suffix = f"{version}-provisional"
+    if do_git and git.tag_exists(paths.root, version):
+        info["previous_commit"] = git.tag_commit(paths.root, version)
+        suffix = git.rename_tag(paths.root, version, suffix)  # …-provisional-2 if a previous supersede exists
+        info["renamed_tag"] = suffix
+    moves = [
+        (paths.versions / version, paths.versions / suffix),
+        (paths.runs / version, paths.runs / suffix),
+        (paths.sealed / f"predictions_{version}.enc", paths.sealed / f"predictions_{suffix}.enc"),
+        (paths.sealed / f"predictions_{version}.enc.meta.json", paths.sealed / f"predictions_{suffix}.enc.meta.json"),
+        (paths.sealed / f"predictions_{version}.sha256", paths.sealed / f"predictions_{suffix}.sha256"),
+        (paths.sealed / f"traces_{version}.enc", paths.sealed / f"traces_{suffix}.enc"),
+        (paths.sealed / f"traces_{version}.enc.meta.json", paths.sealed / f"traces_{suffix}.enc.meta.json"),
+    ]
+    moved = []
+    for src, dst in moves:
+        if src.exists():
+            if dst.exists():
+                raise VersionError(f"{dst.relative_to(paths.root)} already exists; cannot supersede")
+            src.rename(dst)
+            moved.append(f"{src.relative_to(paths.root)} -> {dst.relative_to(paths.root)}")
+    info["moved"] = "; ".join(moved) or "nothing"
+    append_entry(paths.ledger, f"version {version} superseded (correction)", info, actor=actor)
+    if do_git:
+        git.commit_all(paths.root, f"{version}: superseded ({suffix})")
+    return info
+
+
 def freeze_version(
     paths: Paths,
     version: str,
@@ -74,6 +108,8 @@ def freeze_version(
     actor: str | None = None,
     do_git: bool = True,
     require_main: bool = True,
+    supersede: bool = False,
+    reason: str = "superseded by the owner",
 ) -> VersionResult:
     """`sealed_predict(version) -> str | None` runs the sealed holdout prediction and returns the ciphertext hash."""
     if not re.fullmatch(r"v\d+", version):
@@ -81,12 +117,16 @@ def freeze_version(
     if do_git:
         if not git.tag_exists(paths.root, FREEZE_TAG):
             raise VersionError("Phase 3 freeze tag missing")
-        if git.tag_exists(paths.root, version):
-            raise VersionError(f"tag {version} already exists")
         if require_main and git.current_branch(paths.root) != "main":
             raise VersionError("version freezes happen on main")
         if not git.is_clean(paths.root):
             raise VersionError("working tree must be clean: " + ", ".join(git.dirty_paths(paths.root)[:10]))
+    if supersede:
+        supersede_version(paths, version, reason=reason, actor=actor, do_git=do_git)
+    if do_git and git.tag_exists(paths.root, version):
+        raise VersionError(f"tag {version} already exists (use --supersede)")
+    if (paths.sealed / f"predictions_{version}.enc").exists():
+        raise VersionError(f"sealed predictions for {version} already exist (use --supersede)")
     frozen = frozen_scoring_hash(paths)
     hashes = collect_hashes(paths)
     if frozen and hashes["scoring_tree"] != frozen:

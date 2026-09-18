@@ -319,12 +319,16 @@ def audit_serve(
         ui = create_app(paths, reviewer)
     except RuntimeError as e:
         _fail(str(e))
-    typer.echo(f"spot-check UI at http://127.0.0.1:{port}/ (reviewer {reviewer}); Ctrl-C to stop")
+    typer.echo(f"spot-check UI at http://127.0.0.1:{port}/ (reviewer {reviewer}; basic auth {'on' if ui.state.auth else 'off'}); Ctrl-C to stop")
     uvicorn.run(ui, host="127.0.0.1", port=port, log_level="warning")
 
 
 @app.command()
-def freeze(root: Path | None = typer.Option(None, help="repository root")) -> None:
+def freeze(
+    root: Path | None = typer.Option(None, help="repository root"),
+    supersede: bool = typer.Option(False, "--supersede", help="retire the existing freeze (tag -> freeze-provisional, ledger correction) and freeze afresh"),
+    reason: str = typer.Option("superseded by the owner", help="recorded in the ledger correction entry"),
+) -> None:
     """Phase 3: validate scope and decisions, compute the difficulty index, write the dev split, lock
     decisions, record hashes, commit and tag `freeze`."""
     from codeloop.versioning.freeze import FreezeError, perform_freeze
@@ -332,10 +336,12 @@ def freeze(root: Path | None = typer.Option(None, help="repository root")) -> No
 
     paths = _paths(root)
     try:
-        result = perform_freeze(paths)
+        result = perform_freeze(paths, supersede=supersede, reason=reason)
     except (FreezeError, GitError) as e:
         _fail(str(e))
     typer.secho(f"frozen at {result.commit[:12]} (tag {result.tag})", fg=typer.colors.GREEN)
+    if supersede:
+        typer.echo("  previous freeze kept as tag freeze-provisional; push with: git push --force origin --tags")
     typer.echo(f"  scoring tree sha256={result.scoring_tree_sha256}")
     typer.echo(f"  config tree sha256={result.config_tree_sha256}; splits tree sha256={result.splits_tree_sha256}")
     for name, s in result.summary.items():
@@ -484,8 +490,9 @@ def review_serve(
     except (SealKeyError, RuntimeError) as e:
         _fail(str(e))
     what = "holdout labeling" if holdout_labeling else f"{version}/{batch}"
-    typer.echo(f"review UI at http://127.0.0.1:{port}/ (coder {coder_id}, {what}); Ctrl-C to stop")
-    uvicorn.run(create_review_app(session), host="127.0.0.1", port=port, log_level="warning")
+    ui = create_review_app(session)
+    typer.echo(f"review UI at http://127.0.0.1:{port}/ (coder {coder_id}, {what}; basic auth {'on' if ui.state.auth else 'off'}); Ctrl-C to stop")
+    uvicorn.run(ui, host="127.0.0.1", port=port, log_level="warning")
 
 
 labels_app = typer.Typer(no_args_is_help=True, help="CPC labels from review events.")
@@ -672,6 +679,8 @@ def version_freeze(
     version: str = typer.Argument(..., help="v0, v1, …"),
     concurrency: int = typer.Option(4),
     skip_holdout: bool = typer.Option(False, "--skip-holdout", help="do not run the sealed holdout prediction (tests only)"),
+    supersede: bool = typer.Option(False, "--supersede", help="retire the existing vK (tag -> vK-provisional, artefacts renamed, ledger correction) and freeze afresh"),
+    reason: str = typer.Option("superseded by the owner", help="recorded in the ledger correction entry"),
     root: Path | None = typer.Option(None),
 ) -> None:
     """Freeze vK on a clean main: VERSION.md, tag, then sealed holdout predictions (D7)."""
@@ -697,10 +706,12 @@ def version_freeze(
         return sealed_predict(paths, config, v, llm=client, tables=tables, passphrase=passphrase, concurrency=concurrency)
 
     try:
-        r = freeze_version(paths, version, sealed_predict=do_predict)
+        r = freeze_version(paths, version, sealed_predict=do_predict, supersede=supersede, reason=reason)
     except (VersionError, SealedPredictError) as e:
         _fail(str(e))
     typer.secho(f"{version} frozen at {r.tag_commit[:12]}; sealed predictions sha256={r.sealed_predictions_sha256}", fg=typer.colors.GREEN)
+    if supersede:
+        typer.echo(f"  previous {version} kept as tag {version}-provisional; push with: git push --force origin --tags")
 
 
 holdout_app = typer.Typer(no_args_is_help=True, help="Holdout protocol (spec §15).")
@@ -768,6 +779,20 @@ def report(root: Path | None = typer.Option(None)) -> None:
     paths = _paths(root)
     summary = build_reports(paths)
     typer.echo(f"reports regenerated: {len(summary['cells'])} version×batch cells; see reports/index.md")
+
+
+ledger_app = typer.Typer(no_args_is_help=True, help="Append-only ledger.")
+app.add_typer(ledger_app, name="ledger")
+
+
+@ledger_app.command("note")
+def ledger_note(text: str = typer.Argument(..., help="free-text note"), root: Path | None = typer.Option(None)) -> None:
+    """Append a free-text entry to ledger.md (timestamp and actor are recorded)."""
+    from codeloop.ledger import append_entry
+
+    paths = _paths(root)
+    append_entry(paths.ledger, "note", {"text": text})
+    typer.echo("ledger entry appended")
 
 
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")

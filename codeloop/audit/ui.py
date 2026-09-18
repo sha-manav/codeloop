@@ -18,6 +18,7 @@ from codeloop.audit.run import load_results
 from codeloop.audit.sample import load_spot_check_sample
 from codeloop.audit.schema import CATEGORIES
 from codeloop.paths import Paths
+from codeloop.review_ui.auth import install_basic_auth
 from codeloop.schemas.encounter import Encounter, load_encounters_jsonl
 
 _CSS = """
@@ -68,6 +69,7 @@ def _page(title: str, body: str) -> str:
 
 def create_app(paths: Paths, reviewer: str) -> FastAPI:
     app = FastAPI(title="CodeLoop audit spot-check")
+    app.state.auth = install_basic_auth(app)
     encounters: dict[str, Encounter] = {e.id: e for e in load_encounters_jsonl(paths.dev_encounters)}
     results = load_results(paths)
     sample = load_spot_check_sample(paths)

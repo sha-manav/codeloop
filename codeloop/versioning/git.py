@@ -86,3 +86,18 @@ def code_matches_tag(root: Path, tag: str, dirs: tuple[str, ...] = CODE_DIRS) ->
     if not tag_exists(root, tag):
         return False
     return all(tree_id(root, "HEAD", d) == tree_id(root, tag, d) for d in dirs)
+
+
+def rename_tag(root: Path, old: str, new_base: str) -> str:
+    """Move tag `old` to `new_base` (or new_base-2, -3, … if taken) at the same commit; returns the new name."""
+    if not tag_exists(root, old):
+        raise GitError(f"tag {old!r} does not exist")
+    new = new_base
+    n = 1
+    while tag_exists(root, new):
+        n += 1
+        new = f"{new_base}-{n}"
+    commit = tag_commit(root, old)
+    _git(root, "tag", "-a", new, commit, "-m", f"superseded {old}")
+    _git(root, "tag", "-d", old)
+    return new

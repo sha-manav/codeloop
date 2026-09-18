@@ -7,7 +7,7 @@
 # (reviewer `provisional:claude-fable-5-1`, see reports/audit.md), not a CPC judgment. When the CPC
 # grades the sample, re-run `codeloop audit report`, revise this file, and re-freeze before Phase 8.
 
-icd10cm_release: null   # pinned in Phase 4 together with config/tables.yaml
+icd10cm_release: FY2027   # matches config/tables.yaml (2027 code descriptions, effective 2026-10-01)
 
 modules:
   core_dx:        {on: true}

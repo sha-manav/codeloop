@@ -69,8 +69,18 @@ def test_blind_mode_never_serves_predictions_and_reveals_after_submit(tmp_path):
     assert [d["code"] for d in r["label"]["diagnoses"]] == ["M1712"] and [ln["code"] for ln in r["label"]["lines"]] == ["73562", "96372"]
     assert r["evidence_grades"] == {"dx:M1711#0": "supported"} and r["query_grades"] == {"query:0": "warranted"}
     assert ui.get("/").status_code == 200 and ui.get(f"/encounter/{review_id}").status_code == 200 and ui.get("/encounter/D2N999").status_code == 404
+    # approve is refused until every drafted field, passage and query has a decision (guidelines §4)
+    r = ui.post("/api/approve", json={"encounter_id": blind_id})
+    assert r.status_code == 400 and "not ready to approve" in r.text
+    for ev in (
+        {"type": "accept", "field_ref": "dx:M1711"}, {"type": "accept", "field_ref": "line:73562:0"},
+        {"type": "grade_evidence", "field_ref": "dx:M1711", "span_id": "dx:M1711#0", "grade": "unsupported"},
+        {"type": "grade_query", "field_ref": "query:0", "grade": "unwarranted"},
+    ):
+        assert ui.post("/api/event", json={"encounter_id": blind_id, **ev}).status_code == 200
+    assert ui.get(f"/api/encounter/{blind_id}").json()["pending"] == {"fields": [], "spans": [], "queries": []}
     # labels build: only approved encounters, with touches/minutes/grades; blind label kept separately
-    ui.post("/api/approve", json={"encounter_id": blind_id})
+    assert ui.post("/api/approve", json={"encounter_id": blind_id}).status_code == 200
     result = build_labels(paths, batch="spare", version="dev", store=session.store, actor="tests")
     assert result.approved == 2 and len(result.pending) == len(ids) - 2
     labels = {r["encounter_id"]: r for r in read_jsonl(paths.labels_file("spare"))}

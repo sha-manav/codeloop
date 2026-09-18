@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from typing import Any
 
@@ -18,7 +19,7 @@ BATCHES = ("batch1", "batch2", "batch3")
 
 
 def _versions(paths: Paths) -> list[str]:
-    return sorted(p.name for p in paths.runs.glob("v*") if p.is_dir())
+    return sorted(p.name for p in paths.runs.glob("v*") if p.is_dir() and re.fullmatch(r"v\d+", p.name))
 
 
 def cell_tag(version: str, batch: str) -> str:

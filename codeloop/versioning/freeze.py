@@ -53,8 +53,12 @@ def difficulty_index(
     z_len, z_codes, z_flags = _z(note_len), _z(n_codes), _z(n_flags)
     return {
         i: {
-            "note_len": note_len[k], "n_amazon_codes": n_codes[k], "n_audit_flags": n_flags[k],
-            "z_note_len": z_len[k], "z_amazon_codes": z_codes[k], "z_audit_flags": z_flags[k],
+            "note_len": note_len[k],
+            "n_amazon_codes": n_codes[k],
+            "n_audit_flags": n_flags[k],
+            "z_note_len": z_len[k],
+            "z_amazon_codes": z_codes[k],
+            "z_audit_flags": z_flags[k],
             "difficulty": z_len[k] + z_codes[k] + z_flags[k],
         }
         for k, i in enumerate(ids)
@@ -174,23 +178,52 @@ def validate_scope(scope_path: Path) -> Scope:
     return scope
 
 
+def supersede_freeze(paths: Paths, *, reason: str, actor: str | None = None, do_git: bool = True) -> dict[str, str]:
+    """Retire the current freeze: tag `freeze` -> `freeze-provisional`, dev_split.json -> a .provisional copy,
+    and a correction entry in the ledger. The caller then proceeds as a fresh freeze."""
+    info: dict[str, str] = {"reason": reason}
+    if do_git and git.tag_exists(paths.root, FREEZE_TAG):
+        info["previous_commit"] = git.tag_commit(paths.root, FREEZE_TAG)
+        info["renamed_tag"] = git.rename_tag(paths.root, FREEZE_TAG, f"{FREEZE_TAG}-provisional")
+    if paths.dev_split.exists():
+        stamp = utc_now().replace(":", "").replace("-", "")
+        moved = paths.splits / f"dev_split.provisional-{stamp}.json"
+        paths.dev_split.rename(moved)
+        info["previous_dev_split"] = moved.relative_to(paths.root).as_posix()
+        info["previous_dev_split_sha256"] = sha256_file(moved)
+    prev = frozen_scoring_hash(paths)
+    if prev:
+        info["previous_scoring_tree_sha256"] = prev
+    append_entry(paths.ledger, "freeze superseded (correction)", info, actor=actor)
+    return info
+
+
 def perform_freeze(
-    paths: Paths, *, actor: str | None = None, require_clean: bool = True, do_git: bool = True
+    paths: Paths,
+    *,
+    actor: str | None = None,
+    require_clean: bool = True,
+    do_git: bool = True,
+    supersede: bool = False,
+    reason: str = "superseded by the owner",
 ) -> FreezeResult:
     config = load_project_config(paths.project_yaml)
     validate_scope(paths.scope_yaml)
     if not paths.holdout_ids.exists():
         raise FreezeError("holdout not sealed; run Phase 0 first")
+    if do_git and not git.is_repo(paths.root):
+        raise FreezeError("not a git repository")
+    if do_git and require_clean and not git.is_clean(paths.root):
+        dirty = ", ".join(git.dirty_paths(paths.root)[:10])
+        raise FreezeError(f"working tree must be clean before freezing: {dirty}")
+    if supersede:
+        supersede_freeze(paths, reason=reason, actor=actor, do_git=do_git)
     if paths.dev_split.exists():
-        raise FreezeError(f"{paths.dev_split.relative_to(paths.root)} exists; the freeze happens once")
-    if do_git:
-        if not git.is_repo(paths.root):
-            raise FreezeError("not a git repository")
-        if git.tag_exists(paths.root, FREEZE_TAG):
-            raise FreezeError(f"tag {FREEZE_TAG!r} already exists")
-        if require_clean and not git.is_clean(paths.root):
-            dirty = ", ".join(git.dirty_paths(paths.root)[:10])
-            raise FreezeError(f"working tree must be clean before freezing: {dirty}")
+        raise FreezeError(
+            f"{paths.dev_split.relative_to(paths.root)} exists; the freeze happens once (use --supersede)"
+        )
+    if do_git and git.tag_exists(paths.root, FREEZE_TAG):
+        raise FreezeError(f"tag {FREEZE_TAG!r} already exists (use --supersede)")
     encounters, amazon, flags = load_split_inputs(paths)
     holdout = set(paths.holdout_ids.read_text().split())
     if any(e.id in holdout for e in encounters):
@@ -202,7 +235,11 @@ def perform_freeze(
     difficulty = difficulty_index(encounters, amazon, flags)
     ds = config.dev_split
     sizes = {
-        "seed": ds.seed, "batch1": ds.batch_size, "batch2": ds.batch_size, "batch3": ds.batch_size, "spare": ds.spare,
+        "seed": ds.seed,
+        "batch1": ds.batch_size,
+        "batch2": ds.batch_size,
+        "batch3": ds.batch_size,
+        "spare": ds.spare,
     }
     split = stratified_split(
         encounters, difficulty, sizes=sizes, blind_per_batch=ds.blind_per_batch, seed=int(config.seeds["split_seed"])
@@ -244,8 +281,12 @@ def perform_freeze(
         commit = git.commit_all(paths.root, "Phase 3: freeze (dev split, locked decisions, scoring hash)")
         git.create_tag(paths.root, FREEZE_TAG, f"CodeLoop freeze; scoring tree {scoring_hash}")
     return FreezeResult(
-        commit=commit, tag=FREEZE_TAG if do_git else "", scoring_tree_sha256=scoring_hash,
-        config_tree_sha256=config_hash, splits_tree_sha256=splits_hash, dev_split_sha256=sha256_file(paths.dev_split),
+        commit=commit,
+        tag=FREEZE_TAG if do_git else "",
+        scoring_tree_sha256=scoring_hash,
+        config_tree_sha256=config_hash,
+        splits_tree_sha256=splits_hash,
+        dev_split_sha256=sha256_file(paths.dev_split),
         summary=split["summary"],
     )
 

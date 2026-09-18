@@ -70,6 +70,20 @@ codeloop holdout verify-scorer && codeloop holdout score  # single-shot holdout 
 codeloop report                                     # regenerate reports/
 ```
 
+## Operating notes
+
+- **Protecting the local UIs.** Set `CODELOOP_UI_USER` and `CODELOOP_UI_PASSWORD` before `codeloop review serve` or
+  `codeloop audit serve` to require HTTP basic auth on every request (useful when the coder connects over a tunnel).
+  Leave both unset for single-user local use; setting only one is refused.
+- **Correcting a freeze.** Decisions and scope are locked at the freeze, and a version is frozen once. If a correction is
+  unavoidable (for example the CPC's spot-check changes the scope before any batch is reviewed), run
+  `codeloop freeze --supersede --reason "..."` or `codeloop version freeze v0 --supersede --reason "..."`. The previous
+  tag survives as `freeze-provisional` / `v0-provisional` (numbered if repeated), the previous split, VERSION.md, sealed
+  predictions and run outputs are renamed with the same suffix, a correction entry is appended to `ledger.md`, and a
+  fresh freeze proceeds. Push with `git push --force origin --tags` afterwards.
+- **Free-text ledger entries.** `codeloop ledger note "CPC onboarded"` appends a timestamped, attributed note.
+- **Coder guidelines** live in `docs/CODER_GUIDELINES.md` and must state the same evidence policy as decision D1.
+
 ## Status
 
 | Phase | State |
