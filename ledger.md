@@ -424,3 +424,12 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - splits_tree_sha256: 16d82ac2b4b347ea91ede4949401a341a97d7d4489d259e77613eceea1cacef1
 - scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
 - decisions: D0–D10 locked
+
+## 2026-09-18T22:29:55Z — version v0 superseded (correction)
+
+- actor: manavshah <manavshah03@gmail.com>
+- reason: mapper now adds modifier 26 to X-ray lines per guidelines v1.1
+- version: v0
+- previous_commit: bfa5d76d595e7e59f6d922791701d1e84cc03966
+- renamed_tag: v0-provisional-2
+- moved: versions/v0 -> versions/v0-provisional-2; runs/v0 -> runs/v0-provisional-2; data/sealed/predictions_v0.enc -> data/sealed/predictions_v0-provisional-2.enc; data/sealed/predictions_v0.enc.meta.json -> data/sealed/predictions_v0-provisional-2.enc.meta.json; data/sealed/predictions_v0.sha256 -> data/sealed/predictions_v0-provisional-2.sha256; data/sealed/traces_v0.enc -> data/sealed/traces_v0-provisional-2.enc; data/sealed/traces_v0.enc.meta.json -> data/sealed/traces_v0-provisional-2.enc.meta.json
