@@ -296,3 +296,31 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Owner-requested edits after the freeze: D4 reworded (3 runs unchanged; temperature/provider seed recorded as null, seeds are cache-key discriminators), scope.yaml icd10cm_release pinned to FY2027. Config hashes now differ from the freeze entry; run 'codeloop freeze --supersede' (and 'codeloop version freeze v0 --supersede' if v0 should reflect the new config) before batch1 review.
+
+## 2026-09-18T06:33:17Z — freeze superseded (correction)
+
+- actor: manavshah <manavshah03@gmail.com>
+- reason: config corrected after the freeze: D4 reworded to match models.yaml, icd10cm_release pinned to FY2027
+- previous_commit: 3c2bb7e08f75383f6c2bf50fdd590f5da34ccfb8
+- renamed_tag: freeze-provisional
+- previous_dev_split: data/splits/dev_split.provisional-20260918T063317Z.json
+- previous_dev_split_sha256: 8172cd79122c28eda0d4ef2b492764df3ff5fa440d5ff6cb1fc10dd79784f332
+- previous_scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+
+## 2026-09-18T06:33:17Z — freeze
+
+- actor: manavshah <manavshah03@gmail.com>
+- codeloop_version: 0.1.0
+- split_seed: 20260918
+- sizes: {"batch1": 45, "batch2": 45, "batch3": 45, "seed": 20, "spare": 12}
+- blind_per_batch: 5
+- set_summary: {"batch1": {"mean_amazon_codes": 1.8, "mean_audit_flags": 0.733, "mean_difficulty": -0.193, "mean_note_len": 2580.778, "n": 45, "subsets": {"aci": 24, "virtassist": 12, "virtscribe": 9}}, "batch2": {"mean_amazon_codes": 2.2, "mean_audit_flags": 0.578, "mean_difficulty": -0.01, "mean_note_len": 2616.911, "n": 45, "subsets": {"aci": 24, "virtassist": 12, "virtscribe": 9}}, "batch3": {"mean_amazon_codes": 2.111, "mean_audit_flags": 0.533, "mean_difficulty": -0.009, "mean_note_len": 2740.178, "n": 45, "subsets": {"aci": 25, "virtassist": 11, "virtscribe": 9}}, "seed": {"mean_amazon_codes": 2.15, "mean_audit_flags": 0.7, "mean_difficulty": 0.269, "mean_note_len": 2742.35, "n": 20, "subsets": {"aci": 12, "virtassist": 5, "virtscribe": 3}}, "spare": {"mean_amazon_codes": 2.083, "mean_audit_flags": 0.75, "mean_difficulty": 0.345, "mean_note_len": 2796.917, "n": 12, "subsets": {"aci": 6, "virtassist": 4, "virtscribe": 2}}}
+- dev_split_sha256: befc71b0a30073fa94f17e93e771183204bfd08f516aba98ef96622fabdc3305
+- scope_yaml_sha256: 099cef2ae33929bb61f8cece6597506f5edb42e50d164cd0a4d833ce31a5d735
+- scope_status: provisional
+- project_yaml_sha256: 9003e5305d179ad2d8326eb38669598d9dc9e5283cf1f53faaaccf68cc3ababe
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- config_tree_sha256: e47b9fb7c803366e00528ed0b3ee9262dbee1176207ff5da217670bb984feebc
+- splits_tree_sha256: ee7189ae572e4aa484d632faeead1afb100b3681b77de5496b8102d4b3073085
+- scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- decisions: D0–D10 locked
