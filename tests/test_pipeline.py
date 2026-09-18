@@ -66,7 +66,7 @@ def test_run_encounter_end_to_end():
     # left-knee OA supported only by the transcript: downgraded under note_only -> provider query, no dx
     q = [x for x in pkg.provider_queries if "laterality" in x.field_ref or x.field_ref.startswith("dx:M171")]
     assert q and any(s.source == "dialogue" for s in q[0].evidence)
-    assert [(ln.code, ln.modifiers, ln.units, ln.pointers) for ln in pkg.lines] == [("73562", ["RT"], 1, ["M1711"])]
+    assert [(ln.code, ln.modifiers, ln.units, ln.pointers) for ln in pkg.lines] == [("73562", ["26", "RT"], 1, ["M1711"])]
     assert pkg.lines[0].evidence[0].source == "note" and pkg.compliance.passed and pkg.compliance.checked
     assert pkg.scrubber == [] and any("dexamethasone" in g.missing.lower() or "J1100" in g.missing for g in pkg.data_gaps) is False
     assert any("administration" in g.field_ref for g in pkg.data_gaps) is False  # dexamethasone resolves via the synthetic ASP row

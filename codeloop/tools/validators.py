@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from codeloop.tables import Tables
 
-VALID_MODIFIERS: frozenset[str] = frozenset({"RT", "LT", "50", "59", "XE", "XS", "XP", "XU", "QW", "JW", "JZ", "25"})
+VALID_MODIFIERS: frozenset[str] = frozenset(
+    {"RT", "LT", "50", "59", "XE", "XS", "XP", "XU", "QW", "JW", "JZ", "25", "26", "TC"}
+)
+IMAGING_COMPONENT_MODIFIER = "26"  # coder guidelines v1.1: X-rays are billed as the professional component
 BYPASS_MODIFIERS: frozenset[str] = frozenset({"59", "XE", "XS", "XP", "XU"})
 X_MODIFIERS: frozenset[str] = frozenset({"XE", "XS", "XP", "XU"})
 

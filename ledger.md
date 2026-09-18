@@ -386,3 +386,13 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: CPC spot-check complete (reviewer cpc1, 30/30 done, 26 flags graded, 1 missed service). Imaging 9/15 confirmed (precision 0.60, evaluable_n_est 37); other_procedure 2/7; ecg 0/2; waived 0/2. CPC recommends billing the professional component (modifier 26) for in-office X-rays and notes DME/orthotic supplies as a possible category. Scope decision pending the owner's call on the imaging convention.
+
+## 2026-09-18T22:29:39Z — scope confirmed after CPC spot-check
+
+- actor: manavshah <manavshah03@gmail.com>
+- decision: core_lines = in-office imaging only; all optional modules off (D10 arithmetic on cpc1 grades)
+- imaging_convention: professional component: modifier 26 on every X-ray line, never global, never TC (CPC recommendation; owner delegated the call)
+- coder_guidelines: docs/CODER_GUIDELINES.md v1.1
+- coder_guidelines_sha256: 01da959d8667843d4a52ffdbfd92cd4f3d3ebab02df19810a7a0ec013f083f04
+- scope_yaml_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- next: freeze --supersede, version freeze v0 --supersede, run v0 batch1, deploy review UI

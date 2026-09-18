@@ -28,6 +28,14 @@ PAIRED_BODY_PARTS: tuple[str, ...] = (
 )
 
 
+IMAGING_MODIFIERS: tuple[str, ...] = ("26",)  # professional component on every X-ray line (guidelines v1.1)
+
+
+def imaging_modifiers(body_part: str | None, laterality: str) -> list[str]:
+    """Modifiers for an in-office radiograph line: 26 always, plus RT/LT for a documented side."""
+    return sorted({*IMAGING_MODIFIERS, *laterality_modifiers(body_part, laterality)})
+
+
 def laterality_modifiers(body_part: str | None, laterality: str) -> list[str]:
     """RT/LT for a documented side on a paired structure; bilateral studies carry no side modifier here
     (a bilateral-specific code is preferred when one exists)."""

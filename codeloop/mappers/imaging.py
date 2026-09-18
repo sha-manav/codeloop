@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from codeloop.agent.schemas import LineSelection, Service
-from codeloop.rules.line_rules import laterality_modifiers
+from codeloop.rules.line_rules import imaging_modifiers
 from codeloop.schemas.package import DataGap, Span
 from codeloop.scoring import Scope
 from codeloop.tables import Tables
@@ -67,7 +67,7 @@ def apply_line_rules(
         return d
     d.code = code
     d.units = max(1, int(selection.units or 1))
-    d.modifiers = laterality_modifiers(service.body_part, service.laterality)
+    d.modifiers = imaging_modifiers(service.body_part, service.laterality)
     pointers = [problem_codes[i] for i in selection.pointer_problem_indices if i in problem_codes]
     d.pointers = sorted({normalize_icd10cm(p) for p in pointers})
     return d

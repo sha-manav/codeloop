@@ -3,20 +3,20 @@
 # an *on* module's allowlist are kept; excluded modifiers and modifiers owned by *off* modules are
 # stripped; diagnoses are always kept.
 #
-# PROVISIONAL (2026-09-17): the spot-check grades behind these numbers are a machine stand-in
-# (reviewer `provisional:claude-fable-5-1`, see reports/audit.md), not a CPC judgment. When the CPC
-# grades the sample, re-run `codeloop audit report`, revise this file, and re-freeze before Phase 8.
+# Confirmed 2026-09-18 by the CPC spot-check (reviewer cpc1, reports/audit.md): imaging 9/15 confirmed,
+# evaluable_n_est 37; every other category below the D10 thresholds. Imaging is billed as the professional
+# component (modifier 26 on every X-ray line) per docs/CODER_GUIDELINES.md v1.1 §3.
 
 icd10cm_release: FY2027   # matches config/tables.yaml (2027 code descriptions, effective 2026-10-01)
 
 modules:
   core_dx:        {on: true}
-  # in-office imaging: 62/167 dev encounters flagged, precision 11/15 (provisional), evaluable_n_est ≈ 45.
+  # in-office imaging: 62/167 dev encounters flagged, CPC precision 9/15, evaluable_n_est ≈ 37.
   # Ranges by code number only: chest, spine, pelvis, upper extremity, lower extremity/hip, abdomen radiographs.
   core_lines:     {on: true, code_ranges: ["71045-71048", "72020-72120", "72170-72190", "73000-73140", "73501-73660", "74018-74022"]}
-  # Held out of core_lines pending CPC grades (no confirmed flags in the provisional spot-check):
-  #   ecg 9 flagged (0/2 confirmed), waived_in_office_test 8 (0/2), other_procedure 17 (0/7),
-  #   joint_aspiration_injection 3 and spirometry 3 (not sampled).
+  # Out of core_lines after the CPC spot-check: ecg 9 flagged (0/2 confirmed), waived_in_office_test 8 (0/2),
+  #   other_procedure 17 (2/7, evaluable ≈ 5), joint_aspiration_injection 3 and spirometry 3 (not sampled),
+  #   DME/orthotic supplies (1 missed service found in 30).
   vaccine_admin:  {on: false, threshold: 15, evaluable_n_est: 0, code_ranges: ["90460-90461", "90471-90474", "90476-90759", "91300-91322"]}
   distinct_59x:   {on: false, threshold: 15, evaluable_n_est: 0, modifiers: ["59", "XE", "XS", "XP", "XU"]}
   qw:             {on: false, threshold: 15, evaluable_n_est: 0, modifiers: ["QW"]}
@@ -30,6 +30,9 @@ holdout_module_min_n: 10   # decision D6
 
 audit_provenance:
   audit_report: reports/audit.md
-  status: provisional
-  graded_by: "provisional:claude-fable-5-1"
-  cpc_spot_check: pending
+  status: final
+  graded_by: cpc1
+  cpc_spot_check: completed 2026-09-18
+
+conventions:
+  imaging_billing: professional_component   # modifier 26 on every X-ray line; never global, never TC (guidelines v1.1)

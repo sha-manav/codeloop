@@ -1,6 +1,6 @@
 # CodeLoop — Coder Guidelines
 
-**Version 1.0 — draft for confirmation after the spot-check session.**
+**Version 1.1 — imaging convention confirmed after the spot-check session (2026-09-18).**
 For the certified professional coder working on CodeLoop. Applies to the spot-check, the pilot, batches 1–3, and the final holdout coding. Rule questions go in the questions log (§9); the owner answers in writing and updates this document between batches. This file is committed to the project repository and its hash is recorded; a rule never changes mid-batch.
 
 ---
@@ -42,9 +42,9 @@ The encounters are scripted or role-played from a public research dataset. Names
 One category is in scope in this phase: **plain-film imaging (X-rays) performed at this visit, in this office.**
 
 - Bill it only when the note documents that the imaging was obtained at this visit in this office. Imaging that was ordered, planned, done elsewhere, done previously, or merely reviewed is not billable here. If the draft bills it, remove it with reason `unsupported`.
-- **Convention: assume the practice owns its imaging equipment.** Bill the global code. Do not add modifier 26 or TC.
+- **Convention (confirmed at the spot-check): bill the professional component.** These notes document the interpretation but not that the practice supplied the equipment and technical acquisition, so every X-ray line carries modifier **26**. Never bill the global code and never add TC.
 - Select the code by anatomy and the documented number of views. If the number of views is not documented, the label is the most conservative code that fits the documented anatomy (fewest views), and you record that you would query (§5).
-- Use RT or LT when the code is side-specific and the side is documented in the note. Bilateral studies: two lines, RT and LT. Do not use modifier 50 on X-rays.
+- Use RT or LT (alongside 26) when the code is side-specific and the side is documented in the note. Bilateral studies: two lines, RT and LT. Do not use modifier 50 on X-rays.
 - Units: one per study.
 - Diagnosis pointers: point each line at the diagnosis or symptom that justifies the study.
 
@@ -128,3 +128,4 @@ Keep a running log with the encounter ID, the field, and the question. Send it t
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-09-17 | Initial draft; imaging convention (global billing) and undocumented-views rule pending confirmation after the spot-check. |
+| 1.1 | 2026-09-18 | Imaging convention set to professional component (modifier 26 on every X-ray line) on the CPC's recommendation; undocumented-views rule (fewest views, would query) confirmed. |
