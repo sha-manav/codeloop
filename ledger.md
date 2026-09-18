@@ -396,3 +396,31 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - coder_guidelines_sha256: 01da959d8667843d4a52ffdbfd92cd4f3d3ebab02df19810a7a0ec013f083f04
 - scope_yaml_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
 - next: freeze --supersede, version freeze v0 --supersede, run v0 batch1, deploy review UI
+
+## 2026-09-18T22:29:55Z — freeze superseded (correction)
+
+- actor: manavshah <manavshah03@gmail.com>
+- reason: scope confirmed after the CPC spot-check; imaging convention set to professional component (modifier 26)
+- previous_commit: 1e9e6d17b18f0f62e6eb2b297dd558f5ea2a29fa
+- renamed_tag: freeze-provisional-2
+- previous_dev_split: data/splits/dev_split.provisional-20260918T222955Z.json
+- previous_dev_split_sha256: befc71b0a30073fa94f17e93e771183204bfd08f516aba98ef96622fabdc3305
+- previous_scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+
+## 2026-09-18T22:29:55Z — freeze
+
+- actor: manavshah <manavshah03@gmail.com>
+- codeloop_version: 0.1.0
+- split_seed: 20260918
+- sizes: {"batch1": 45, "batch2": 45, "batch3": 45, "seed": 20, "spare": 12}
+- blind_per_batch: 5
+- set_summary: {"batch1": {"mean_amazon_codes": 1.8, "mean_audit_flags": 0.733, "mean_difficulty": -0.193, "mean_note_len": 2580.778, "n": 45, "subsets": {"aci": 24, "virtassist": 12, "virtscribe": 9}}, "batch2": {"mean_amazon_codes": 2.2, "mean_audit_flags": 0.578, "mean_difficulty": -0.01, "mean_note_len": 2616.911, "n": 45, "subsets": {"aci": 24, "virtassist": 12, "virtscribe": 9}}, "batch3": {"mean_amazon_codes": 2.111, "mean_audit_flags": 0.533, "mean_difficulty": -0.009, "mean_note_len": 2740.178, "n": 45, "subsets": {"aci": 25, "virtassist": 11, "virtscribe": 9}}, "seed": {"mean_amazon_codes": 2.15, "mean_audit_flags": 0.7, "mean_difficulty": 0.269, "mean_note_len": 2742.35, "n": 20, "subsets": {"aci": 12, "virtassist": 5, "virtscribe": 3}}, "spare": {"mean_amazon_codes": 2.083, "mean_audit_flags": 0.75, "mean_difficulty": 0.345, "mean_note_len": 2796.917, "n": 12, "subsets": {"aci": 6, "virtassist": 4, "virtscribe": 2}}}
+- dev_split_sha256: ff1ebecd72cff5fe275102286b4c0ac3fde3bf14e13e552782d0f7825b91f2cb
+- scope_yaml_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- scope_status: final
+- project_yaml_sha256: 9003e5305d179ad2d8326eb38669598d9dc9e5283cf1f53faaaccf68cc3ababe
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- config_tree_sha256: f2b502d351475e2c30577ec1a8e5e3006b3bbb11d305aadec8a4bed4c032ecd4
+- splits_tree_sha256: 16d82ac2b4b347ea91ede4949401a341a97d7d4489d259e77613eceea1cacef1
+- scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- decisions: D0–D10 locked
