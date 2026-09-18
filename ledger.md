@@ -324,3 +324,12 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - splits_tree_sha256: ee7189ae572e4aa484d632faeead1afb100b3681b77de5496b8102d4b3073085
 - scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
 - decisions: D0–D10 locked
+
+## 2026-09-18T06:33:32Z — version v0 superseded (correction)
+
+- actor: manavshah <manavshah03@gmail.com>
+- reason: re-frozen on the corrected config (superseded freeze 3c2bb7e)
+- version: v0
+- previous_commit: 2fd92e0e97c821cca1daed387c9d00481fae5f38
+- renamed_tag: v0-provisional
+- moved: versions/v0 -> versions/v0-provisional; runs/v0 -> runs/v0-provisional; data/sealed/predictions_v0.enc -> data/sealed/predictions_v0-provisional.enc; data/sealed/predictions_v0.enc.meta.json -> data/sealed/predictions_v0-provisional.enc.meta.json; data/sealed/predictions_v0.sha256 -> data/sealed/predictions_v0-provisional.sha256; data/sealed/traces_v0.enc -> data/sealed/traces_v0-provisional.enc; data/sealed/traces_v0.enc.meta.json -> data/sealed/traces_v0-provisional.enc.meta.json
