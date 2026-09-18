@@ -333,3 +333,31 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - previous_commit: 2fd92e0e97c821cca1daed387c9d00481fae5f38
 - renamed_tag: v0-provisional
 - moved: versions/v0 -> versions/v0-provisional; runs/v0 -> runs/v0-provisional; data/sealed/predictions_v0.enc -> data/sealed/predictions_v0-provisional.enc; data/sealed/predictions_v0.enc.meta.json -> data/sealed/predictions_v0-provisional.enc.meta.json; data/sealed/predictions_v0.sha256 -> data/sealed/predictions_v0-provisional.sha256; data/sealed/traces_v0.enc -> data/sealed/traces_v0-provisional.enc; data/sealed/traces_v0.enc.meta.json -> data/sealed/traces_v0-provisional.enc.meta.json
+
+## 2026-09-18T06:38:06Z — holdout predict v0 (sealed)
+
+- actor: manavshah <manavshah03@gmail.com>
+- n: 40
+- predictions_enc_sha256: 05af4b0d0c5de8eedf332da7328255a44e28dc9778a15ecb2f688592d5bb2ce5
+- traces_enc_sha256: 65559a2a53fc5c9647eec11d7c61a3210c38f5b944a9db70179d1b9b64689014
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: 099cef2ae33929bb61f8cece6597506f5edb42e50d164cd0a4d833ce31a5d735
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- tokens_in: 278084
+- tokens_out: 123742
+- cache: disabled
+- seed: 1
+
+## 2026-09-18T06:38:06Z — version freeze v0
+
+- actor: manavshah <manavshah03@gmail.com>
+- commit: bfa5d76d595e7e59f6d922791701d1e84cc03966
+- tag: v0
+- models_yaml: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_yaml: 099cef2ae33929bb61f8cece6597506f5edb42e50d164cd0a4d833ce31a5d735
+- tables_yaml: 47a324256764e933abb47ef82eab82f0577f18f703a2bf80e04a3385210e3b89
+- project_decisions: eef4e335d8f4f4352c3b73ebd83b977c9682b03c06a498412b6a5461e088f514
+- scoring_tree: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- config_tree: e47b9fb7c803366e00528ed0b3ee9262dbee1176207ff5da217670bb984feebc
+- prompt_hashes: {"audit": "da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81", "cluster_findings": "4f6bceb52b30d59830a35e613e7d188e0c72cfc863f2bd3f36a354683ec12afe", "extract": "7491eb0094deeef74e820702f18ad5c728534984f3c8ed68fc99a0d47f856339", "map_dx": "ecfc8fbd2fd14049735a2a9260101ee25bac8fa974016b5a96cf4bba89233594", "map_lines": "10a6c8c2db8110e7a5915da78017d95d8aed5fe47160ed3d449201c74437a7ad", "ping": "e9a79ea28a061709d7d3838bb8dfe791b6496a74b93d4c0790c3053d559ff32f"}
+- sealed_predictions_sha256: 05af4b0d0c5de8eedf332da7328255a44e28dc9778a15ecb2f688592d5bb2ce5
