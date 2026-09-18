@@ -109,13 +109,13 @@ Pull events after a session ends (the coder tells you), not while they are worki
 |---|---|
 | 0 Seal | done (seed 20260917 confirmed by the owner) |
 | 1 Contract and scorer | done |
-| 2 Audit | run over the 167 with claude-opus-5; spot-check graded by a **provisional machine stand-in**, CPC grades pending (they override automatically) |
-| 3 Freeze | done (`freeze` tag); scope provisional: core_lines = in-office imaging, optional modules off |
+| 2 Audit | done; CPC spot-check completed 2026-09-18 (imaging 9/15 confirmed, everything else below threshold) |
+| 3 Freeze | done (`freeze` tag, superseded twice with ledger corrections); scope final: core_lines = in-office imaging billed as professional component (modifier 26), optional modules off |
 | 4 v0 agent | done on `seed` and `spare` (`reports/calibration_dev_seed.md`) |
 | 5 Scrubber and compliance | done (NCCI 2026Q4, MUE, MPFS RVU26D, ICD-10-CM FY2027) |
-| 6 Review UI | done; pilot on `spare` by the owner pending |
+| 6 Review UI | done; deployed on Fly.io (`codeloop serve`) |
 | 7 Harness | done; `v0` frozen with sealed holdout predictions |
-| 8 Cycles | v0 drafts for batch1 produced; **CPC review of batch1 is the next human step** |
+| 8 Cycles | v0 drafts for batch1 produced and served at https://codeloop-ui.fly.dev; **CPC review of batch1 in progress** |
 | 9 Holdout | blind labeling and single-shot scoring await the CPC after v3 |
 | 10 Reports | `codeloop report` regenerates everything that exists |
 
