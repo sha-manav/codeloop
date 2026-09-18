@@ -8,6 +8,7 @@ action is appended to runs/audit/spot_check_responses.jsonl. Holdout encounters 
 from __future__ import annotations
 
 import html
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -67,9 +68,11 @@ def _page(title: str, body: str) -> str:
     return f"<!doctype html><html><head><meta charset='utf-8'><title>{html.escape(title)}</title><style>{_CSS}</style></head><body>{body}<script>{_JS}</script></body></html>"
 
 
-def create_app(paths: Paths, reviewer: str) -> FastAPI:
+def create_app(paths: Paths, reviewer: str, *, responses_path: Path | None = None, auth: bool = True) -> FastAPI:
+    """`responses_path` redirects all writes/reads of spot-check responses (served deployments use a data volume)."""
     app = FastAPI(title="CodeLoop audit spot-check")
-    app.state.auth = install_basic_auth(app)
+    app.state.auth = install_basic_auth(app) if auth else False
+    store_path = responses_path
     encounters: dict[str, Encounter] = {e.id: e for e in load_encounters_jsonl(paths.dev_encounters)}
     results = load_results(paths)
     sample = load_spot_check_sample(paths)
@@ -80,7 +83,7 @@ def create_app(paths: Paths, reviewer: str) -> FastAPI:
 
     @app.get("/", response_class=HTMLResponse)
     def queue() -> str:
-        events = load_events(paths)
+        events = load_events(paths, store_path)
         done = done_encounters(events)
         grades = latest_grades(events)
         rows = []
@@ -88,12 +91,15 @@ def create_app(paths: Paths, reviewer: str) -> FastAPI:
             n_flags = len(results.get(eid, {"result": {"flags": []}})["result"]["flags"])
             graded = sum(1 for (e, _i) in grades if e == eid)
             state = "<span class='done'>done</span>" if eid in done else f"{graded}/{n_flags} graded"
-            rows.append(f"<tr><td><a href='/encounter/{html.escape(eid)}'>{html.escape(eid)}</a></td><td>{arms[eid]}</td><td>{n_flags}</td><td>{state}</td></tr>")
+            rows.append(
+                f"<tr><td><a href='/encounter/{html.escape(eid)}'>{html.escape(eid)}</a></td><td>{arms[eid]}</td><td>{n_flags}</td><td>{state}</td></tr>"
+            )
         body = (
             f"<header><strong>CodeLoop audit spot-check</strong><span>reviewer: {html.escape(reviewer)}</span>"
             f"<span>{len(done)}/{len(order)} done</span></header>"
             "<main style='grid-template-columns:1fr'><div class='pane'><table><tr><th>Encounter</th><th>Arm</th><th>Flags</th><th>Status</th></tr>"
-            + "".join(rows) + "</table></div></main>"
+            + "".join(rows)
+            + "</table></div></main>"
         )
         return _page("Spot-check queue", body)
 
@@ -103,7 +109,7 @@ def create_app(paths: Paths, reviewer: str) -> FastAPI:
             raise HTTPException(404, "not in the spot-check sample")
         enc = encounters[eid]
         rec = results.get(eid, {"result": {"flags": [], "patient": {}}, "flag_spans": []})
-        grades = latest_grades(load_events(paths))
+        grades = latest_grades(load_events(paths, store_path))
         flags_html = []
         for i, f in enumerate(rec["result"]["flags"]):
             g = grades.get((eid, i))
@@ -145,7 +151,7 @@ def create_app(paths: Paths, reviewer: str) -> FastAPI:
             raise HTTPException(400, "encounter not in the spot-check sample")
         try:
             event = SpotCheckEvent.model_validate({**payload, "reviewer": reviewer})
-            append_event(paths, event)
+            append_event(paths, event, store_path)
         except ValueError as e:
             raise HTTPException(400, str(e)) from e
         return JSONResponse({"ok": True})

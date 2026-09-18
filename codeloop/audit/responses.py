@@ -42,16 +42,16 @@ def responses_path(paths: Paths) -> Path:
     return audit_dir(paths) / "spot_check_responses.jsonl"
 
 
-def append_event(paths: Paths, event: SpotCheckEvent) -> None:
+def append_event(paths: Paths, event: SpotCheckEvent, path: Path | None = None) -> None:
     event.validate_shape()
-    p = responses_path(paths)
+    p = path or responses_path(paths)
     p.parent.mkdir(parents=True, exist_ok=True)
     with open(p, "a", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(event.model_dump(mode="json"), ensure_ascii=False, sort_keys=True) + "\n")
 
 
-def load_events(paths: Paths) -> list[SpotCheckEvent]:
-    p = responses_path(paths)
+def load_events(paths: Paths, path: Path | None = None) -> list[SpotCheckEvent]:
+    p = path or responses_path(paths)
     if not p.exists():
         return []
     return [SpotCheckEvent.model_validate(r) for r in read_jsonl(p)]

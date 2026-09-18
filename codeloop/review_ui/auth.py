@@ -1,4 +1,4 @@
-"""Optional HTTP basic auth for the local UIs, controlled by CODELOOP_UI_USER / CODELOOP_UI_PASSWORD.
+"""HTTP basic auth for the UIs, controlled by CODELOOP_UI_USER / CODELOOP_UI_PASS.
 
 Both unset: no auth (local single-user use). Both set: every request must carry matching credentials.
 Only one set: misconfiguration, refuse to start.
@@ -14,7 +14,8 @@ from fastapi import FastAPI
 from starlette.responses import PlainTextResponse
 
 ENV_USER = "CODELOOP_UI_USER"
-ENV_PASSWORD = "CODELOOP_UI_PASSWORD"
+ENV_PASS = "CODELOOP_UI_PASS"
+ENV_PASSWORD = "CODELOOP_UI_PASSWORD"  # legacy alias of CODELOOP_UI_PASS
 
 
 class BasicAuthMiddleware:
@@ -43,12 +44,17 @@ class BasicAuthMiddleware:
         await response(scope, receive, send)
 
 
-def install_basic_auth(app: FastAPI) -> bool:
-    """Wrap `app` when both env vars are set; returns True when auth is active."""
-    user, password = os.environ.get(ENV_USER), os.environ.get(ENV_PASSWORD)
+def install_basic_auth(app: FastAPI, *, require: bool = False) -> bool:
+    """Wrap `app` when both env vars are set; returns True when auth is active.
+
+    `require=True` (the served entrypoint) refuses to run without credentials."""
+    user = os.environ.get(ENV_USER)
+    password = os.environ.get(ENV_PASS) or os.environ.get(ENV_PASSWORD)
     if not user and not password:
+        if require:
+            raise RuntimeError(f"{ENV_USER} and {ENV_PASS} must be set")
         return False
     if not (user and password):
-        raise RuntimeError(f"set both {ENV_USER} and {ENV_PASSWORD} (or neither)")
+        raise RuntimeError(f"set both {ENV_USER} and {ENV_PASS} (or neither)")
     app.add_middleware(BasicAuthMiddleware, user=user, password=password)
     return True

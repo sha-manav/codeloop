@@ -350,10 +350,10 @@ class ReviewSession:
         }
 
 
-def create_review_app(session: ReviewSession) -> FastAPI:
+def create_review_app(session: ReviewSession, *, auth: bool = True) -> FastAPI:
     app = FastAPI(title="CodeLoop review")
     app.state.session = session
-    app.state.auth = install_basic_auth(app)
+    app.state.auth = install_basic_auth(app) if auth else False
 
     @app.get("/", response_class=HTMLResponse)
     def queue() -> str:

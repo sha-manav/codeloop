@@ -1,0 +1,13 @@
+data/sealed/
+data/raw/
+data/tables/
+.venv/
+.git/
+.cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+runs/**/traces/
+docker/
+*.sqlite
+*.building

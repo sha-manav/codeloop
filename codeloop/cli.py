@@ -795,6 +795,20 @@ def ledger_note(text: str = typer.Argument(..., help="free-text note"), root: Pa
     typer.echo("ledger entry appended")
 
 
+@app.command()
+def serve(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Container entrypoint: audit or review UI from env vars (CODELOOP_UI_MODE, CODELOOP_BATCH, CODELOOP_VERSION,
+    CODELOOP_CODER_ID, CODELOOP_DATA_DIR, CODELOOP_UI_USER/PASS); binds 0.0.0.0:$PORT (8080); basic auth on every route."""
+    from codeloop.review_ui.serve import ServeConfigError
+    from codeloop.review_ui.serve import main as serve_main
+
+    paths = _paths(root)
+    try:
+        serve_main(paths.root)
+    except (ServeConfigError, RuntimeError) as e:
+        _fail(str(e))
+
+
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
 app.add_typer(llm_app, name="llm")
 

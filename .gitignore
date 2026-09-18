@@ -13,9 +13,7 @@ build/
 data/raw/*
 !data/raw/.gitkeep
 
-# normalized dev encounters: rebuilt by `make data`; committing is an owner decision (ACI-Bench is CC BY 4.0)
-data/dev/*
-!data/dev/.gitkeep
+# normalized dev encounters are committed (ACI-Bench is CC BY 4.0) so the UI image carries them; `make data` rebuilds them
 
 # traces are large and carry model output verbatim; predictions are committed
 runs/**/traces/

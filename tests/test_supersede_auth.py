@@ -89,7 +89,7 @@ def test_ledger_note_cli(tmp_path):
 def test_basic_auth_on_review_and_audit_ui(tmp_path, monkeypatch):
     paths, config, ids = _ui_repo(tmp_path)
     monkeypatch.setenv("CODELOOP_UI_USER", "cpc")
-    monkeypatch.setenv("CODELOOP_UI_PASSWORD", "s3cret-password")
+    monkeypatch.setenv("CODELOOP_UI_PASS", "s3cret-password")
     session = ReviewSession(paths, batch="spare", version="dev", coder_id="cpc", store_path=None)
     session.store = EventStore(None)
     ui = TestClient(create_review_app(session))
@@ -111,7 +111,7 @@ def test_basic_auth_on_review_and_audit_ui(tmp_path, monkeypatch):
     audit_ui = TestClient(create_app(paths, reviewer="cpc"))
     assert audit_ui.get("/").status_code == 401 and audit_ui.get("/", auth=("cpc", "s3cret-password")).status_code == 200
     # misconfiguration: only one variable set
-    monkeypatch.delenv("CODELOOP_UI_PASSWORD")
+    monkeypatch.delenv("CODELOOP_UI_PASS")
     with pytest.raises(RuntimeError):
         create_review_app(session)
     # no variables: open access

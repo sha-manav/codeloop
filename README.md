@@ -40,7 +40,7 @@ decisions are `DECISIONS.md` (rendered from `config/project.yaml`); the chronolo
 Cite: Yim W, Fu Y, Ben Abacha A, Snider N, Lin T, Yetisgen M. *ACI-BENCH: a Novel Ambient Clinical
 Intelligence Dataset for Benchmarking Automatic Visit Note Generation.* Sci Data 10, 586 (2023).
 
-Normalized encounter text under `data/dev/` is gitignored by default and rebuilt with `make data`.
+Normalized encounter text under `data/dev/` is committed (ACI-Bench is CC BY 4.0) and can be rebuilt with `make data`.
 The committed public label files have the holdout rows removed; `reports/ingest.md` records the
 license considerations for redistributing those subsets.
 
@@ -83,6 +83,25 @@ codeloop report                                     # regenerate reports/
   fresh freeze proceeds. Push with `git push --force origin --tags` afterwards.
 - **Free-text ledger entries.** `codeloop ledger note "CPC onboarded"` appends a timestamped, attributed note.
 - **Coder guidelines** live in `docs/CODER_GUIDELINES.md` and must state the same evidence policy as decision D1.
+
+## Hosting the coder UIs on Fly.io
+
+`codeloop serve` is a single container entrypoint for either UI, configured by environment variables and always behind
+basic auth (`CODELOOP_UI_USER` / `CODELOOP_UI_PASS`, refused if unset). State is written under `CODELOOP_DATA_DIR`
+(`/data`, a Fly volume): review events to `/data/events/<version>_<batch>.sqlite`, audit responses to
+`/data/audit/spot_check_responses.jsonl` (seeded from the repo copy on first start). The image (`Dockerfile.ui`) excludes
+`data/sealed/` and `data/raw/`; the entrypoint never reads `CODELOOP_SEAL_KEY` and never serves holdout labeling.
+
+```bash
+fly auth login && fly apps create codeloop-ui && fly volumes create codeloop_data --size 1 --region iad
+fly secrets set CODELOOP_UI_USER=cpc CODELOOP_UI_PASS='<strong password>'
+make fly-deploy-audit                              # spot-check UI
+make fly-pull-audit && uv run codeloop audit report
+make fly-deploy-review BATCH=batch1 VERSION=v0     # review UI (blind subset first)
+make fly-pull-events BATCH=batch1 VERSION=v0 && uv run codeloop labels build --batch batch1 --version v0
+```
+
+Pull events after a session ends (the coder tells you), not while they are working.
 
 ## Status
 

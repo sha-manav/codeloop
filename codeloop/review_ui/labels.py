@@ -32,9 +32,15 @@ def build_labels(
     paths: Paths, *, batch: str, version: str, store: EventStore | None = None, actor: str | None = None
 ) -> LabelsBuildResult:
     d = paths.review_dir(version, batch)
-    store = store or (EventStore(d / "events.sqlite") if (d / "events.sqlite").exists() else None)
     if store is None:
-        raise LabelsError(f"no event store for {version}/{batch}; run `codeloop review serve` first")
+        for candidate in (d / "events.sqlite", paths.runs / version / batch / "events.sqlite"):
+            if candidate.exists():
+                store = EventStore(candidate)
+                break
+    if store is None:
+        raise LabelsError(
+            f"no event store for {version}/{batch}; run `codeloop review serve` or `make fly-pull-events` first"
+        )
     split = load_dev_split(paths)
     ids = list(split["sets"][batch])
     pred_path = paths.runs / version / batch / "predictions.jsonl"
