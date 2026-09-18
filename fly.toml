@@ -20,18 +20,9 @@ primary_region = "iad"
   min_machines_running = 1
   processes = ["app"]
 
-  [[http_service.checks]]
-    # /health sits behind basic auth like every other route; a TCP-level check keeps credentials out of this file.
-    interval = "30s"
-    timeout = "5s"
-    grace_period = "10s"
-    method = "GET"
-    path = "/health"
-    protocol = "http"
-    tls_skip_verify = false
-    [http_service.checks.headers]
-      # Optional: uncomment and paste base64("user:pass") to make the HTTP check pass through auth.
-      # Authorization = "Basic ..."
+  # No HTTP health check: /health sits behind basic auth like every other route, and a check that fails
+  # keeps the machine out of routing. Fly falls back to process health. To add an authenticated check,
+  # define [[http_service.checks]] with path = "/health" and an Authorization header (base64 of user:pass).
 
 [[mounts]]
   source = "codeloop_data"
