@@ -1,6 +1,6 @@
 # Prevalence audit (Phase 2)
 
-Generated 2026-09-17T13:25:48Z. Dev encounters audited: 167 (the 40 holdout encounters are never audited).
+Generated 2026-09-18T22:24:56Z. Dev encounters audited: 167 (the 40 holdout encounters are never audited).
 Model(s): claude-opus-5; prompt hash(es): da9371916f1de85e…;
 tokens in/out: 527313/57618. Flags: 106 (106 with a located evidence span).
 Patient facts documented: age 139/167, sex 166/167.
@@ -10,10 +10,8 @@ Flags per encounter by subset: aci: mean 0.70 over 91; virtassist: mean 0.66 ove
 ## Spot-check
 
 Sample drawn 2026-09-17T13:21:09Z with seed 20260920: 15 flagged-arm + 15 random-arm encounters out of 167 (86 with ≥1 flag).
-Grades recorded: 26 flags graded (11 confirmed); missed services reported: 0.
-Graders (latest grade per flag): {'provisional:claude-fable-5-1': 26}.
-
-**Provisional:** grades from provisional:claude-fable-5-1 are a machine stand-in, not a CPC judgment. The CPC's grades replace them automatically (latest grade per flag wins); the module decisions below are provisional until then.
+Grades recorded: 26 flags graded (11 confirmed); missed services reported: 1.
+Graders (latest grade per flag): {'cpc1': 26}.
 
 ## Per-category prevalence and precision
 
@@ -32,8 +30,8 @@ Graders (latest grade per flag): {'provisional:claude-fable-5-1': 26}.
 | waived_in_office_test | 9 | 8 | 2 | 0 | 0.00 (0.00–0.66) | 0.0 |
 | immunization | 0 | 0 | 0 | 0 | — | — |
 | drug_administration_with_wastage | 0 | 0 | 0 | 0 | — | — |
-| in_office_imaging | 64 | 62 | 15 | 11 | 0.73 (0.48–0.89) | 45.5 |
-| other_procedure | 18 | 17 | 7 | 0 | 0.00 (0.00–0.35) | 0.0 |
+| in_office_imaging | 64 | 62 | 15 | 9 | 0.60 (0.36–0.80) | 37.2 |
+| other_procedure | 18 | 17 | 7 | 2 | 0.29 (0.08–0.64) | 4.9 |
 
 ## Module decisions (decision D10)
 
@@ -63,8 +61,14 @@ Code numbers only. A category is proposed for the allowlist when at least one fl
 | waived_in_office_test | 0 | 0.0 | hold: 81002-81002, 81025-81025, 82962-82962, 83036-83036, 86308-86308, 87804-87804, 87811-87811, 87880-87880 |
 | immunization | 0 | — | hold: 90460-90461, 90471-90474, 90476-90759, 91300-91322 |
 | drug_administration_with_wastage | 0 | — | hold: 96372-96379, J0000-J9999 |
-| in_office_imaging | 11 | 45.5 | propose: 71045-71048, 72020-72120, 73000-73140, 73501-73660, 74018-74022 |
-| other_procedure | 0 | 0.0 | hold: (none: define per finding) |
+| in_office_imaging | 9 | 37.2 | propose: 71045-71048, 72020-72120, 73000-73140, 73501-73660, 74018-74022 |
+| other_procedure | 2 | 4.9 | propose: (none: define per finding) |
+
+## Services the CPC reported as missed by the audit
+
+| Category | Count |
+|---|---|
+| other_procedure | 1 |
 
 ## Notes
 

@@ -52,10 +52,14 @@ fly-deploy-review:  ## deploy the review UI for BATCH=… VERSION=… (CODER_ID=
 	@test -n "$(BATCH)" -a -n "$(VERSION)" || (echo "usage: make fly-deploy-review BATCH=batch1 VERSION=v0" && exit 1)
 	$(FLY) deploy -e CODELOOP_UI_MODE=review -e CODELOOP_BATCH=$(BATCH) -e CODELOOP_VERSION=$(VERSION) -e CODELOOP_CODER_ID=$(CODER_ID) -e CODELOOP_DATA_DIR=/data
 
-fly-pull-audit:     ## copy the spot-check responses back into runs/audit/
-	$(FLY) ssh sftp get /data/audit/spot_check_responses.jsonl runs/audit/spot_check_responses.jsonl
+fly-pull-audit:     ## copy the spot-check responses back into runs/audit/ (overwrites the local copy)
+	rm -f runs/audit/.pull.jsonl
+	$(FLY) ssh sftp get /data/audit/spot_check_responses.jsonl runs/audit/.pull.jsonl
+	mv runs/audit/.pull.jsonl runs/audit/spot_check_responses.jsonl
 
 fly-pull-events:    ## copy the review event store for BATCH=… VERSION=… into runs/<version>/<batch>/events.sqlite
 	@test -n "$(BATCH)" -a -n "$(VERSION)" || (echo "usage: make fly-pull-events BATCH=batch1 VERSION=v0" && exit 1)
 	mkdir -p runs/$(VERSION)/$(BATCH)
-	$(FLY) ssh sftp get /data/events/$(VERSION)_$(BATCH).sqlite runs/$(VERSION)/$(BATCH)/events.sqlite
+	rm -f runs/$(VERSION)/$(BATCH)/.pull.sqlite
+	$(FLY) ssh sftp get /data/events/$(VERSION)_$(BATCH).sqlite runs/$(VERSION)/$(BATCH)/.pull.sqlite
+	mv runs/$(VERSION)/$(BATCH)/.pull.sqlite runs/$(VERSION)/$(BATCH)/events.sqlite

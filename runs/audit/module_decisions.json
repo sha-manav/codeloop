@@ -25,7 +25,7 @@
       "on": false
     }
   },
-  "generated_at": "2026-09-17T13:25:48Z",
+  "generated_at": "2026-09-18T22:24:56Z",
   "multi_procedure": {
     "confirmed": 0,
     "evaluable_n_est": 0.0,
@@ -75,14 +75,14 @@
       "precision_low": null
     },
     "in_office_imaging": {
-      "confirmed": 11,
-      "evaluable_n_est": 45.46666666666666,
+      "confirmed": 9,
+      "evaluable_n_est": 37.199999999999996,
       "flagged_encounters": 62,
       "flags": 64,
       "graded": 15,
-      "precision": 0.7333333333333333,
-      "precision_high": 0.8910254667430761,
-      "precision_low": 0.4804956594401943
+      "precision": 0.6,
+      "precision_high": 0.8017550385865841,
+      "precision_low": 0.357468301206246
     },
     "in_office_injection": {
       "confirmed": 0,
@@ -135,14 +135,14 @@
       "precision_low": null
     },
     "other_procedure": {
-      "confirmed": 0,
-      "evaluable_n_est": 0.0,
+      "confirmed": 2,
+      "evaluable_n_est": 4.857142857142857,
       "flagged_encounters": 17,
       "flags": 18,
       "graded": 7,
-      "precision": 0.0,
-      "precision_high": 0.35433043506668743,
-      "precision_low": 5.551115123125783e-17
+      "precision": 0.2857142857142857,
+      "precision_high": 0.6410655481673808,
+      "precision_low": 0.08221892400405678
     },
     "spirometry": {
       "confirmed": 0,

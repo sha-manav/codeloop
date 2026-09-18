@@ -381,3 +381,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - scope_sha256: 099cef2ae33929bb61f8cece6597506f5edb42e50d164cd0a4d833ce31a5d735
 - tables_version: tables.yaml:47a324256764e933/parser:1
 - estimated_cost_usd: 4.41
+
+## 2026-09-18T22:25:30Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: CPC spot-check complete (reviewer cpc1, 30/30 done, 26 flags graded, 1 missed service). Imaging 9/15 confirmed (precision 0.60, evaluable_n_est 37); other_procedure 2/7; ecg 0/2; waived 0/2. CPC recommends billing the professional component (modifier 26) for in-office X-rays and notes DME/orthotic supplies as a possible category. Scope decision pending the owner's call on the imaging convention.
