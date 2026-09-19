@@ -86,6 +86,38 @@ def apply_event(label: LabelPackage, e: Event) -> LabelPackage:
     return label
 
 
+def field_on_label(label: LabelPackage, ref: str) -> bool:
+    """Whether an edit/remove reference points at something that is on the package right now."""
+    parts = ref.split(":")
+    if parts[0] == "dx" and len(parts) > 1:
+        return any(d.code == parts[1] for d in label.diagnoses)
+    if parts[0] == "line":
+        return _line_index(label, ref) is not None
+    return ref == "first_listed"
+
+
+def apply_touch(label: LabelPackage, e: Event) -> tuple[LabelPackage, bool]:
+    """apply_event plus whether the package changed. An Edit pressed on unchanged values, or an edit/remove aimed
+    at a field that is not on the package, changes nothing: it is not a correction and is never counted as one."""
+    before = label.model_dump()
+    label = apply_event(label, e)
+    return label, label.model_dump() != before
+
+
+def ineffective_touch_ids(draft: dict[str, Any] | None, events: list[tuple[int, Event]]) -> set[int]:
+    """Store ids of one encounter's review-mode edit/add/remove events that changed nothing when replayed over its
+    draft (findings extraction skips them: a reason attached to no change is not a correction)."""
+    label = draft_to_label(draft)
+    out: set[int] = set()
+    for rid, e in events:
+        if e.mode in BLIND_MODES or e.type not in TOUCH_TYPES:
+            continue
+        label, changed = apply_touch(label, e)
+        if not changed:
+            out.add(rid)
+    return out
+
+
 def review_minutes(events: list[Event]) -> float:
     """Sum of gaps between consecutive events from `open` to `approve`, each gap capped at the idle cap."""
     seq = [e for e in events if e.mode in ("review", "blind", "holdout")]
@@ -113,8 +145,8 @@ def replay(encounter_id: str, coder_id: str, draft: dict[str, Any] | None, event
         if e.mode in BLIND_MODES:
             continue  # blind-mode field events only shape the blind label, which arrives as blind_submit
         if e.type in TOUCH_TYPES:
-            touches += 1
-            label = apply_event(label, e)
+            label, changed = apply_touch(label, e)
+            touches += int(changed)  # an Edit that changed nothing is not a touch
         elif e.type == "grade_evidence" and e.span_id and e.grade:
             evidence_grades[e.span_id] = e.grade
         elif e.type == "grade_query" and e.field_ref and e.grade:

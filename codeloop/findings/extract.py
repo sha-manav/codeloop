@@ -11,6 +11,7 @@ import yaml
 
 from codeloop.config import ProjectConfig
 from codeloop.paths import Paths
+from codeloop.review_ui.replay import ineffective_touch_ids
 from codeloop.review_ui.store import EventStore
 from codeloop.schemas.event import Event
 from codeloop.schemas.field_ref import parse_field_ref
@@ -78,10 +79,31 @@ def _in_range(code: str, spec: str) -> bool:
     return lo <= code <= hi
 
 
-def group_events(events: list[tuple[int, Event]], scope: Scope) -> dict[str, Group]:
+def ineffective_ids(paths: Paths, events: list[tuple[int, Event]]) -> set[int]:
+    """Ids of edit/add/remove events that changed nothing when replayed over the draft they were made on (an Edit
+    pressed on unchanged values still carries a reason, but there is no correction behind it). Encounters whose
+    draft cannot be found are left alone."""
+    by_enc: dict[str, list[tuple[int, Event]]] = defaultdict(list)
+    for rid, e in events:
+        by_enc[e.encounter_id].append((rid, e))
+    drafts: dict[tuple[str, str], dict[str, dict]] = {}
+    out: set[int] = set()
+    for eid, evs in by_enc.items():
+        key = (evs[0][1].version, evs[0][1].batch)
+        if key not in drafts:
+            path = paths.runs / key[0] / key[1] / "predictions.jsonl"
+            drafts[key] = {r["encounter_id"]: r for r in read_jsonl(path)} if path.exists() else {}
+        if eid in drafts[key]:
+            out |= ineffective_touch_ids(drafts[key][eid], evs)
+    return out
+
+
+def group_events(
+    events: list[tuple[int, Event]], scope: Scope, skip: set[int] | frozenset[int] = frozenset()
+) -> dict[str, Group]:
     groups: dict[str, Group] = {}
     for eid_num, e in events:
-        key = grouping_key(e, scope)
+        key = grouping_key(e, scope) if eid_num not in skip else None
         if key is None:
             continue
         reason, field_type, module, category = key
@@ -126,7 +148,8 @@ def extract_findings(
             raise RuntimeError(f"{jsonl} missing; run `codeloop labels build --batch {batch}`")
         store = EventStore.from_jsonl(jsonl)
     scope = Scope.load(paths.scope_yaml)
-    groups = group_events(store.all(), scope)
+    events = store.all()
+    groups = group_events(events, scope, skip=ineffective_ids(paths, events))
     rule = config.decisions["D3"].value
     min_new, min_repeat = int(rule.get("in_batch", 3)), int(rule.get("if_seen_in_prior_batch", 2))
     existing = load_existing(paths)

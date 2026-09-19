@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from codeloop.review_ui.app import ReviewSession, create_review_app
 from codeloop.review_ui.labels import build_labels
-from codeloop.review_ui.replay import replay, review_minutes
+from codeloop.review_ui.replay import ineffective_touch_ids, replay, review_minutes
 from codeloop.review_ui.store import EventStore
 from codeloop.schemas.event import Event
 from codeloop.seal.crypto import decrypt_from_file
@@ -105,6 +105,68 @@ def test_page_js_sends_the_encounter_id_with_every_post(tmp_path):
     assert all(fn == "send" for fn, _ in posts), posts
     # passage text is never inlined into a handler attribute: an apostrophe in it would end the attribute
     assert "onclick='" not in js and "JSON.stringify(spans)" not in js
+
+
+def test_guards_refuse_what_the_append_only_store_could_never_take_back(tmp_path):
+    """Refused before anything is written: an empty blind submit, an Edit that changes nothing, blank or misshapen
+    codes, values replay could not load, fields that are not there, duplicates. Each once reached the production
+    store (or could have) where the only remedy is a ledger note."""
+    paths, config, ids = _repo(tmp_path)
+    session = ReviewSession(paths, batch="spare", version="dev", coder_id="owner", store_path=None)
+    session.store = EventStore(None)
+    ui = TestClient(create_review_app(session))
+    blind_id, review_id = ids[0], ids[2]
+
+    def refused(eid, needle, **ev):
+        r = ui.post("/api/event", json={"encounter_id": eid, **ev})
+        assert r.status_code == 400 and needle in r.json()["detail"], (ev, r.text)
+
+    # blind: an empty label is never submitted, the encounter stays blind and the draft stays unread
+    r = ui.post("/api/blind_submit", json={"encounter_id": blind_id})
+    assert r.status_code == 400 and "no diagnoses" in r.json()["detail"]
+    assert session.mode(blind_id) == "blind" and session.events(blind_id) == [] and session.predictions_loaded_for == set()
+    refused(blind_id, "code box is empty", type="add", field_ref="dx:", after={"code": " "})
+    refused(blind_id, "not shaped like an ICD-10-CM", type="add", field_ref="dx:5K90", after={"code": "5K9.0"})
+    refused(blind_id, "not shaped like a CPT", type="add", field_ref="line:7356", after={"code": "7356"})
+    refused(blind_id, "cannot be saved", type="add", field_ref="line:73562", after={"code": "73562", "units": 0})
+    refused(blind_id, "cannot be saved", type="add", field_ref="line:73562", after={"code": "73562", "units": None})
+    assert ui.post("/api/event", json={"encounter_id": blind_id, "type": "add", "field_ref": "dx:J069", "after": {"code": "J06.9", "first_listed": True}}).status_code == 200
+    refused(blind_id, "already on the package", type="add", field_ref="dx:J069", after={"code": "j06.9"})
+    refused(blind_id, "code box is empty", type="edit", field_ref="dx:J069", after={"code": "", "status": "active", "first_listed": True})
+    refused(blind_id, "Nothing changed", type="edit", field_ref="dx:J069", after={"code": "J06.9", "status": "active", "first_listed": True})
+    assert [e.type for e in session.events(blind_id)] == ["add"]
+    assert ui.post("/api/blind_submit", json={"encounter_id": blind_id}).status_code == 200
+
+    # review: the draft is dx M1711 (first-listed) and line 73562 RT x1 -> M1711
+    as_drafted = {"code": "M17.11", "status": "active", "first_listed": True}
+    refused(review_id, "Nothing changed", type="edit", field_ref="dx:M1711", after=as_drafted, reason="guideline")
+    refused(review_id, "Nothing changed", type="edit", field_ref="line:73562:0", reason="query_needed",
+            after={"code": "73562", "modifiers": ["rt"], "units": 1, "pointers": ["M1711"]})
+    refused(review_id, "not on the package", type="edit", field_ref="dx:Z999", after={"code": "Z99.9"}, reason="wrong_value")
+    refused(review_id, "not on the package", type="remove", field_ref="line:99999:0", reason="unsupported")
+    refused(review_id, "cannot be first-listed", type="edit", field_ref="first_listed", after={"code": "E11.9"}, reason="guideline")
+    refused(review_id, "cannot be saved", type="edit", field_ref="line:73562:0", after={"units": "many"}, reason="wrong_value")
+    refused(review_id, "Unknown field", type="edit", field_ref="query:0", after={"code": "M17.11"}, reason="judgment")
+    assert session.events(review_id) == []
+    ok = ui.post("/api/event", json={"encounter_id": review_id, "type": "edit", "field_ref": "dx:M1711", "after": {**as_drafted, "code": "M17.12"}, "reason": "specificity"})
+    assert ok.status_code == 200 and ui.get(f"/api/encounter/{review_id}").json()["touches"] == 1
+
+
+def test_an_edit_that_changes_nothing_is_not_a_touch():
+    """Such events are in the batch1 store from before the guard existed; replay and findings must not count them."""
+    base = dict(coder_id="c", encounter_id="E", batch="b", version="v", mode="review")
+    draft = {"diagnoses": [{"code": "R1033", "first_listed": True}], "lines": [{"code": "74018", "modifiers": ["26"], "units": 1, "pointers": ["R1033"]}]}
+    events = [
+        (1, Event(ts="2026-09-19T10:00:00Z", type="open", **base)),
+        (2, Event(ts="2026-09-19T10:01:00Z", type="edit", field_ref="dx:R1033", after={"code": "R1033", "status": "active", "first_listed": True}, reason="guideline", **base)),
+        (3, Event(ts="2026-09-19T10:02:00Z", type="edit", field_ref="line:74018:0", after={"code": "74018", "modifiers": ["26"], "units": 1, "pointers": ["R1033"]}, reason="query_needed", **base)),
+        (4, Event(ts="2026-09-19T10:03:00Z", type="edit", field_ref="dx:R1033", after={"code": "R10.30", "status": "active", "first_listed": True}, reason="query_needed", **base)),
+        (5, Event(ts="2026-09-19T10:04:00Z", type="remove", field_ref="dx:Z999", reason="unsupported", **base)),
+        (6, Event(ts="2026-09-19T10:05:00Z", type="approve", **base)),
+    ]
+    rec = replay("E", "c", draft, [e for _, e in events])
+    assert rec.touches == 1 and [d.code for d in rec.label.diagnoses] == ["R1030"] and [ln.code for ln in rec.label.lines] == ["74018"]
+    assert ineffective_touch_ids(draft, events) == {2, 3, 5}
 
 
 def test_replay_is_deterministic_and_minutes_capped():

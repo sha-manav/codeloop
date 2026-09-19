@@ -22,7 +22,7 @@ from codeloop.schemas.event import Event
 from codeloop.seal.crypto import encrypt_to_file
 from codeloop.seal.run import perform_seal
 from codeloop.util.hashing import sha256_text
-from codeloop.util.jsonl import write_jsonl
+from codeloop.util.jsonl import read_jsonl, write_jsonl
 from codeloop.versioning.freeze import perform_freeze
 from codeloop.versioning.versions import VersionError, freeze_version
 from tests.synthetic import FAKE_KEY, make_inputs, make_repo
@@ -104,10 +104,15 @@ def test_findings_package_gate_end_to_end(tmp_path):
     paths, config = _repo(tmp_path)
     ids = json.loads(paths.dev_split.read_text())["sets"][BATCH][:10]
     store = _seed_labels_and_events(paths, ids)
+    # an Edit pressed on unchanged values carries a reason but no correction: not a touch, never a finding
+    store.append(Event(ts="2026-10-01T10:01:45Z", coder_id="cpc", batch=BATCH, version="v0", mode="review", encounter_id=ids[1], type="edit",
+                       field_ref="dx:R509", after={"code": "R50.9", "status": "active", "first_listed": False}, reason="guideline"))
     r = build_labels(paths, BATCH, version="v0", store=store, actor="tests") if False else build_labels(paths, batch=BATCH, version="v0", store=store, actor="tests")
     assert r.approved == 10
+    assert {x["encounter_id"]: x["touches"] for x in read_jsonl(paths.labels_file(BATCH))}[ids[1]] == 1
     findings = extract_findings(paths, config, batch=BATCH)
     by_key = {f.grouping_key: f for f in findings}
+    assert "guideline|dx|core_dx|R50" not in by_key
     spec = by_key["specificity|dx|core_dx|M17"]
     assert spec.status == "eligible" and spec.count == 6 and spec.id.startswith("FIND-DX-")
     assert by_key["unsupported|dx|core_dx|R50"].status == "candidate"

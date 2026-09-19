@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -20,13 +21,28 @@ from pydantic import ValidationError
 from codeloop.ledger import utc_now
 from codeloop.paths import Paths
 from codeloop.review_ui.auth import install_basic_auth
-from codeloop.review_ui.replay import build_blind_label, replay, status_of
+from codeloop.review_ui.replay import (
+    TOUCH_TYPES,
+    apply_touch,
+    build_blind_label,
+    field_on_label,
+    replay,
+    status_of,
+)
 from codeloop.review_ui.store import EventStore
 from codeloop.schemas.encounter import Encounter, load_encounters_jsonl
 from codeloop.schemas.event import REASONS, Event
-from codeloop.schemas.label import LabelRecord
+from codeloop.schemas.label import LabelPackage, LabelRecord
 from codeloop.seal.crypto import decrypt_from_file, encrypt_to_file
+from codeloop.util.codes import looks_like_icd10cm, normalize_icd10cm
 from codeloop.util.jsonl import read_jsonl
+
+_LINE_CODE_RE = re.compile(r"^(?:[0-9]{4}[0-9A-Z]|[A-Z][0-9]{4})$")  # CPT (incl. category II/III, PLA) or HCPCS II shape
+
+
+class Refused(ValueError):
+    """An action the server will not store. The message is written for the coder and shown as is."""
+
 
 _CSS = """
 body{font-family:system-ui,sans-serif;margin:0;background:#f6f7f9;color:#1c1e21}
@@ -54,7 +70,7 @@ const REASONS = %REASONS%;
 let DATA = null, SPANS = {};
 async function api(path, body){
   const r = await fetch(path, {method: body ? 'POST' : 'GET', headers: {'Content-Type': 'application/json'}, body: body ? JSON.stringify(body) : undefined});
-  if(!r.ok){ alert('error: ' + (await r.text())); throw new Error('api'); }
+  if(!r.ok){ const t = await r.text(); let msg = 'error: ' + t; try { const d = JSON.parse(t).detail; if(typeof d === 'string') msg = d; } catch(e) {} alert(msg); throw new Error('api'); }
   return r.json();
 }
 // Every POST is about the open encounter: the server rejects a body without encounter_id.
@@ -106,8 +122,15 @@ async function addLine(){
   const code = document.getElementById('add-line-code').value.trim(); if(!code){alert('code required'); return;}
   await post({type: 'add', field_ref: 'line:'+code.toUpperCase(), after: {code, modifiers: document.getElementById('add-line-mods').value.split(',').map(s=>s.trim()).filter(Boolean), units: parseInt(document.getElementById('add-line-units').value||'1'), pointers: document.getElementById('add-line-ptr').value.split(',').map(s=>s.trim()).filter(Boolean)}, reason: reason || null});
 }
-async function approve(){ await send('/api/approve', {}); window.location = '/'; }
-async function blindSubmit(){ if(!confirm('Submit the blind label? The draft will then be revealed.')) return; await send('/api/blind_submit', {}); await load(); }
+// A code typed into an Add box but never added would be lost without a word.
+function typedNotAdded(){ return ['add-dx-code', 'add-line-code'].some(id => { const el = document.getElementById(id); return el && el.value.trim(); }); }
+const NOT_ADDED = 'A code is typed in an Add box but was never added. Press Add, or clear the box.';
+async function approve(){ if(typedNotAdded()){ alert(NOT_ADDED); return; } await send('/api/approve', {}); window.location = '/'; }
+async function blindSubmit(){
+  if(typedNotAdded()){ alert(NOT_ADDED); return; }
+  if(!confirm(`Submit the blind label with ${DATA.label.diagnoses.length} diagnosis code(s) and ${DATA.label.lines.length} line(s)? This is final. The draft will then be revealed.`)) return;
+  await send('/api/blind_submit', {}); await load();
+}
 function renderPackage(label, draft){
   const acc = new Set(DATA.accepted), touched = new Set(DATA.touched);
   SPANS = {};
@@ -238,6 +261,49 @@ class ReviewSession:
         self.predictions_loaded_for.add(eid)
         return self._predictions.get(eid)
 
+    def current_label(self, eid: str) -> LabelPackage:
+        events = self.events(eid)
+        if self.mode(eid) == "review":
+            return replay(eid, self.coder_id, self.draft(eid), events).label
+        return build_blind_label(events)
+
+    def check_touch(self, ev: Event) -> None:
+        """Refuse an edit/add/remove that cannot mean what the coder intends. The store is append-only and labels
+        are rebuilt by replaying it, so a bad event can never be taken back: it is dry-run on a copy of the current
+        package first, and refused when it fails, changes nothing, or carries a blank or misshapen code."""
+        ref = ev.field_ref or ""
+        kind = ref.split(":")[0]
+        if kind not in ("dx", "line", "first_listed"):
+            raise Refused(f"Unknown field {ref!r}. Reload the page and try again.")
+        after = ev.after or {}
+        if ev.type == "add" or (ev.type == "edit" and "code" in after):
+            code = str(after.get("code") or "").strip()
+            if not code:
+                raise Refused("The code box is empty. Type the code, then press the button again.")
+            if kind == "line" and not _LINE_CODE_RE.match(code.upper()):
+                raise Refused(f"{code!r} is not shaped like a CPT or HCPCS code (five characters). Check the typing.")
+            if kind != "line" and not looks_like_icd10cm(code):
+                raise Refused(f"{code!r} is not shaped like an ICD-10-CM code. Check the typing.")
+        label = self.current_label(ev.encounter_id)
+        if ev.type in ("edit", "remove") and not field_on_label(label, ref):
+            raise Refused("That field is not on the package any more. Reload the page.")
+        if kind != "line" and "code" in after:
+            new_code, on_label = normalize_icd10cm(str(after["code"])), {d.code for d in label.diagnoses}
+            if kind == "first_listed" and new_code not in on_label:
+                raise Refused(f"{after['code']} is not on the package, so it cannot be first-listed.")
+            if kind == "dx" and new_code in on_label and (ev.type == "add" or new_code != ref.split(":")[1]):
+                raise Refused(f"{after['code']} is already on the package.")
+        try:
+            _, changed = apply_touch(label.model_copy(deep=True), ev)
+        except ValidationError as e:
+            problems = "; ".join(f"{'.'.join(str(x) for x in err['loc'])}: {err['msg']}" for err in e.errors())
+            raise Refused(f"That value cannot be saved ({problems}).") from e
+        if not changed:
+            raise Refused(
+                "Nothing changed, so nothing was saved. Edit saves what is in the boxes: change the value first, then "
+                "choose the reason and press Edit. If the field is right as drafted, press Accept."
+            )
+
     def record(self, payload: dict[str, Any]) -> Event:
         eid = payload["encounter_id"]
         mode = self.mode(eid)
@@ -251,12 +317,19 @@ class ReviewSession:
                 "mode": mode,
             }
         )
+        if ev.type in TOUCH_TYPES:
+            self.check_touch(ev)
         self.store.append(ev)
         return ev
 
     def blind_submit(self, eid: str) -> LabelRecord:
         events = self.events(eid)
         label = build_blind_label(events)
+        if not label.diagnoses:  # final and unrepeatable once the draft is revealed, so never by accident
+            raise Refused(
+                "The blind label has no diagnoses yet, so it was not submitted. Type each code, press Add, check "
+                "the list, then submit. Submitting is final."
+            )
         ev = Event(
             ts=utc_now(),
             coder_id=self.coder_id,
@@ -414,6 +487,8 @@ def create_review_app(session: ReviewSession, *, auth: bool = True) -> FastAPI:
         payload["encounter_id"] = eid
         try:
             ev = session.record(payload)
+        except Refused as e:
+            raise HTTPException(400, str(e)) from e
         except (ValidationError, ValueError) as e:
             raise HTTPException(400, f"invalid event: {e}") from e
         return JSONResponse({"ok": True, "type": ev.type, "mode": ev.mode})
@@ -425,7 +500,10 @@ def create_review_app(session: ReviewSession, *, auth: bool = True) -> FastAPI:
             raise HTTPException(400, "unknown encounter")
         if session.mode(eid) not in ("blind", "holdout"):
             raise HTTPException(400, "encounter is not in blind mode")
-        rec = session.blind_submit(eid)
+        try:
+            rec = session.blind_submit(eid)
+        except Refused as e:
+            raise HTTPException(400, str(e)) from e
         return JSONResponse(
             {
                 "ok": True,

@@ -161,8 +161,16 @@ def test_blind_flow_reveals_the_draft_and_keeps_both_labels(served, page):
     _open(page, served, eid, "blind")
     expect(page.locator(".banner")).to_have_count(1)
     assert "M1711" not in page.content()  # no draft on the page before the blind label is in
+    # an empty blind label is refused (it is final, and once went in seven seconds after opening the encounter)
+    with page.expect_event("dialog", predicate=lambda d: d.type == "alert"):
+        page.get_by_role("button", name="Submit blind label").click()
+    assert "no diagnoses yet" in page.dialogs[-1] and "mode: blind" in page.locator("#modebar").inner_text()
+    # so is submitting over a code that was typed but never added
     page.fill("#add-dx-code", "J06.9")
     page.check("#add-dx-first")
+    with page.expect_event("dialog"):
+        page.get_by_role("button", name="Submit blind label").click()
+    assert "never added" in page.dialogs[-1]
     _card(page, "Add diagnosis").get_by_role("button", name="Add", exact=True).click()
     expect(page.locator(".field b", has_text="J069")).to_have_count(1)
     page.fill("#add-line-code", "73562")
@@ -185,7 +193,8 @@ def test_blind_flow_reveals_the_draft_and_keeps_both_labels(served, page):
     page.get_by_role("button", name="Unwarranted", exact=True).click()
     expect(_card(page, "synthetic question?").locator("b")).to_have_text("unwarranted")
     _approve(page, served, eid)
-    assert page.dialogs == ["confirm: Submit the blind label? The draft will then be revealed."]
+    assert [d.split(":")[0] for d in page.dialogs] == ["confirm", "alert", "alert", "confirm"]
+    assert page.dialogs[-1].startswith("confirm: Submit the blind label with 1 diagnosis code(s) and 1 line(s)? This is final.")
     events, rec = _stored(served, eid)
     assert [(e.mode, e.type) for e in events][:4] == [("blind", "open"), ("blind", "add"), ("blind", "add"), ("blind", "blind_submit")]
     assert [d.code for d in rec.blind_label.diagnoses] == ["J069"] and rec.blind_label.diagnoses[0].first_listed
@@ -202,6 +211,20 @@ def test_refusals_reach_the_coder(served, page):
     assert page.dialogs == ["alert: choose a reason"]
     with page.expect_event("dialog"):
         page.get_by_role("button", name="Approve encounter").click()
-    assert len(page.dialogs) == 2 and "not ready to approve: 3 field(s)" in page.dialogs[1]
+    assert len(page.dialogs) == 2 and page.dialogs[1].startswith("alert: not ready to approve: 3 field(s)")
+    # Edit saves what is in the boxes; pressed on unchanged values it is refused with an explanation, not stored
+    page.select_option("#r-dx-E119", "guideline")
+    with page.expect_event("dialog"):
+        _card(page, "E119").get_by_role("button", name="Edit").click()
+    assert page.dialogs[2].startswith("alert: Nothing changed, so nothing was saved.")
+    page.fill("#c-dx-E119", "")
+    page.select_option("#r-dx-E119", "wrong_value")
+    with page.expect_event("dialog"):
+        _card(page, "E119").get_by_role("button", name="Edit").click()
+    assert page.dialogs[3].startswith("alert: The code box is empty.")
+    page.fill("#add-dx-code", "I10")
+    with page.expect_event("dialog"):
+        page.get_by_role("button", name="Approve encounter").click()
+    assert "never added" in page.dialogs[4]
     events, rec = _stored(served, eid)
     assert [e.type for e in events] == ["open"] and rec.touches == 0
