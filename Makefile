@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: install test lint seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events
+.PHONY: install test lint ui-e2e seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events
 
 install:            ## create .venv and install codeloop with dev tools
 	$(UV) sync --group dev
@@ -10,6 +10,9 @@ test:               ## run the full test suite (includes the holdout leakage tes
 
 lint:
 	$(UV) run ruff check codeloop tests
+
+ui-e2e:             ## drive the review UI in headless Chrome on the synthetic corpus (skips without a browser)
+	$(UV) run --with playwright pytest -rs tests/test_review_ui_browser.py
 
 seal:               ## Phase 0, once: draw and encrypt the holdout, write dev + public labels
 	$(UV) run codeloop seal
@@ -48,7 +51,7 @@ CODER_ID ?= cpc1
 fly-deploy-audit:   ## deploy the audit spot-check UI
 	$(FLY) deploy -e CODELOOP_UI_MODE=audit -e CODELOOP_CODER_ID=$(CODER_ID) -e CODELOOP_DATA_DIR=/data
 
-fly-deploy-review:  ## deploy the review UI for BATCH=… VERSION=… (CODER_ID=cpc1)
+fly-deploy-review: ui-e2e  ## deploy the review UI for BATCH=… VERSION=… (CODER_ID=cpc1), after the browser check
 	@test -n "$(BATCH)" -a -n "$(VERSION)" || (echo "usage: make fly-deploy-review BATCH=batch1 VERSION=v0" && exit 1)
 	$(FLY) deploy -e CODELOOP_UI_MODE=review -e CODELOOP_BATCH=$(BATCH) -e CODELOOP_VERSION=$(VERSION) -e CODELOOP_CODER_ID=$(CODER_ID) -e CODELOOP_DATA_DIR=/data
 

@@ -51,12 +51,14 @@ details{margin-top:.8rem}
 
 _JS = r"""
 const REASONS = %REASONS%;
-let DATA = null;
+let DATA = null, SPANS = {};
 async function api(path, body){
   const r = await fetch(path, {method: body ? 'POST' : 'GET', headers: {'Content-Type': 'application/json'}, body: body ? JSON.stringify(body) : undefined});
   if(!r.ok){ alert('error: ' + (await r.text())); throw new Error('api'); }
   return r.json();
 }
+// Every POST is about the open encounter: the server rejects a body without encounter_id.
+function send(path, body){ return api(path, {encounter_id: EID, ...body}); }
 function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function reasonSelect(id){ return `<select id="${id}"><option value="">reason…</option>${REASONS.map(r => `<option value="${r}">${r}</option>`).join('')}</select>`; }
 function highlight(spans){
@@ -69,6 +71,8 @@ function highlight(spans){
   };
   render(note, DATA.note_text, spans); render(dlg, DATA.dialogue_text, spans);
 }
+// Spans are looked up by ref, never inlined into an onclick attribute: passage text can hold quotes.
+function show(ref){ highlight(SPANS[ref] || []); }
 function spanChips(ref, spans){
   return spans.map((s, i) => {
     const id = `${ref}#${i}`; const g = DATA.evidence_grades[id] || '';
@@ -76,7 +80,7 @@ function spanChips(ref, spans){
       <button onclick="event.stopPropagation(); grade('${esc(ref)}','${esc(id)}','supported')">✓</button><button onclick="event.stopPropagation(); grade('${esc(ref)}','${esc(id)}','unsupported')">✗</button></span>`;
   }).join('');
 }
-async function post(ev){ await api('/api/event', ev); await load(); }
+async function post(ev){ await send('/api/event', ev); await load(); }
 async function grade(ref, spanId, g){ await post({type: 'grade_evidence', field_ref: ref, span_id: spanId, grade: g}); }
 async function gradeQuery(ref, g){ await post({type: 'grade_query', field_ref: ref, grade: g}); }
 async function accept(ref){ await post({type: 'accept', field_ref: ref}); }
@@ -102,15 +106,16 @@ async function addLine(){
   const code = document.getElementById('add-line-code').value.trim(); if(!code){alert('code required'); return;}
   await post({type: 'add', field_ref: 'line:'+code.toUpperCase(), after: {code, modifiers: document.getElementById('add-line-mods').value.split(',').map(s=>s.trim()).filter(Boolean), units: parseInt(document.getElementById('add-line-units').value||'1'), pointers: document.getElementById('add-line-ptr').value.split(',').map(s=>s.trim()).filter(Boolean)}, reason: reason || null});
 }
-async function approve(){ await api('/api/approve', {}); window.location = '/'; }
-async function blindSubmit(){ if(!confirm('Submit the blind label? The draft will then be revealed.')) return; await api('/api/blind_submit', {}); await load(); }
+async function approve(){ await send('/api/approve', {}); window.location = '/'; }
+async function blindSubmit(){ if(!confirm('Submit the blind label? The draft will then be revealed.')) return; await send('/api/blind_submit', {}); await load(); }
 function renderPackage(label, draft){
   const acc = new Set(DATA.accepted), touched = new Set(DATA.touched);
+  SPANS = {};
   let h = '<h3>Diagnoses</h3>';
   for(const d of label.diagnoses){
-    const ref = 'dx:'+d.code; const spans = (draft && draft.spans[ref]) || [];
+    const ref = 'dx:'+d.code; const spans = (draft && draft.spans[ref]) || []; SPANS[ref] = spans;
     const cls = acc.has(ref) ? 'accepted' : (touched.has(ref) ? 'touched' : '');
-    h += `<div class="field ${cls}" onclick='highlight(${JSON.stringify(spans)})'><b>${esc(d.code)}</b> ${d.first_listed ? '<span class="chip">first-listed</span>' : ''} <span class="muted">${esc(d.status)}</span>
+    h += `<div class="field ${cls}" onclick="show('${esc(ref)}')"><b>${esc(d.code)}</b> ${d.first_listed ? '<span class="chip">first-listed</span>' : ''} <span class="muted">${esc(d.status)}</span>
       <div>${spanChips(ref, spans)}</div>
       <div class="muted">${esc((draft && draft.rationales[ref]) || '')}</div>
       <div><input id="c-dx-${esc(d.code)}" value="${esc(d.code)}" size="8"> <select id="s-dx-${esc(d.code)}"><option ${d.status==='active'?'selected':''}>active</option><option ${d.status==='historical'?'selected':''}>historical</option></select>
@@ -123,18 +128,26 @@ function renderPackage(label, draft){
   const seen = {};
   label.lines.forEach((l, i) => {
     const idx = seen[l.code] || 0; seen[l.code] = idx + 1; const ref = `line:${l.code}:${idx}`; const key = `line-${l.code}-${idx}`;
-    const spans = (draft && draft.spans[ref]) || []; const cls = acc.has(ref) ? 'accepted' : (touched.has(ref) ? 'touched' : '');
-    h += `<div class="field ${cls}" onclick='highlight(${JSON.stringify(spans)})'><b>${esc(l.code)}</b> mods [${esc(l.modifiers.join(','))}] units ${l.units} ptr [${esc(l.pointers.join(','))}]
+    const spans = (draft && draft.spans[ref]) || []; const cls = acc.has(ref) ? 'accepted' : (touched.has(ref) ? 'touched' : ''); SPANS[ref] = spans;
+    h += `<div class="field ${cls}" onclick="show('${esc(ref)}')"><b>${esc(l.code)}</b> mods [${esc(l.modifiers.join(','))}] units ${l.units} ptr [${esc(l.pointers.join(','))}]
       <div>${spanChips(ref, spans)}</div><div class="muted">${esc((draft && draft.rationales[ref]) || '')}</div>
       <div><input id="c-${key}" value="${esc(l.code)}" size="6"> mods <input id="m-${key}" value="${esc(l.modifiers.join(','))}" size="8"> units <input id="u-${key}" value="${l.units}" size="3"> ptr <input id="p-${key}" value="${esc(l.pointers.join(','))}" size="14"> ${reasonSelect('r-'+key)}
       ${DATA.mode==='review' ? `<button onclick="event.stopPropagation(); accept('${ref}')">Accept</button>` : ''}
       <button onclick="event.stopPropagation(); editLine('${ref}','${key}')">Edit</button><button onclick="event.stopPropagation(); remove('${ref}','r-${key}')">Remove</button></div></div>`;
   });
   h += `<div class="field"><b>Add line</b> <input id="add-line-code" placeholder="CPT/HCPCS" size="6"> mods <input id="add-line-mods" size="8"> units <input id="add-line-units" value="1" size="3"> ptr <input id="add-line-ptr" placeholder="codes, comma" size="14"> ${reasonSelect('r-add-line')} <button onclick="addLine()">Add</button></div>`;
+  // Guidelines §4: passages on a field that was edited to another code or removed still get a grade,
+  // and approval waits for them, so they stay on screen under their drafted ref.
+  const orphans = draft ? Object.keys(draft.spans).filter(ref => !(ref in SPANS) && draft.spans[ref].length) : [];
+  if(orphans.length){
+    h += '<h3>Passages on edited or removed fields</h3>';
+    for(const ref of orphans){ SPANS[ref] = draft.spans[ref];
+      h += `<div class="field touched" onclick="show('${esc(ref)}')"><b>${esc(ref.split(':')[1])}</b> <span class="muted">as drafted</span><div>${spanChips(ref, draft.spans[ref])}</div></div>`; }
+  }
   if(draft && draft.queries.length){
     h += '<h3>Provider queries</h3>';
-    draft.queries.forEach((q, i) => { const ref = `query:${i}`; const g = DATA.query_grades[ref] || '';
-      h += `<div class="field" onclick='highlight(${JSON.stringify(q.evidence)})'><span class="muted">${esc(q.field_ref)}</span> ${esc(q.question)} <b>${esc(g)}</b>
+    draft.queries.forEach((q, i) => { const ref = `query:${i}`; const g = DATA.query_grades[ref] || ''; SPANS[ref] = q.evidence;
+      h += `<div class="field" onclick="show('${esc(ref)}')"><span class="muted">${esc(q.field_ref)}</span> ${esc(q.question)} <b>${esc(g)}</b>
         <button onclick="event.stopPropagation(); gradeQuery('${ref}','warranted')">Warranted</button><button onclick="event.stopPropagation(); gradeQuery('${ref}','unwarranted')">Unwarranted</button></div>`; });
   }
   if(draft && draft.scrubber.length){ h += '<h3>Scrubber</h3>' + draft.scrubber.map(f => `<div class="muted">${esc(f.rule_id)} ${esc(f.severity)}: ${esc(f.message)}</div>`).join(''); }
@@ -154,7 +167,7 @@ async function load(){
   }
   document.getElementById('right').innerHTML = right;
 }
-window.addEventListener('load', async () => { if(typeof EID !== 'undefined'){ await api('/api/event', {type: 'open'}).catch(()=>{}); await load(); } });
+window.addEventListener('load', async () => { if(typeof EID !== 'undefined'){ await send('/api/event', {type: 'open'}).catch(()=>{}); await load(); } });
 """
 
 

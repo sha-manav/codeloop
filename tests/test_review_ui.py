@@ -1,4 +1,5 @@
 import json
+import re
 
 from fastapi.testclient import TestClient
 
@@ -87,6 +88,23 @@ def test_blind_mode_never_serves_predictions_and_reveals_after_submit(tmp_path):
     assert labels[review_id]["touches"] == 2 and labels[review_id]["query_grades"] == {"query:0": "warranted"} and labels[review_id]["blind_label"] is None
     assert labels[blind_id]["blind_label"]["diagnoses"][0]["code"] == "E119" and labels[blind_id]["label"]["diagnoses"][0]["code"] == "M1711" and labels[blind_id]["blind_subset"]
     assert (paths.review_dir("dev", "spare") / "events.jsonl").exists()
+
+
+def test_page_js_sends_the_encounter_id_with_every_post(tmp_path):
+    """The API tests above post hand-written bodies; this pins what the page itself sends. Every POST once went out
+    without encounter_id, so nothing a coder did could be saved. tests/test_review_ui_browser.py runs the real thing."""
+    paths, config, ids = _repo(tmp_path)
+    session = ReviewSession(paths, batch="spare", version="dev", coder_id="owner", store_path=None)
+    session.store = EventStore(None)
+    page = TestClient(create_review_app(session)).get(f"/encounter/{ids[2]}").text
+    assert f"const EID = {json.dumps(ids[2])};" in page
+    js = page.split("<script>")[-1]
+    assert "function send(path, body){ return api(path, {encounter_id: EID, ...body}); }" in js
+    posts = re.findall(r"\b(api|send)\('(/api/(?:event|approve|blind_submit))'", js)
+    assert {path for _, path in posts} == {"/api/event", "/api/approve", "/api/blind_submit"}
+    assert all(fn == "send" for fn, _ in posts), posts
+    # passage text is never inlined into a handler attribute: an apostrophe in it would end the attribute
+    assert "onclick='" not in js and "JSON.stringify(spans)" not in js
 
 
 def test_replay_is_deterministic_and_minutes_capped():
