@@ -211,7 +211,15 @@ def test_refusals_reach_the_coder(served, page):
     assert page.dialogs == ["alert: choose a reason"]
     with page.expect_event("dialog"):
         page.get_by_role("button", name="Approve encounter").click()
-    assert len(page.dialogs) == 2 and page.dialogs[1].startswith("alert: not ready to approve: 3 field(s)")
+    assert len(page.dialogs) == 2 and page.dialogs[1] == (
+        "alert: not ready to approve: 3 field(s) need Accept, Edit or Remove (M1711, E119, 73562); "
+        "3 passage(s) not graded, on M1711, E119, 73562; 1 provider query(ies) not graded (no. 1)."
+    )
+    # accepting a card must not hide that its passages are still ungraded (a coder got stuck exactly there)
+    _card(page, "73562").get_by_role("button", name="Accept").click()
+    expect(page.locator(".field.accepted .chip.ungraded")).to_have_count(1)
+    expect(page.locator(".field.accepted .chip.ungraded")).to_contain_text("(not graded)")
+    expect(page.locator("#modebar")).to_contain_text("2 fields (M1711, E119), 3 passages (M1711, E119, 73562), 1 queries")
     # Edit saves what is in the boxes; pressed on unchanged values it is refused with an explanation, not stored
     page.select_option("#r-dx-E119", "guideline")
     with page.expect_event("dialog"):
@@ -227,4 +235,4 @@ def test_refusals_reach_the_coder(served, page):
         page.get_by_role("button", name="Approve encounter").click()
     assert "never added" in page.dialogs[4]
     events, rec = _stored(served, eid)
-    assert [e.type for e in events] == ["open"] and rec.touches == 0
+    assert [e.type for e in events] == ["open", "accept"] and rec.touches == 0

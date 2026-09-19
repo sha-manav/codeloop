@@ -55,7 +55,7 @@ mark{background:#fde68a}
 .field{border:1px solid #d9dde3;border-radius:6px;padding:.5rem;margin:.5rem 0;cursor:pointer}
 .field.accepted{border-color:#15803d;background:#f0fdf4}.field.touched{border-color:#b45309;background:#fffbeb}
 .chip{display:inline-block;padding:.1rem .4rem;border:1px solid #9aa3ad;border-radius:10px;margin:.15rem;font-size:12px}
-.chip.supported{background:#dcfce7}.chip.unsupported{background:#fee2e2}
+.chip.supported{background:#dcfce7}.chip.unsupported{background:#fee2e2}.chip.ungraded{background:#fff;border:1px dashed #b45309}
 button{padding:.3rem .6rem;margin:.15rem;border-radius:4px;border:1px solid #9aa3ad;background:#fff;cursor:pointer}
 button.primary{background:#1f2937;color:#fff;border-color:#1f2937}
 select,input{padding:.25rem;margin:.15rem}
@@ -92,7 +92,7 @@ function show(ref){ highlight(SPANS[ref] || []); }
 function spanChips(ref, spans){
   return spans.map((s, i) => {
     const id = `${ref}#${i}`; const g = DATA.evidence_grades[id] || '';
-    return `<span class="chip ${g}" title="${esc(s.text)}">${esc(s.source)} ${s.start}-${s.end} ${g ? '(' + g + ')' : ''}
+    return `<span class="chip ${g || 'ungraded'}" title="${esc(s.text)}">${esc(s.source)} ${s.start}-${s.end} (${g || 'not graded'})
       <button onclick="event.stopPropagation(); grade('${esc(ref)}','${esc(id)}','supported')">✓</button><button onclick="event.stopPropagation(); grade('${esc(ref)}','${esc(id)}','unsupported')">✗</button></span>`;
   }).join('');
 }
@@ -179,7 +179,8 @@ function renderPackage(label, draft){
 async function load(){
   DATA = await api('/api/encounter/' + encodeURIComponent(EID));
   const pend = DATA.pending || {fields: [], spans: [], queries: []};
-  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields, ${pend.spans.length} passages, ${pend.queries.length} queries`;
+  const where = refs => refs.length ? ' (' + [...new Set(refs.map(x => esc(x.split('#')[0].split(':')[1])))].join(', ') + ')' : '';
+  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries`;
   document.getElementById('note').dataset.source = 'note'; document.getElementById('dialogue').dataset.source = 'dialogue';
   highlight([]);
   let right = '';
@@ -436,6 +437,28 @@ class ReviewSession:
         }
 
 
+def _not_ready(pending: dict[str, list[str]]) -> str:
+    """The approve refusal, naming what is missing: an ungraded passage on a card that is already accepted is easy
+    to overlook, and a bare count sent a coder hunting through the wrong fields."""
+
+    def codes(refs: list[str]) -> str:
+        counts: dict[str, int] = {}
+        for r in refs:
+            code = r.split("#")[0].split(":")[1]
+            counts[code] = counts.get(code, 0) + 1
+        return ", ".join(f"{c} x{n}" if n > 1 else c for c, n in counts.items())
+
+    parts = []
+    if pending["fields"]:
+        parts.append(f"{len(pending['fields'])} field(s) need Accept, Edit or Remove ({codes(pending['fields'])})")
+    if pending["spans"]:
+        parts.append(f"{len(pending['spans'])} passage(s) not graded, on {codes(pending['spans'])}")
+    if pending["queries"]:
+        numbers = ", ".join(str(int(q.split(":")[1]) + 1) for q in pending["queries"])
+        parts.append(f"{len(pending['queries'])} provider query(ies) not graded (no. {numbers})")
+    return "not ready to approve: " + "; ".join(parts) + "."
+
+
 def create_review_app(session: ReviewSession, *, auth: bool = True) -> FastAPI:
     app = FastAPI(title="CodeLoop review")
     app.state.session = session
@@ -521,12 +544,7 @@ def create_review_app(session: ReviewSession, *, auth: bool = True) -> FastAPI:
             raise HTTPException(400, "blind label must be submitted before approval")
         pending = session.pending(eid)
         if any(pending.values()):
-            raise HTTPException(
-                400,
-                "not ready to approve: "
-                f"{len(pending['fields'])} field(s) without accept/edit/remove {pending['fields'][:5]}, "
-                f"{len(pending['spans'])} passage(s) ungraded, {len(pending['queries'])} query(ies) ungraded",
-            )
+            raise HTTPException(400, _not_ready(pending))
         session.record({"encounter_id": eid, "type": "approve"})
         return JSONResponse({"ok": True})
 
