@@ -36,10 +36,25 @@ ctx = RunContext(
     scope=Scope.load(paths.scope_yaml), scope_hash=sha256_file(paths.scope_yaml), evidence_policy=str(config.decisions["D1"].value),
     on_date=datetime.now(UTC).strftime("%Y%m%d"), seed=seed, prompt_hashes=llm.prompts.hashes(),
 )
+raw_selections: dict[int, str | None] = {}
+_complete = llm.complete
+
+
+def _spy(name, variables, schema, **kw):  # what the mapper itself returned, before the rules (indices and codes only)
+    comp = _complete(name, variables, schema, **kw)
+    if name == "map_dx":
+        raw_selections.clear()
+        raw_selections.update({sel.problem_index: sel.code for sel in comp.parsed.selections})
+    return comp
+
+
+llm.complete = _spy
 for enc in load_encounters_jsonl(paths.dev_encounters):
     if enc.id not in wanted:
         continue
+    raw_selections.clear()
     trace = run_encounter(enc, ctx)
+    print(f"  mapper returned selections for indices {sorted(raw_selections)}: {raw_selections}")
     stages = {s.name: s for s in trace.stages}
     problems = (stages["extract"].output or {}).get("problems", [])
     mapped = {d["problem_index"]: d for d in (stages["map_dx"].output or [])}
@@ -49,4 +64,6 @@ for enc in load_encounters_jsonl(paths.dev_encounters):
         m = mapped.get(i, {})
         code = m.get("code")
         mark = "TP" if code in g else ("FP" if code else "--")
-        print(f"    [{i}] basis={p.get('basis'):14} status={p.get('status'):10} -> {str(code):8} {mark} {'; '.join(m.get('notes') or [])[:90]}")
+        n_cand = 0 if p.get("status") == "ruled_out" else len(ctx.retriever.candidates_for_problem(p["description"], p.get("qualifiers", []), p["laterality"], p["status"]))
+        hit = sorted(set(g) & {c.code for c in ctx.retriever.candidates_for_problem(p["description"], p.get("qualifiers", []), p["laterality"], p["status"])}) if n_cand else []
+        print(f"    [{i}] basis={p.get('basis'):14} integral_to={str(p.get('integral_to')):5} status={p.get('status'):10} candidates={n_cand:2} gold-in-candidates={hit} -> {str(code):8} {mark} {'; '.join(m.get('notes') or [])[:80]}")
