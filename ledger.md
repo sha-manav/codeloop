@@ -567,3 +567,24 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - result: FAIL
 - route_to_human: false
 - numbers: {"base_agreement": 0.7058024691358025, "base_runs": 1, "base_scrubber_errors": 0.0, "base_targeted_error": 1.0, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.4000000000000001}
+
+## 2026-09-20T08:54:21Z — run v0 batch1
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v0-batch1-20260920T085411Z-33b42c
+- commit: 2e58f17bc301c856ae34d117d6f71090e20fbca8
+- seeds: [2, 3]
+- encounters: 45
+- llm_calls: 218
+- tokens_in: 565101
+- tokens_out: 232255
+- cache_hits: 218
+- failures: 0
+- scrubber_rule_counts: {"STRUCTURAL:error": 2}
+- compliance_failed: 0
+- predictions_sha256: {"2": "a8448c2aa63120703c0eed709a5f573142e06200b1f50a3a2ab1638d6e57b5b5", "3": "70d2639f8866a2660535be14583578743ac23064c582e9796eba98f2435617bd"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 8.63
+- note: run at tag v0 in a separate worktree (main has moved past the tag); every LLM call was a cache hit, so the cost shown is nominal; adds the seed-2 and seed-3 base runs the gate compares against; the seed-1 drafts the coder reviewed are unchanged; summary kept as runs/v0/batch1/run.seeds2-3.json
