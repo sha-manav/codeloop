@@ -1,0 +1,78 @@
+{
+  "commit": "9d30187d95ce14949f6e6f3d877bba1191d14298",
+  "kind": "targeted",
+  "mean": {
+    "dx_recall": 0.8333333333333334,
+    "escalation_failures": 0.0,
+    "line_recall": 1.0,
+    "mean_agreement": 0.6875661375661375,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.16666666666666666
+  },
+  "n_encounters": 3,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "611c709876565e17865c83e9075750c45b7568305b13f501e6dd2b0db463e5c1",
+    "2": "743338b644a20655de115a4bb1941144cbd36991ac43a0e27dce88a0382887b7",
+    "3": "3a8b996ce967bcc25b7874acd97595d34f57ef21eb0010ae3f8990da6ade645e"
+  },
+  "ran_at": "2026-09-20T08:55:35Z",
+  "runs": [
+    {
+      "dx_recall": 0.8333333333333334,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.6708994708994709,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": 0.5,
+      "targeted_fields": 4,
+      "targeted_wrong": 2
+    },
+    {
+      "dx_recall": 0.8333333333333334,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.6708994708994709,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": 0.0,
+      "targeted_fields": 4,
+      "targeted_wrong": 0
+    },
+    {
+      "dx_recall": 0.8333333333333334,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.7208994708994708,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": 0.0,
+      "targeted_fields": 4,
+      "targeted_wrong": 0
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "targeted-FIND-DX-0006",
+  "variance": {
+    "dx_recall": 0.0,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.000555555555555554,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.05555555555555555
+  }
+}

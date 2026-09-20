@@ -1,0 +1,78 @@
+{
+  "commit": "9d30187d95ce14949f6e6f3d877bba1191d14298",
+  "kind": "targeted",
+  "mean": {
+    "dx_recall": 0.9047619047619048,
+    "escalation_failures": 0.0,
+    "line_recall": 1.0,
+    "mean_agreement": 0.7004761904761905,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.4000000000000001
+  },
+  "n_encounters": 5,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "6aa313b437906e285cb4a0a5e0ff986311d3841d0a1db6fdb169f9554de59d55",
+    "2": "b7af0d5da615eb2ff2cb4d86b5bf9f573102824e2efd99ba81a2b9fb42fde8a9",
+    "3": "f24e462b9db598833aca110d0df8d41141394f9ef8fab2a5b461e9e0f615fe29"
+  },
+  "ran_at": "2026-09-20T08:55:12Z",
+  "runs": [
+    {
+      "dx_recall": 1.0,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.7271428571428571,
+      "n": 5,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": 0.4,
+      "targeted_fields": 5,
+      "targeted_wrong": 2
+    },
+    {
+      "dx_recall": 0.8571428571428571,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.6871428571428572,
+      "n": 5,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": 0.4,
+      "targeted_fields": 5,
+      "targeted_wrong": 2
+    },
+    {
+      "dx_recall": 0.8571428571428571,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.6871428571428572,
+      "n": 5,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": 0.4,
+      "targeted_fields": 5,
+      "targeted_wrong": 2
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "targeted-FIND-DX-0030",
+  "variance": {
+    "dx_recall": 0.004535147392290252,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.0003555555555555542,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.0
+  }
+}

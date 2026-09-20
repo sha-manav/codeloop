@@ -1,0 +1,78 @@
+{
+  "commit": "9d30187d95ce14949f6e6f3d877bba1191d14298",
+  "kind": "targeted",
+  "mean": {
+    "dx_recall": 1.0,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.6246031746031746,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.2222222222222222
+  },
+  "n_encounters": 3,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "a277fb5136d2c8429b4e931a380ac92a1a6387aa56bffc4e2aac969c67463e3a",
+    "2": "6be38f1cfb206dcdded7d734bdc5aed65713fffa2a70cba130d8b2c2aff3eadc",
+    "3": "13bd5f6a08f56c631a8c6d4cf728181184840bf5f18dac5724a4d0aadbe993e5"
+  },
+  "ran_at": "2026-09-20T08:56:01Z",
+  "runs": [
+    {
+      "dx_recall": 1.0,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.6,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": 0.0,
+      "targeted_fields": 3,
+      "targeted_wrong": 0
+    },
+    {
+      "dx_recall": 1.0,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.6369047619047619,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": 0.3333333333333333,
+      "targeted_fields": 3,
+      "targeted_wrong": 1
+    },
+    {
+      "dx_recall": 1.0,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.6369047619047619,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": 0.3333333333333333,
+      "targeted_fields": 3,
+      "targeted_wrong": 1
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "targeted-FIND-DX-0020",
+  "variance": {
+    "dx_recall": 0.0,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.00030265810027714756,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.024691358024691357
+  }
+}

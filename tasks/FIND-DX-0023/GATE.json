@@ -12,7 +12,7 @@
       "passed": true
     },
     {
-      "detail": "error rate base 1.000 -> head 0.400 (need <= 0.750); runs [0.4, 0.4, 0.4]",
+      "detail": "error rate base 1.000 -> head 0.000 (need <= 0.750); runs [0.0, 0.0, 0.0]",
       "name": "targeted",
       "passed": true
     },
@@ -52,10 +52,10 @@
     "head_agreement": 0.7194679600235155,
     "head_runs": 3,
     "head_scrubber_errors": 0.6666666666666666,
-    "head_targeted_error": 0.4000000000000001
+    "head_targeted_error": 0.0
   },
   "passed": true,
-  "ran_at": "2026-09-20T08:55:31Z",
+  "ran_at": "2026-09-20T08:56:48Z",
   "route_to_human": false,
-  "task": "FIND-DX-0030"
+  "task": "FIND-DX-0023"
 }
