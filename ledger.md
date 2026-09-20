@@ -662,3 +662,28 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - config_tree: f2b502d351475e2c30577ec1a8e5e3006b3bbb11d305aadec8a4bed4c032ecd4
 - prompt_hashes: {"audit": "da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81", "cluster_findings": "4f6bceb52b30d59830a35e613e7d188e0c72cfc863f2bd3f36a354683ec12afe", "extract": "7491eb0094deeef74e820702f18ad5c728534984f3c8ed68fc99a0d47f856339", "map_dx": "ecfc8fbd2fd14049735a2a9260101ee25bac8fa974016b5a96cf4bba89233594", "map_lines": "beabf637556f179ba3c5c7acb8d16fdf306bbd5cbf20b062e49263b9625217f3", "ping": "e9a79ea28a061709d7d3838bb8dfe791b6496a74b93d4c0790c3053d559ff32f"}
 - sealed_predictions_sha256: 9fcd4076a13175cf1488c6330ffaf9dce23af72807186e84951d624410a8eebf
+
+## 2026-09-20T09:16:22Z — run v1 batch2
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v1-batch2-20260920T091148Z-aa0387
+- commit: d6aed4d5e4df0a1e98e7706e80f6dd255e33b042
+- seeds: [1, 2, 3]
+- encounters: 45
+- llm_calls: 138
+- tokens_in: 353148
+- tokens_out: 147887
+- cache_hits: 0
+- failures: 77
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "037f929146c81b9af7c6e65eda1638bb3004aef9f4f55a35cadaea806b40acd8", "2": "325a691f3565773cc234db498cdd6537fc3807440b8f3e5c49271cbea69ba46d", "3": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 5.46
+
+## 2026-09-20T09:17:13Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Run v1-batch2-20260920T091148Z-aa0387: the provider account ran out of credit during seed 2. Seed 1, the drafts the coder reviews, is complete (45 of 45, sha256 037f929146c81b9af7c6e65eda1638bb3004aef9f4f55a35cadaea806b40acd8) and is kept. The partial seed-2 file (13 of 45) and the empty seed-3 file named in that entry were not kept: the gate reads every stored seed of a version as a full base run, so a partial file would corrupt the next gate's base. Seeds 2 and 3 are to be run again at tag v1 when the account has credit (needed only as base runs for the v1 -> v2 gate, not for the review).
