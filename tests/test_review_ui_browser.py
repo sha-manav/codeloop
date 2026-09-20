@@ -158,6 +158,11 @@ def test_review_flow_saves_every_action(served, page):
     page.fill("#p-line-73562-0", "E11.9")
     page.select_option("#r-line-73562-0", "wrong_value")
     _card(page, "73562").get_by_role("button", name="Edit").click()
+    # the removed diagnosis was the first-listed one: the status bar says so until another is chosen
+    expect(page.locator("#modebar .bad")).to_have_text("no diagnosis is marked first-listed")
+    page.check("#f-dx-E119")
+    page.select_option("#r-dx-E119", "judgment")
+    _card(page, "E119").get_by_role("button", name="Edit").click()
     expect(page.locator("#modebar .bad")).to_have_count(0)
     page.get_by_role("button", name="Warranted", exact=True).click()
     expect(_card(page, "synthetic question?").locator("b")).to_have_text("warranted")
@@ -165,11 +170,12 @@ def test_review_flow_saves_every_action(served, page):
     assert page.dialogs == []
     events, rec = _stored(served, eid)
     assert [e.type for e in events] == [
-        "open", "remove", "grade_evidence", "grade_evidence", "accept", "grade_evidence", "edit", "grade_query", "approve",
+        "open", "remove", "grade_evidence", "grade_evidence", "accept", "grade_evidence", "edit", "edit", "grade_query", "approve",
     ]
-    assert [d.code for d in rec.label.diagnoses] == ["E119"] and [(ln.code, ln.pointers) for ln in rec.label.lines] == [("73562", ["E11.9"])]
+    assert [(d.code, d.first_listed) for d in rec.label.diagnoses] == [("E119", True)]
+    assert [(ln.code, ln.pointers) for ln in rec.label.lines] == [("73562", ["E11.9"])]
     assert rec.evidence_grades == {"dx:M1711#0": "supported", "dx:E119#0": "unsupported", "line:73562:0#0": "supported"}
-    assert rec.query_grades == {"query:0": "warranted"} and rec.touches == 2
+    assert rec.query_grades == {"query:0": "warranted"} and rec.touches == 3
 
 
 def test_blind_flow_reveals_the_draft_and_keeps_both_labels(served, page):
@@ -261,7 +267,9 @@ def test_pointers_codes_and_modifiers_are_checked_before_anything_is_final(serve
     page.select_option("#r-dx-M1711", "guideline")
     _card(page, "M1711").get_by_role("button", name="Remove").click()
     expect(_card(page, "73562").locator(".bad")).to_have_text("M1711 ⚠")
-    expect(page.locator("#modebar .bad")).to_have_text("line 73562 points at M1711, which is not a diagnosis on the package")
+    expect(page.locator("#modebar .bad")).to_have_text(
+        "line 73562 points at M1711, which is not a diagnosis on the package; no diagnosis is marked first-listed"
+    )
     # a category typed where the release needs a longer code is refused, with the reason
     page.fill("#add-dx-code", "K59.0")
     page.select_option("#r-add-dx", "missed")
@@ -285,8 +293,13 @@ def test_pointers_codes_and_modifiers_are_checked_before_anything_is_final(serve
     # with the typing fixed the edit goes through and the pointer problem clears
     page.fill("#m-line-73562-0", "26,LT")
     _card(page, "73562").get_by_role("button", name="Edit").click()
-    expect(page.locator("#modebar .bad")).to_have_count(0)
     expect(_card(page, "73562").locator(".bad")).to_have_count(0)
+    expect(page.locator("#modebar .bad")).to_have_text("no diagnosis is marked first-listed")  # M1711 was the first-listed one
+    page.check("#f-dx-K5900")
+    page.select_option("#r-dx-K5900", "judgment")
+    _card(page, "K5900").get_by_role("button", name="Edit").click()
+    expect(page.locator("#modebar .bad")).to_have_count(0)
     events, rec = _stored(served, eid)
-    assert rec.label.lines[0].modifiers == ["26", "LT"] and rec.label.lines[0].pointers == ["K59.00"] and rec.touches == 3
+    assert rec.label.lines[0].modifiers == ["26", "LT"] and rec.label.lines[0].pointers == ["K59.00"] and rec.touches == 4
+    assert [(d.code, d.first_listed) for d in rec.label.diagnoses] == [("E119", False), ("K5900", True)]
 

@@ -124,6 +124,17 @@ def pointer_problems(label: LabelPackage) -> list[str]:
     return out
 
 
+def first_listed_problems(label: LabelPackage) -> list[str]:
+    """A package with diagnoses has exactly one first-listed (a scored field). Drafts always do; a label loses it when
+    the first-listed diagnosis is removed or un-ticked and no other is chosen (one batch1 encounter was approved so)."""
+    firsts = [d.code for d in label.diagnoses if d.first_listed]
+    if not label.diagnoses or len(firsts) == 1:
+        return []
+    if not firsts:
+        return ["no diagnosis is marked first-listed"]
+    return [f"{len(firsts)} diagnoses are marked first-listed ({', '.join(firsts)})"]
+
+
 def apply_touch(label: LabelPackage, e: Event) -> tuple[LabelPackage, bool]:
     """apply_event plus whether the package changed. An Edit pressed on unchanged values, or an edit/remove aimed
     at a field that is not on the package, changes nothing: it is not a correction and is never counted as one."""

@@ -81,7 +81,7 @@ def test_blind_mode_never_serves_predictions_and_reveals_after_submit(tmp_path):
         {"type": "grade_query", "field_ref": "query:0", "grade": "unwarranted"},
     ):
         assert ui.post("/api/event", json={"encounter_id": blind_id, **ev}).status_code == 200
-    assert ui.get(f"/api/encounter/{blind_id}").json()["pending"] == {"fields": [], "spans": [], "queries": [], "pointers": []}
+    assert ui.get(f"/api/encounter/{blind_id}").json()["pending"] == {"fields": [], "spans": [], "queries": [], "pointers": [], "first_listed": []}
     # labels build: only approved encounters, with touches/minutes/grades; blind label kept separately
     assert ui.post("/api/approve", json={"encounter_id": blind_id}).status_code == 200
     result = build_labels(paths, batch="spare", version="dev", store=session.store, actor="tests")
@@ -181,7 +181,8 @@ def test_lines_must_point_at_diagnoses_that_are_on_the_package(tmp_path):
                {"type": "grade_evidence", "field_ref": "dx:M1711", "span_id": "dx:M1711#0", "grade": "supported"}):
         assert post(review_id, **ev).status_code == 200
     state = ui.get(f"/api/encounter/{review_id}").json()
-    assert state["pending"] == {"fields": [], "spans": [], "queries": [], "pointers": ["line 73562 points at M1711, which is not a diagnosis on the package"]}
+    assert state["pending"] == {"fields": [], "spans": [], "queries": [], "first_listed": [],
+                                "pointers": ["line 73562 points at M1711, which is not a diagnosis on the package"]}
     r = ui.post("/api/approve", json={"encounter_id": review_id})
     assert r.status_code == 400 and "line 73562 points at M1711" in r.json()["detail"] and "pointer box" in r.json()["detail"]
     assert post(review_id, type="edit", field_ref="line:73562:0", after={"pointers": ["S86.912A"]}, reason="wrong_value").status_code == 200
@@ -197,6 +198,38 @@ def test_lines_must_point_at_diagnoses_that_are_on_the_package(tmp_path):
     assert r.status_code == 400 and "line 71046 has no diagnosis pointer" in r.json()["detail"] and session.mode(blind_id) == "blind"
     assert ui.get(f"/api/encounter/{blind_id}").json()["pending"]["pointers"] == ["line 71046 has no diagnosis pointer"]
     assert post(blind_id, type="edit", field_ref="line:71046:0", after={"pointers": ["J06.9"]}).status_code == 200
+    assert ui.post("/api/blind_submit", json={"encounter_id": blind_id}).status_code == 200
+
+
+def test_a_package_with_diagnoses_has_exactly_one_first_listed(tmp_path):
+    """Removing or un-ticking the first-listed diagnosis left a label with none (a scored field); one batch1
+    encounter was approved that way."""
+    paths, config, ids = _repo(tmp_path)
+    session = ReviewSession(paths, batch="spare", version="dev", coder_id="owner", store_path=None)
+    session.store = EventStore(None)
+    ui = TestClient(create_review_app(session))
+    blind_id, review_id = ids[0], ids[2]
+
+    def post(eid, **ev):
+        return ui.post("/api/event", json={"encounter_id": eid, **ev})
+
+    # review: replace the drafted first-listed diagnosis without choosing a new one
+    assert post(review_id, type="add", field_ref="dx:E119", after={"code": "E11.9"}, reason="missed").status_code == 200
+    assert post(review_id, type="remove", field_ref="dx:M1711", reason="guideline").status_code == 200
+    assert post(review_id, type="edit", field_ref="line:73562:0", after={"pointers": ["E11.9"]}, reason="wrong_value").status_code == 200
+    for ev in ({"type": "accept", "field_ref": "line:73562:0"}, {"type": "grade_query", "field_ref": "query:0", "grade": "unwarranted"},
+               {"type": "grade_evidence", "field_ref": "dx:M1711", "span_id": "dx:M1711#0", "grade": "supported"}):
+        assert post(review_id, **ev).status_code == 200
+    assert ui.get(f"/api/encounter/{review_id}").json()["pending"]["first_listed"] == ["no diagnosis is marked first-listed"]
+    r = ui.post("/api/approve", json={"encounter_id": review_id})
+    assert r.status_code == 400 and "no diagnosis is marked first-listed" in r.json()["detail"] and "tick first-listed" in r.json()["detail"]
+    assert post(review_id, type="edit", field_ref="dx:E119", after={"code": "E11.9", "first_listed": True}, reason="judgment").status_code == 200
+    assert ui.post("/api/approve", json={"encounter_id": review_id}).status_code == 200
+    # blind: a label built without ticking first-listed is not submitted
+    assert post(blind_id, type="add", field_ref="dx:J069", after={"code": "J06.9"}).status_code == 200
+    r = ui.post("/api/blind_submit", json={"encounter_id": blind_id})
+    assert r.status_code == 400 and "no diagnosis is marked first-listed" in r.json()["detail"] and session.mode(blind_id) == "blind"
+    assert post(blind_id, type="edit", field_ref="dx:J069", after={"code": "J06.9", "first_listed": True}).status_code == 200
     assert ui.post("/api/blind_submit", json={"encounter_id": blind_id}).status_code == 200
 
 

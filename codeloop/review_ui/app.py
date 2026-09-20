@@ -27,6 +27,7 @@ from codeloop.review_ui.replay import (
     apply_touch,
     build_blind_label,
     field_on_label,
+    first_listed_problems,
     pointer_problems,
     replay,
     status_of,
@@ -193,9 +194,10 @@ function renderPackage(label, draft){
 }
 async function load(){
   DATA = await api('/api/encounter/' + encodeURIComponent(EID));
-  const pend = {fields: [], spans: [], queries: [], pointers: [], ...(DATA.pending || {})};
+  const pend = {fields: [], spans: [], queries: [], pointers: [], first_listed: [], ...(DATA.pending || {})};
+  const structure = [...pend.pointers, ...pend.first_listed];
   const where = refs => refs.length ? ' (' + [...new Set(refs.map(x => esc(x.split('#')[0].split(':')[1])))].join(', ') + ')' : '';
-  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries${pend.pointers.length ? ' · <span class="bad">' + esc(pend.pointers.join('; ')) + '</span>' : ''}`;
+  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries${structure.length ? ' · <span class="bad">' + esc(structure.join('; ')) + '</span>' : ''}`;
   document.getElementById('note').dataset.source = 'note'; document.getElementById('dialogue').dataset.source = 'dialogue';
   highlight([]);
   let right = '';
@@ -366,6 +368,12 @@ class ReviewSession:
         problems = pointer_problems(label)
         if problems:
             raise Refused("Not submitted: " + "; ".join(problems) + ". Fix the line's pointer box (Edit), then submit.")
+        problems = first_listed_problems(label)
+        if problems:
+            raise Refused(
+                "Not submitted: " + "; ".join(problems) + ". Tick first-listed on the condition chiefly responsible "
+                "for the visit and press Edit, then submit."
+            )
         ev = Event(
             ts=utc_now(),
             coder_id=self.coder_id,
@@ -421,6 +429,7 @@ class ReviewSession:
             "spans": [x for x in spans if x not in rec.evidence_grades],
             "queries": [q for q in queries if q not in rec.query_grades],
             "pointers": pointer_problems(rec.label),
+            "first_listed": first_listed_problems(rec.label),
         }
 
     def state(self, eid: str) -> dict[str, Any]:
@@ -471,7 +480,10 @@ class ReviewSession:
             "blind_submitted": self.blind_done(eid),
             "pending": self.pending(eid)
             if mode == "review"
-            else {"fields": [], "spans": [], "queries": [], "pointers": pointer_problems(label)},
+            else {
+                "fields": [], "spans": [], "queries": [],
+                "pointers": pointer_problems(label), "first_listed": first_listed_problems(label),
+            },
         }
 
 
@@ -496,6 +508,8 @@ def _not_ready(pending: dict[str, list[str]]) -> str:
         parts.append(f"{len(pending['queries'])} provider query(ies) not graded (no. {numbers})")
     if pending.get("pointers"):
         parts.append("; ".join(pending["pointers"]) + " (fix the line's pointer box with Edit)")
+    if pending.get("first_listed"):
+        parts.append("; ".join(pending["first_listed"]) + " (tick first-listed on one diagnosis and press Edit)")
     return "not ready to approve: " + "; ".join(parts) + "."
 
 
