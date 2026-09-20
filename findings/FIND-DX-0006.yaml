@@ -1,7 +1,7 @@
 id: FIND-DX-0006
 title: guideline corrections on dx fields in core_dx (M25)
 batch_discovered: batch1
-status: accepted
+status: resolved
 pattern: reason=guideline, field_type=dx, module=core_dx, code_category=M25
 reasons:
 - guideline
@@ -26,14 +26,14 @@ count: 3
 hypothesis: Joint symptom and sign codes taken from the HPI, review of systems or
   exam are coded next to the definitive diagnosis that explains them; symptoms integral
   to a documented definitive diagnosis are not coded separately.
-pipeline_cause: null
+pipeline_cause: model_reasoning
 targeted_eval: evals/datasets/FIND-DX-0006.yaml
 task: tasks/FIND-DX-0006/
 resolution:
-  version: null
-  pr: null
-  before_error_rate: null
-  after_error_rate: null
+  version: v1
+  pr: https://github.com/sha-manav/codeloop/pull/1
+  before_error_rate: 0.5833
+  after_error_rate: 0.1667
   batch_next_error_rate: null
 triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-20
   (ledger). Basis: where the draft''s evidence for each removed code sits in the note

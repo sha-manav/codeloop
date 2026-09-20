@@ -629,3 +629,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Findings triage update, batch1: FIND-DX-0010 (R01, n=7) accepted -> ambiguous (triage delegated to the build agent, recorded as before). v0 coded R011 in ten batch1 encounters and in none does the assessment and plan mention the finding; the coder kept it in three reviewed early (D2N039, D2N078, D2N097) and removed it in seven reviewed later. The labels disagree with themselves, so no rule can satisfy the gate; the question goes to the coder through the owner. The other four accepted findings (FIND-DX-0006, -0020, -0023, -0030) passed the gate at 9d30187 on branch codeloop/FIND-DX-0030 and await the owner's review and merge.
+
+## 2026-09-20T09:04:26Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: PR #1 (branch codeloop/FIND-DX-0030, gated head 9d30187: not-assessed rule for FIND-DX-0006, -0020, -0023, -0030) merged into main by the build agent at the owner's direction: the agent reported the gate results and the open points, asked the owner to merge or to say the agent should, and the owner answered 'keep going' (2026-09-20). Gate PASS x4 and CI green before the merge. Next: unit tests for the rule on main, version freeze v1, v1 drafts for batch2 with seeds 1-3, review UI redeployed for batch2.
