@@ -13,7 +13,7 @@ from codeloop.llm.client import LLMClient
 from codeloop.mappers import imaging
 from codeloop.mappers.registry import CATEGORY_MODULE, mappable_categories
 from codeloop.paths import Paths
-from codeloop.rules.dx_rules import apply_dx_rules, choose_first_listed
+from codeloop.rules.dx_rules import apply_dx_rules, choose_first_listed, drop_not_assessed
 from codeloop.schemas.encounter import Encounter
 from codeloop.schemas.package import CodingPackage, DataGap, DiagnosisPred, LinePred, ProviderQuery
 from codeloop.schemas.trace import StageTrace, Trace
@@ -217,6 +217,20 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
             [f"mappable services: {len(allowed)}/{len(ex.services)}"],
         )
     )
+
+    # 4b. documented-but-not-assessed diagnoses (rules/dx_rules.NOT_ASSESSED_CLASSES); after the lines are mapped so
+    # that a diagnosis a billed line depends on is never taken away
+    not_assessed = drop_not_assessed(decisions, enc.note_text, [d.pointers for d in line_decisions if d.code])
+    if not_assessed:
+        for ld in line_decisions:
+            ld.pointers = [ptr for ptr in ld.pointers if ptr not in not_assessed]
+
+        def about_dropped(field_ref: str) -> bool:
+            return any(field_ref == f"dx:{c}" or field_ref.startswith(f"dx:{c}:") for c in not_assessed)
+
+        queries = [q for q in queries if not about_dropped(q.field_ref)]
+        gaps = [g for g in gaps if not about_dropped(g.field_ref)]
+        choose_first_listed(decisions)
 
     # 5. assemble
     st = _stage("assemble", [d.code for d in decisions] + [d.code for d in line_decisions])
