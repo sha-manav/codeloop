@@ -27,8 +27,8 @@ hypothesis: Joint symptom and sign codes taken from the HPI, review of systems o
   exam are coded next to the definitive diagnosis that explains them; symptoms integral
   to a documented definitive diagnosis are not coded separately.
 pipeline_cause: null
-targeted_eval: null
-task: null
+targeted_eval: evals/datasets/FIND-DX-0006.yaml
+task: tasks/FIND-DX-0006/
 resolution:
   version: null
   pr: null

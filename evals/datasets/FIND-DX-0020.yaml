@@ -1,0 +1,14 @@
+finding: FIND-DX-0020
+cases:
+- encounter_id: D2N014
+  gold: data/labels/batch1.jsonl#D2N014
+  field_refs:
+  - dx:R42
+- encounter_id: D2N157
+  gold: data/labels/batch1.jsonl#D2N157
+  field_refs:
+  - dx:R42
+- encounter_id: D2N170
+  gold: data/labels/batch1.jsonl#D2N170
+  field_refs:
+  - dx:R42

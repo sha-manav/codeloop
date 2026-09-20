@@ -1,0 +1,30 @@
+finding: FIND-DX-0010
+cases:
+- encounter_id: D2N117
+  gold: data/labels/batch1.jsonl#D2N117
+  field_refs:
+  - dx:R011
+- encounter_id: D2N118
+  gold: data/labels/batch1.jsonl#D2N118
+  field_refs:
+  - dx:R011
+- encounter_id: D2N157
+  gold: data/labels/batch1.jsonl#D2N157
+  field_refs:
+  - dx:R011
+- encounter_id: D2N170
+  gold: data/labels/batch1.jsonl#D2N170
+  field_refs:
+  - dx:R011
+- encounter_id: D2N174
+  gold: data/labels/batch1.jsonl#D2N174
+  field_refs:
+  - dx:R011
+- encounter_id: D2N191
+  gold: data/labels/batch1.jsonl#D2N191
+  field_refs:
+  - dx:R011
+- encounter_id: D2N195
+  gold: data/labels/batch1.jsonl#D2N195
+  field_refs:
+  - dx:R011

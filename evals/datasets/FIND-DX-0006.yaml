@@ -1,0 +1,15 @@
+finding: FIND-DX-0006
+cases:
+- encounter_id: D2N136
+  gold: data/labels/batch1.jsonl#D2N136
+  field_refs:
+  - dx:M25562
+- encounter_id: D2N174
+  gold: data/labels/batch1.jsonl#D2N174
+  field_refs:
+  - dx:M25461
+  - dx:M2559
+- encounter_id: D2N190
+  gold: data/labels/batch1.jsonl#D2N190
+  field_refs:
+  - dx:M25361

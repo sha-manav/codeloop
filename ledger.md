@@ -518,3 +518,43 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Findings triage, batch1 (v0). The owner delegated the triage call to the build agent on 2026-09-20 ('move forward in whatever way you think is best'); recorded in each finding as triage_assisted_by owner+llm:claude-fable-5-1. Accepted: FIND-DX-0010 (R01, n=7), FIND-DX-0030 (Z87, n=5), FIND-DX-0006 (M25, n=3), FIND-DX-0020 (R42, n=3), FIND-DX-0023 (R63, n=3), all removals with reason guideline and one shared root cause: the draft codes what is documented anywhere in the note (physical exam, review of systems, HPI, social history) rather than what is assessed, managed or affecting care. FIND-LINES-0005 set back from eligible to candidate: one of its three occurrences (D2N195) is a remove-then-re-add self-correction, leaving two net occurrences, below the D3 threshold. The other 51 findings stay candidates. Basis for every decision: evidence section names and counts, passage grades and codes only; no encounter text.
+
+## 2026-09-20T08:08:45Z — findings package FIND-DX-0010
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0010.yaml
+- targeted_suite: targeted-FIND-DX-0010
+- regression_suite: regression-through-batch1
+- task: tasks/FIND-DX-0010/
+
+## 2026-09-20T08:08:45Z — findings package FIND-DX-0030
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0030.yaml
+- targeted_suite: targeted-FIND-DX-0030
+- regression_suite: regression-through-batch1
+- task: tasks/FIND-DX-0030/
+
+## 2026-09-20T08:08:46Z — findings package FIND-DX-0006
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0006.yaml
+- targeted_suite: targeted-FIND-DX-0006
+- regression_suite: regression-through-batch1
+- task: tasks/FIND-DX-0006/
+
+## 2026-09-20T08:08:46Z — findings package FIND-DX-0020
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0020.yaml
+- targeted_suite: targeted-FIND-DX-0020
+- regression_suite: regression-through-batch1
+- task: tasks/FIND-DX-0020/
+
+## 2026-09-20T08:08:46Z — findings package FIND-DX-0023
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0023.yaml
+- targeted_suite: targeted-FIND-DX-0023
+- regression_suite: regression-through-batch1
+- task: tasks/FIND-DX-0023/

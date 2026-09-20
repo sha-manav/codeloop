@@ -32,8 +32,8 @@ hypothesis: Personal-history Z codes are emitted for any documented history (soc
   history or a passing mention) without requiring that the history affects care at
   this visit; all five were drafted with status historical and removed.
 pipeline_cause: null
-targeted_eval: null
-task: null
+targeted_eval: evals/datasets/FIND-DX-0030.yaml
+task: tasks/FIND-DX-0030/
 resolution:
   version: null
   pr: null

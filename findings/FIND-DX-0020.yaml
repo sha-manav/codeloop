@@ -26,8 +26,8 @@ hypothesis: 'Review-of-systems positives are extracted as problems and coded alt
   never assessed: the draft''s note evidence for R42 is in the REVIEW OF SYSTEMS section
   in 3 of 3 encounters.'
 pipeline_cause: null
-targeted_eval: null
-task: null
+targeted_eval: evals/datasets/FIND-DX-0020.yaml
+task: tasks/FIND-DX-0020/
 resolution:
   version: null
   pr: null

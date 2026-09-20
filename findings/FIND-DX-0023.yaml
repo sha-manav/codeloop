@@ -25,8 +25,8 @@ count: 3
 hypothesis: Weight-change symptoms mentioned in the HPI or review of systems are coded
   although the assessment does not address them.
 pipeline_cause: null
-targeted_eval: null
-task: null
+targeted_eval: evals/datasets/FIND-DX-0023.yaml
+task: tasks/FIND-DX-0023/
 resolution:
   version: null
   pr: null

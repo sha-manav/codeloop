@@ -39,8 +39,8 @@ hypothesis: 'Physical-exam findings are extracted as problems and coded as activ
   evidence for R011 is in the PHYSICAL EXAM section in 7 of 7 encounters (one also
   touches the assessment).'
 pipeline_cause: null
-targeted_eval: null
-task: null
+targeted_eval: evals/datasets/FIND-DX-0010.yaml
+task: tasks/FIND-DX-0010/
 resolution:
   version: null
   pr: null
