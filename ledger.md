@@ -692,3 +692,23 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Batch2 review (v1 drafts, seed 1) opened on the hosted UI 2026-09-20T09:18Z, coder id cpc1, image built from commit c68660f. Instrument at the start of batch2, all in place from the first encounter: every POST carries the encounter id; edits are dry-run and refused when they change nothing, carry a blank or misshapen code or modifier, target a missing field or duplicate a diagnosis; typed diagnosis codes must be in the FY2027 billable list; an unknown modifier asks for confirmation; approve and blind submit require every line to point at a diagnosis on the package and exactly one first-listed diagnosis (added at 2900412, before batch2); an empty blind label is refused. Blind subset of batch2: five encounters, to be done first. The batch1 event store is unchanged on the volume (1095 events, as pulled).
+
+## 2026-09-20T09:29:33Z — run v1 batch2
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v1-batch2-20260920T092406Z-1243c9
+- commit: 1936d4b61a09d6eb588eab4762f8a95c4f0430a8
+- seeds: [2, 3]
+- encounters: 45
+- llm_calls: 211
+- tokens_in: 538307
+- tokens_out: 233216
+- cache_hits: 39
+- failures: 0
+- scrubber_rule_counts: {"STRUCTURAL:error": 3}
+- compliance_failed: 0
+- predictions_sha256: {"2": "5808205077f4613bb1b2807a6fc433ffac83e20bfcf46b1cdd8c72bfabadf607", "3": "baf38b4a1368b30af4bb2948d3d3ce2b2c2de7dfda752b0b4da378a64ddab2ce"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 8.52
