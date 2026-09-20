@@ -712,3 +712,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
 - tables_version: tables.yaml:47a324256764e933/parser:1
 - estimated_cost_usd: 8.52
+
+## 2026-09-20T09:40:45Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Coder guidelines v1.2 (docs/CODER_GUIDELINES.md, sha256 1bda4744bc1f4d06c7d67491527f99890fc6c3371829df97157e4456eca1752f), effective with batch 2 before the coder opened it: review-screen mechanics only (Edit saves what is in the boxes; typed codes and modifiers are checked; passages of removed or recoded fields stay gradable; pointer and first-listed checks before approve; blind submit is final and refuses an empty label, a missing first-listed or a line without a pointer). No coding rule changed since 1.1; the evidence policy statement is unchanged. Prepared by the build agent under the owner's standing delegation; the owner forwards it to the coder.

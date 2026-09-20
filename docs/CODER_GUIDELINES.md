@@ -1,6 +1,6 @@
 # CodeLoop — Coder Guidelines
 
-**Version 1.1 — imaging convention confirmed after the spot-check session (2026-09-18).**
+**Version 1.2 — review-screen mechanics updated before batch 2 (2026-09-20). No coding rule changed since 1.1.**
 For the certified professional coder working on CodeLoop. Applies to the spot-check, the pilot, batches 1–3, and the final holdout coding. Rule questions go in the questions log (§9); the owner answers in writing and updates this document between batches. This file is committed to the project repository and its hash is recorded; a rule never changes mid-batch.
 
 ---
@@ -82,6 +82,16 @@ Actions on each drafted field: **Accept**, **Edit**, **Remove**. **Add** creates
 
 **Approve** when every field has been accepted, edited, or removed, every passage is graded, and every query is graded.
 
+**How the screen behaves (from batch 2).** None of this changes what you code; it is how the tool works and what it checks.
+
+- **Edit saves what is in the boxes.** Change the value first, choose the reason, then press Edit. Pressing Edit without changing anything is refused. If the field is right as drafted, press Accept.
+- **Codes you type are checked.** A diagnosis code must be a billable ICD-10-CM FY2027 code (a category that has longer codes under it is refused), and a line code must be shaped like a CPT/HCPCS code. A modifier the project does not expect asks you to confirm it, in case it is a typing slip.
+- **Passages of a field you removed or recoded stay on the screen**, in a section called "Passages on edited or removed fields", so you can still grade them. An ungraded passage has a dashed outline and says "not graded", including inside a field you have already accepted.
+- **Pointers.** When you remove or replace a diagnosis, check the pointer box of any X-ray line that pointed at it: a pointer to a diagnosis that is no longer on the list shows in red, and approval waits until it is fixed (Edit the line, reason `wrong_value`). When you only recode a diagnosis with Edit, the line follows the new code by itself. Every line needs at least one pointer.
+- **First-listed.** Exactly one diagnosis must be marked first-listed. If you remove the first-listed diagnosis, tick first-listed on another one and press Edit.
+- **The status bar names what is still missing** before approval, and so does the message if you press Approve too early.
+- A code typed into an Add box but never added blocks Approve and Submit, so nothing you typed is lost silently.
+
 ## 5. Recording "I would query the provider"
 
 Situations: a fact appears only in the transcript; the side, the number of views, or another detail needed for the code is not documented; the draft chose a value the note cannot support.
@@ -94,7 +104,7 @@ Situations: a fact appears only in the transcript; the side, the number of views
 
 ## 6. Blind encounters
 
-In each batch, five encounters are marked **blind**. Do these five first. The screen shows only the note and transcript, with no draft. Code the whole encounter from scratch (diagnoses with status, first-listed, any in-scope X-ray line), then press **Submit blind label**. The draft then appears, and you review it exactly as usual: every change with a reason, passages graded, queries graded, approve.
+In each batch, five encounters are marked **blind**. Do these five first. The screen shows only the note and transcript, with no draft. Code the whole encounter from scratch (diagnoses with status, first-listed, any in-scope X-ray line with its pointer), pressing **Add** for each code, check the list, then press **Submit blind label**. Submitting is final: the blind label cannot be changed afterwards, so the tool refuses an empty label, a label with no first-listed diagnosis, and a line without a pointer. The draft then appears, and you review it exactly as usual: every change with a reason, passages graded, queries graded, approve.
 
 Your reviewed version is the official label; your blind version is kept separately. When reviewing, judge the draft on its merits; do not try to reproduce your blind version.
 
@@ -129,3 +139,4 @@ Keep a running log with the encounter ID, the field, and the question. Send it t
 |---|---|---|
 | 1.0 | 2026-09-17 | Initial draft; imaging convention (global billing) and undocumented-views rule pending confirmation after the spot-check. |
 | 1.1 | 2026-09-18 | Imaging convention set to professional component (modifier 26 on every X-ray line) on the CPC's recommendation; undocumented-views rule (fewest views, would query) confirmed. |
+| 1.2 | 2026-09-20 | Review-screen mechanics only, effective with batch 2: Edit semantics, checks on typed codes and modifiers, passages of removed fields, pointer and first-listed checks, blind submit is final. No coding rule changed. |
