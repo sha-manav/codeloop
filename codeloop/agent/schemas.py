@@ -30,7 +30,10 @@ ServiceCategory = Literal[
 class Problem(BaseModel):
     description: str
     status: Status
-    basis: Basis = "assessed"  # mentioned_only problems are listed for the record and never coded (dx_rules)
+    basis: Basis = "assessed"  # mentioned_only problems are listed for the record and not coded (dx_rules)
+    # For a symptom or sign that is part of, or explained by, a problem assessed today: that problem's index in this
+    # list. It is coded only if that problem ends up without a code (a symptom is integral to a *coded* diagnosis).
+    integral_to: int | None = None
     laterality: Laterality
     qualifiers: list[str] = Field(default_factory=list)  # acuity, type, stage, complication, as documented
     note_quotes: list[str] = Field(default_factory=list)  # verbatim substrings of the note

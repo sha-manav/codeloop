@@ -36,12 +36,18 @@ def _q(spans: list[Span], limit: int = 3) -> str:
     return " | ".join(f'"{s.text}"' for s in spans[:limit]) or "(none)"
 
 
-def problems_block(problems, note_spans: list[list[Span]], dialogue_spans: list[list[Span]], candidates=None) -> str:
+def problems_block(
+    problems, note_spans: list[list[Span]], dialogue_spans: list[list[Span]], candidates=None, include=None
+) -> str:
+    """`include`: indices to render (original numbering kept); None renders every problem."""
     lines = []
     for i, p in enumerate(problems):
+        if include is not None and i not in include:
+            continue
+        integral = f"; integral to [{p.integral_to}]" if getattr(p, "integral_to", None) is not None else ""
         lines.append(
-            f"[{i}] {p.description}; status: {p.status}; basis: {p.basis}; laterality: {p.laterality}; "
-            f"qualifiers: {p.qualifiers or []}"
+            f"[{i}] {p.description}; status: {p.status}; laterality: {p.laterality}; "
+            f"qualifiers: {p.qualifiers or []}{integral}"
         )
         lines.append(f"    note evidence: {_q(note_spans[i])}")
         lines.append(f"    transcript evidence: {_q(dialogue_spans[i])}")

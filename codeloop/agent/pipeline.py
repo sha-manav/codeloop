@@ -13,7 +13,7 @@ from codeloop.llm.client import LLMClient
 from codeloop.mappers import imaging
 from codeloop.mappers.registry import CATEGORY_MODULE, mappable_categories
 from codeloop.paths import Paths
-from codeloop.rules.dx_rules import apply_dx_rules, choose_first_listed
+from codeloop.rules.dx_rules import apply_dx_rules, choose_first_listed, drop_integral_symptoms
 from codeloop.schemas.encounter import Encounter
 from codeloop.schemas.package import CodingPackage, DataGap, DiagnosisPred, LinePred, ProviderQuery
 from codeloop.schemas.trace import StageTrace, Trace
@@ -92,8 +92,16 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
     st = _stage("map_dx", [p.description for p in ex.problems])
     retriever = ctx.retriever
     candidates = []
-    for p in ex.problems:
-        if p.status == "ruled_out" or p.basis == "mentioned_only":
+    n_problems = len(ex.problems)
+    # a symptom marked integral to another listed problem still goes to the mapper: it is coded if that problem is not
+    integral_to = {
+        i: p.integral_to
+        for i, p in enumerate(ex.problems)
+        if p.integral_to is not None and 0 <= p.integral_to < n_problems and p.integral_to != i and p.status == "active"
+    }
+    skip = {i for i, p in enumerate(ex.problems) if p.basis == "mentioned_only" and i not in integral_to}
+    for i, p in enumerate(ex.problems):
+        if p.status == "ruled_out" or i in skip:
             candidates.append([])
         else:
             candidates.append(retriever.candidates_for_problem(p.description, p.qualifiers, p.laterality, p.status))
@@ -101,25 +109,29 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
     gaps: list[DataGap] = []
     queries: list[ProviderQuery] = []
     if ex.problems:
-        comp = ctx.llm.complete(
-            "map_dx",
-            {
-                "encounter_id": enc.id,
-                "evidence_policy": ctx.evidence_policy,
-                "problems_block": problems_block(ex.problems, p_note, p_dlg, candidates),
-            },
-            DxMapping,
-            seed=ctx.seed,
-        )
-        st.llm_calls.append(comp.trace)
-        mapping: DxMapping = comp.parsed
-        by_index = {s.problem_index: s for s in mapping.selections}
+        by_index = {}
+        if len(skip) < n_problems:
+            comp = ctx.llm.complete(
+                "map_dx",
+                {
+                    "encounter_id": enc.id,
+                    "evidence_policy": ctx.evidence_policy,
+                    "problems_block": problems_block(
+                        ex.problems, p_note, p_dlg, candidates, include=set(range(n_problems)) - skip
+                    ),
+                },
+                DxMapping,
+                seed=ctx.seed,
+            )
+            st.llm_calls.append(comp.trace)
+            mapping: DxMapping = comp.parsed
+            by_index = {s.problem_index: s for s in mapping.selections if s.problem_index not in skip}
         for i, p in enumerate(ex.problems):
             sel = by_index.get(i)
             d = apply_dx_rules(
                 problem_index=i,
                 problem_status=p.status,
-                problem_basis=p.basis,
+                problem_basis="mentioned_only" if i in skip else "assessed",
                 problem_laterality=p.laterality,
                 selected_code=sel.code if sel else None,
                 first_listed=bool(sel and sel.first_listed),
@@ -132,8 +144,9 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
                 evidence_policy=ctx.evidence_policy,
             )
             decisions.append(d)
-            gaps.extend(d.gaps)
-            queries.extend(d.queries)
+        drop_integral_symptoms(decisions, integral_to)  # may clear a symptom's code, queries and gaps
+        gaps = [g for d in decisions for g in d.gaps]
+        queries = [q for d in decisions for q in d.queries]
         choose_first_listed(decisions)
     stages.append(
         _finish(

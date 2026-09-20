@@ -58,8 +58,9 @@ def apply_dx_rules(
     ref_base = f"problem:{problem_index}"
     if problem_basis == "mentioned_only":
         # Documented, but neither assessed nor affecting care at this visit (an exam finding nobody comments on, a
-        # review-of-systems positive, a symptom explained by an assessed condition, history that is simply recorded):
-        # outpatient coding does not report it, so no code, no query, no data gap.
+        # review-of-systems positive, history that is simply recorded): outpatient coding does not report it, so no
+        # code, no query, no data gap. Symptoms integral to an assessed problem do not come through here; see
+        # drop_integral_symptoms.
         d.notes.append("not coded: documented but neither assessed nor affecting care at this visit")
         return d
     if problem_status == "ruled_out" or not selected_code:
@@ -137,6 +138,22 @@ def apply_dx_rules(
         )
     d.code = code
     return d
+
+
+def drop_integral_symptoms(decisions: list[DxDecision], integral_to: dict[int, int]) -> None:
+    """A symptom or sign is not coded beside the diagnosis that explains it, but only when that diagnosis is coded:
+    if it could not be (no fitting candidate, a data gap), the symptom is what the documentation supports, and any
+    line the visit billed still has a diagnosis to point at. `integral_to`: symptom problem index -> explaining one."""
+    by_index = {d.problem_index: d for d in decisions}
+    for i, j in integral_to.items():
+        sym, target = by_index.get(i), by_index.get(j)
+        if sym is None or not sym.code:
+            continue
+        if target is not None and target.code and target is not sym:
+            sym.notes.append(f"not coded: integral to problem {j}, which is coded {target.code} (was {sym.code})")
+            sym.code, sym.first_listed, sym.queries, sym.gaps = None, False, [], []
+        else:
+            sym.notes.append(f"coded although marked integral to problem {j}: that problem has no code")
 
 
 def choose_first_listed(decisions: list[DxDecision]) -> None:
