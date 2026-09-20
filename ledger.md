@@ -588,3 +588,44 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - tables_version: tables.yaml:47a324256764e933/parser:1
 - estimated_cost_usd: 8.63
 - note: run at tag v0 in a separate worktree (main has moved past the tag); every LLM call was a cache hit, so the cost shown is nominal; adds the seed-2 and seed-3 base runs the gate compares against; the seed-1 drafts the coder reviewed are unchanged; summary kept as runs/v0/batch1/run.seeds2-3.json
+
+## 2026-09-20T08:55:31Z — gate FIND-DX-0030
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 05b6e64
+- head: 9d30187d95ce14949f6e6f3d877bba1191d14298
+- result: PASS
+- route_to_human: false
+- numbers: {"base_agreement": 0.6851501379279158, "base_runs": 3, "base_scrubber_errors": 0.6666666666666666, "base_targeted_error": 1.0, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.4000000000000001}
+
+## 2026-09-20T08:55:56Z — gate FIND-DX-0006
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 05b6e64
+- head: 9d30187d95ce14949f6e6f3d877bba1191d14298
+- result: PASS
+- route_to_human: false
+- numbers: {"base_agreement": 0.6851501379279158, "base_runs": 3, "base_scrubber_errors": 0.6666666666666666, "base_targeted_error": 0.5833333333333334, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.16666666666666666}
+
+## 2026-09-20T08:56:22Z — gate FIND-DX-0020
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 05b6e64
+- head: 9d30187d95ce14949f6e6f3d877bba1191d14298
+- result: PASS
+- route_to_human: false
+- numbers: {"base_agreement": 0.6851501379279158, "base_runs": 3, "base_scrubber_errors": 0.6666666666666666, "base_targeted_error": 0.8888888888888888, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.2222222222222222}
+
+## 2026-09-20T08:56:48Z — gate FIND-DX-0023
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 05b6e64
+- head: 9d30187d95ce14949f6e6f3d877bba1191d14298
+- result: PASS
+- route_to_human: false
+- numbers: {"base_agreement": 0.6851501379279158, "base_runs": 3, "base_scrubber_errors": 0.6666666666666666, "base_targeted_error": 1.0, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.0}
+
+## 2026-09-20T08:58:26Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Findings triage update, batch1: FIND-DX-0010 (R01, n=7) accepted -> ambiguous (triage delegated to the build agent, recorded as before). v0 coded R011 in ten batch1 encounters and in none does the assessment and plan mention the finding; the coder kept it in three reviewed early (D2N039, D2N078, D2N097) and removed it in seven reviewed later. The labels disagree with themselves, so no rule can satisfy the gate; the question goes to the coder through the owner. The other four accepted findings (FIND-DX-0006, -0020, -0023, -0030) passed the gate at 9d30187 on branch codeloop/FIND-DX-0030 and await the owner's review and merge.

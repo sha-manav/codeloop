@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from codeloop.rules.sections import assessment_plan_ranges, in_assessment_plan
 from codeloop.schemas.package import DataGap, ProviderQuery, Span
 from codeloop.tools.icd_retrieval import IcdRetriever
 from codeloop.util.codes import normalize_icd10cm
@@ -130,6 +131,58 @@ def apply_dx_rules(
         )
     d.code = code
     return d
+
+
+# Diagnoses that are documented but were not assessed (batch1 findings; coder guidelines section 3: a visit is coded for
+# what was assessed, managed or affecting care). Each class is one accepted finding, keyed by the ICD-10-CM categories
+# the coder removed, so the rule reaches exactly as far as the evidence does; a class is added when a finding is
+# accepted. (finding, code prefixes, needs a definitive musculoskeletal or injury diagnosis beside it)
+NOT_ASSESSED_CLASSES: tuple[tuple[str, tuple[str, ...], bool], ...] = (
+    ("FIND-DX-0020", ("R42",), False),  # a review-of-systems positive coded as a diagnosis
+    ("FIND-DX-0023", ("R63",), False),  # weight-change symptoms from the history
+    ("FIND-DX-0030", ("Z87",), False),  # personal history that is simply recorded
+    ("FIND-DX-0006", ("M253", "M254", "M255", "M256"), True),  # joint symptoms beside the diagnosis that explains them
+)
+_JOINT_SYMPTOMS = ("M253", "M254", "M255", "M256", "M796")
+
+
+def _definitive_msk(code: str) -> bool:
+    return code[:1] in ("M", "S") and not code.startswith(_JOINT_SYMPTOMS)
+
+
+def drop_not_assessed(
+    decisions: list[DxDecision], note_text: str, line_pointers: list[list[str]]
+) -> dict[str, list[str]]:
+    """Un-code a diagnosis of a NOT_ASSESSED class when none of its note evidence lies in the assessment and plan.
+
+    Conservative on every side: the note must have recognizable sections and the diagnosis note evidence; another
+    diagnosis must remain coded; a billed line is never left without a pointer. For joint symptoms the line follows
+    to the definitive diagnosis that explains them (what the coder does when replacing a symptom code); for the other
+    classes a diagnosis that a line would be orphaned without stays coded.
+
+    Returns {dropped code: codes a line that pointed only at dropped codes should point at instead}."""
+    ranges = assessment_plan_ranges(note_text)
+    if ranges is None:
+        return {}
+    dropped: dict[str, list[str]] = {}
+    for d in decisions:
+        if not d.code:
+            continue
+        cls = next((c for c in NOT_ASSESSED_CLASSES if d.code.startswith(c[1])), None)
+        if cls is None or not d.evidence or any(in_assessment_plan(ranges, s.start) for s in d.evidence):
+            continue
+        others = [x.code for x in decisions if x.code and x is not d]
+        definitive = sorted({c for c in others if _definitive_msk(c)})
+        if not others or (cls[2] and not definitive):
+            continue
+        orphans_a_line = any(ptrs and not (set(ptrs) - {d.code} - set(dropped)) for ptrs in line_pointers)
+        if orphans_a_line and not cls[2]:
+            d.notes.append(f"kept although not in the assessment and plan ({cls[0]}): a billed line points only at it")
+            continue
+        d.notes.append(f"not coded ({cls[0]}): {d.code} is documented outside the assessment and plan only")
+        dropped[d.code] = definitive if cls[2] else []
+        d.code, d.first_listed, d.queries, d.gaps = None, False, [], []
+    return dropped
 
 
 def choose_first_listed(decisions: list[DxDecision]) -> None:

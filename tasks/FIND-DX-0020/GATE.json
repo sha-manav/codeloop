@@ -12,7 +12,7 @@
       "passed": true
     },
     {
-      "detail": "error rate base 1.000 -> head 0.400 (need <= 0.750); runs [0.4, 0.4, 0.4]",
+      "detail": "error rate base 0.889 -> head 0.222 (need <= 0.667); runs [0.0, 0.333, 0.333]",
       "name": "targeted",
       "passed": true
     },
@@ -47,15 +47,15 @@
     "base_agreement": 0.6851501379279158,
     "base_runs": 3,
     "base_scrubber_errors": 0.6666666666666666,
-    "base_targeted_error": 1.0,
+    "base_targeted_error": 0.8888888888888888,
     "escalation_failures": 0,
     "head_agreement": 0.7194679600235155,
     "head_runs": 3,
     "head_scrubber_errors": 0.6666666666666666,
-    "head_targeted_error": 0.4000000000000001
+    "head_targeted_error": 0.2222222222222222
   },
   "passed": true,
-  "ran_at": "2026-09-20T08:55:31Z",
+  "ran_at": "2026-09-20T08:56:22Z",
   "route_to_human": false,
-  "task": "FIND-DX-0030"
+  "task": "FIND-DX-0020"
 }
