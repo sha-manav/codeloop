@@ -30,7 +30,7 @@ services:
     tmpfs:
       - /repo/data/sealed   # invariant I5: sealed holdout never mounted
     networks: [internal]
-    command: bash -lc "uv sync --frozen --group dev && exec bash"
+    command: bash -lc "uv sync --frozen --group dev --offline && exec bash"   # offline: the image already holds the dependencies
 networks:
   internal:
     internal: true
