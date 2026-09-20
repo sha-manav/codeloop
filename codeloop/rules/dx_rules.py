@@ -37,6 +37,7 @@ def apply_dx_rules(
     problem_index: int,
     problem_status: str,
     problem_laterality: str,
+    problem_basis: str = "assessed",
     selected_code: str | None,
     first_listed: bool,
     rationale: str,
@@ -55,6 +56,12 @@ def apply_dx_rules(
         evidence=list(note_spans),
     )
     ref_base = f"problem:{problem_index}"
+    if problem_basis == "mentioned_only":
+        # Documented, but neither assessed nor affecting care at this visit (an exam finding nobody comments on, a
+        # review-of-systems positive, a symptom explained by an assessed condition, history that is simply recorded):
+        # outpatient coding does not report it, so no code, no query, no data gap.
+        d.notes.append("not coded: documented but neither assessed nor affecting care at this visit")
+        return d
     if problem_status == "ruled_out" or not selected_code:
         if provider_query:
             d.queries.append(

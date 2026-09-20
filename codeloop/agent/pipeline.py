@@ -93,7 +93,7 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
     retriever = ctx.retriever
     candidates = []
     for p in ex.problems:
-        if p.status == "ruled_out":
+        if p.status == "ruled_out" or p.basis == "mentioned_only":
             candidates.append([])
         else:
             candidates.append(retriever.candidates_for_problem(p.description, p.qualifiers, p.laterality, p.status))
@@ -119,6 +119,7 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
             d = apply_dx_rules(
                 problem_index=i,
                 problem_status=p.status,
+                problem_basis=p.basis,
                 problem_laterality=p.laterality,
                 selected_code=sel.code if sel else None,
                 first_listed=bool(sel and sel.first_listed),

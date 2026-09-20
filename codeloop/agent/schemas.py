@@ -7,6 +7,8 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 Status = Literal["active", "historical", "ruled_out"]
+# Why a documented problem is, or is not, something this visit is coded for (prompts/extract.txt defines each).
+Basis = Literal["assessed", "affects_care", "mentioned_only"]
 Laterality = Literal["right", "left", "bilateral", "unspecified", "not_applicable"]
 ServiceCategory = Literal[
     "in_office_injection",
@@ -28,6 +30,7 @@ ServiceCategory = Literal[
 class Problem(BaseModel):
     description: str
     status: Status
+    basis: Basis = "assessed"  # mentioned_only problems are listed for the record and never coded (dx_rules)
     laterality: Laterality
     qualifiers: list[str] = Field(default_factory=list)  # acuity, type, stage, complication, as documented
     note_quotes: list[str] = Field(default_factory=list)  # verbatim substrings of the note

@@ -40,7 +40,8 @@ def problems_block(problems, note_spans: list[list[Span]], dialogue_spans: list[
     lines = []
     for i, p in enumerate(problems):
         lines.append(
-            f"[{i}] {p.description}; status: {p.status}; laterality: {p.laterality}; qualifiers: {p.qualifiers or []}"
+            f"[{i}] {p.description}; status: {p.status}; basis: {p.basis}; laterality: {p.laterality}; "
+            f"qualifiers: {p.qualifiers or []}"
         )
         lines.append(f"    note evidence: {_q(note_spans[i])}")
         lines.append(f"    transcript evidence: {_q(dialogue_spans[i])}")
