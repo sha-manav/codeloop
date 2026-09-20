@@ -687,3 +687,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Run v1-batch2-20260920T091148Z-aa0387: the provider account ran out of credit during seed 2. Seed 1, the drafts the coder reviews, is complete (45 of 45, sha256 037f929146c81b9af7c6e65eda1638bb3004aef9f4f55a35cadaea806b40acd8) and is kept. The partial seed-2 file (13 of 45) and the empty seed-3 file named in that entry were not kept: the gate reads every stored seed of a version as a full base run, so a partial file would corrupt the next gate's base. Seeds 2 and 3 are to be run again at tag v1 when the account has credit (needed only as base runs for the v1 -> v2 gate, not for the review).
+
+## 2026-09-20T09:19:05Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Batch2 review (v1 drafts, seed 1) opened on the hosted UI 2026-09-20T09:18Z, coder id cpc1, image built from commit c68660f. Instrument at the start of batch2, all in place from the first encounter: every POST carries the encounter id; edits are dry-run and refused when they change nothing, carry a blank or misshapen code or modifier, target a missing field or duplicate a diagnosis; typed diagnosis codes must be in the FY2027 billable list; an unknown modifier asks for confirmation; approve and blind submit require every line to point at a diagnosis on the package and exactly one first-listed diagnosis (added at 2900412, before batch2); an empty blind label is refused. Blind subset of batch2: five encounters, to be done first. The batch1 event store is unchanged on the volume (1095 events, as pulled).

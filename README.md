@@ -115,7 +115,7 @@ Pull events after a session ends (the coder tells you), not while they are worki
 | 5 Scrubber and compliance | done (NCCI 2026Q4, MUE, MPFS RVU26D, ICD-10-CM FY2027) |
 | 6 Review UI | done; deployed on Fly.io (`codeloop serve`) |
 | 7 Harness | done; `v0` frozen with sealed holdout predictions |
-| 8 Cycles | v0 drafts for batch1 produced and served at https://codeloop-ui.fly.dev; **CPC review of batch1 in progress** |
+| 8 Cycles | Cycle 0 done: batch1 reviewed by the CPC (45/45, 2026-09-20), 57 findings, four resolved in `v1` through the gate (PR #1: diagnoses documented only outside the assessment and plan), one ambiguous (FIND-DX-0010, a question for the coder); `v1` frozen with sealed holdout predictions. Cycle 1: v1 drafts for batch2 served at https://codeloop-ui.fly.dev; **CPC review of batch2 pending**. Open: v1 seeds 2 and 3 on batch2 (base runs for the next gate) |
 | 9 Holdout | blind labeling and single-shot scoring await the CPC after v3 |
 | 10 Reports | `codeloop report` regenerates everything that exists |
 
