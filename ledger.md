@@ -624,3 +624,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - result: PASS
 - route_to_human: false
 - numbers: {"base_agreement": 0.6851501379279158, "base_runs": 3, "base_scrubber_errors": 0.6666666666666666, "base_targeted_error": 1.0, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.0}
+
+## 2026-09-20T08:58:26Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Findings triage update, batch1: FIND-DX-0010 (R01, n=7) accepted -> ambiguous (triage delegated to the build agent, recorded as before). v0 coded R011 in ten batch1 encounters and in none does the assessment and plan mention the finding; the coder kept it in three reviewed early (D2N039, D2N078, D2N097) and removed it in seven reviewed later. The labels disagree with themselves, so no rule can satisfy the gate; the question goes to the coder through the owner. The other four accepted findings (FIND-DX-0006, -0020, -0023, -0030) passed the gate at 9d30187 on branch codeloop/FIND-DX-0030 and await the owner's review and merge.

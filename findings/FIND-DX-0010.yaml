@@ -1,7 +1,7 @@
 id: FIND-DX-0010
 title: guideline corrections on dx fields in core_dx (R01)
 batch_discovered: batch1
-status: accepted
+status: ambiguous
 pattern: reason=guideline, field_type=dx, module=core_dx, code_category=R01
 reasons:
 - guideline
@@ -54,5 +54,14 @@ triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-
   supported, so the finding is documented and the coding rule is what removes it.
   Shares a root cause with FIND-DX-0006, -0010, -0020, -0023 and -0030: the extract
   -> map_dx path codes what is documented anywhere in the note rather than what is
-  assessed, managed or affecting care at the visit (coder guidelines section 3).'
+  assessed, managed or affecting care at the visit (coder guidelines section 3). UPDATE
+  2026-09-20, after the improvement work: set to ambiguous. The coder''s labels disagree
+  with themselves on this pattern. v0 coded R011 in ten batch1 encounters; in none
+  of the ten does the assessment and plan mention the finding. The coder kept it in
+  three (D2N039, D2N078, D2N097, all reviewed early in the batch) and removed it in
+  seven reviewed later (the occurrences of this finding). A rule that removes it loses
+  three kept codes and fails the gate on dx recall; one that reproduces both does
+  not exist. Routed to the owner: ask the coder which is right. If he removes the
+  three, adding the R01 class to codeloop/rules/dx_rules.NOT_ASSESSED_CLASSES fixes
+  6 of 7 with no kept code lost.'
 triage_assisted_by: owner+llm:claude-fable-5-1
