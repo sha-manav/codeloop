@@ -169,6 +169,8 @@ def replay(encounter_id: str, coder_id: str, draft: dict[str, Any] | None, event
     for e in events:
         if e.type == "blind_submit":
             blind = LabelPackage.model_validate(e.after or {})
+            if not blind.diagnoses and not blind.lines:
+                blind = None  # nobody's blind coding: the UI refuses an empty submit now (ledger 2026-09-19, D2N023)
             continue
         if e.mode in BLIND_MODES:
             continue  # blind-mode field events only shape the blind label, which arrives as blind_submit

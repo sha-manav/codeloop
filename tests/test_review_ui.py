@@ -232,6 +232,23 @@ def test_typed_codes_must_be_billable_and_modifiers_two_characters(tmp_path):
     assert post(review_id, type="edit", field_ref="dx:M1711", after={"code": "M17.12"}, reason="specificity").status_code == 200
 
 
+def test_an_empty_blind_submit_in_the_store_is_not_a_blind_label():
+    """One reached the batch1 store before the UI refused it (a smoke test, seconds after opening). Reports score every
+    blind_label they find against the reviewed label, so it must not pass for the coder's blind coding."""
+    base = dict(coder_id="c", encounter_id="E", batch="b", version="v")
+    draft = {"diagnoses": [{"code": "E291", "first_listed": True}], "lines": []}
+    events = [
+        Event(ts="2026-09-19T21:15:28Z", type="open", mode="blind", **base),
+        Event(ts="2026-09-19T21:15:35Z", type="blind_submit", mode="blind", after={"diagnoses": [], "lines": []}, **base),
+        Event(ts="2026-09-19T21:51:46Z", type="accept", mode="review", field_ref="dx:E291", **base),
+        Event(ts="2026-09-19T21:52:42Z", type="approve", mode="review", **base),
+    ]
+    rec = replay("E", "c", draft, events)
+    assert rec.blind_label is None and [d.code for d in rec.label.diagnoses] == ["E291"]
+    events[1] = Event(ts="2026-09-19T21:15:35Z", type="blind_submit", mode="blind", after={"diagnoses": [{"code": "E29.1", "first_listed": True}], "lines": []}, **base)
+    assert [d.code for d in replay("E", "c", draft, events).blind_label.diagnoses] == ["E291"]
+
+
 def test_an_edit_that_changes_nothing_is_not_a_touch():
     """Such events are in the batch1 store from before the guard existed; replay and findings must not count them."""
     base = dict(coder_id="c", encounter_id="E", batch="b", version="v", mode="review")
