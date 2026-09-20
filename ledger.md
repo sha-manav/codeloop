@@ -558,3 +558,12 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - targeted_suite: targeted-FIND-DX-0023
 - regression_suite: regression-through-batch1
 - task: tasks/FIND-DX-0023/
+
+## 2026-09-20T08:51:32Z — gate FIND-DX-0030
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: ba0a30d
+- head: 0b9b92cc16ea23d44bf5031dcceaae9eabd84aed
+- result: FAIL
+- route_to_human: false
+- numbers: {"base_agreement": 0.7058024691358025, "base_runs": 1, "base_scrubber_errors": 0.0, "base_targeted_error": 1.0, "escalation_failures": 0, "head_agreement": 0.7194679600235155, "head_runs": 3, "head_scrubber_errors": 0.6666666666666666, "head_targeted_error": 0.4000000000000001}

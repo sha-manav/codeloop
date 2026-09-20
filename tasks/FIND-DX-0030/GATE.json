@@ -1,0 +1,61 @@
+{
+  "base": "ba0a30d",
+  "changed_paths": [
+    "codeloop/agent/pipeline.py",
+    "codeloop/rules/dx_rules.py",
+    "codeloop/rules/sections.py"
+  ],
+  "checks": [
+    {
+      "detail": "only permitted paths changed",
+      "name": "paths",
+      "passed": true
+    },
+    {
+      "detail": "error rate base 1.000 -> head 0.400 (need <= 0.750); runs [0.4, 0.4, 0.4]",
+      "name": "targeted",
+      "passed": true
+    },
+    {
+      "detail": "mean agreement base 0.7058024691358025 -> head 0.7194679600235155 (max drop 0.010)",
+      "name": "regression_agreement",
+      "passed": true
+    },
+    {
+      "detail": "dx_recall base 0.9456521739130435 -> head 0.9021739130434782 (max drop 0.020)",
+      "name": "regression_dx_recall",
+      "passed": false
+    },
+    {
+      "detail": "line_recall base 1.0 -> head 1.0 (max drop 0.020)",
+      "name": "regression_line_recall",
+      "passed": true
+    },
+    {
+      "detail": "error-severity failures base 0.0 -> head 0.6666666666666666 (non-increasing)",
+      "name": "scrubber",
+      "passed": false
+    },
+    {
+      "detail": "escalation failures across runs: 0",
+      "name": "compliance_escalation",
+      "passed": true
+    }
+  ],
+  "head": "0b9b92cc16ea23d44bf5031dcceaae9eabd84aed",
+  "numbers": {
+    "base_agreement": 0.7058024691358025,
+    "base_runs": 1,
+    "base_scrubber_errors": 0.0,
+    "base_targeted_error": 1.0,
+    "escalation_failures": 0,
+    "head_agreement": 0.7194679600235155,
+    "head_runs": 3,
+    "head_scrubber_errors": 0.6666666666666666,
+    "head_targeted_error": 0.4000000000000001
+  },
+  "passed": false,
+  "ran_at": "2026-09-20T08:51:32Z",
+  "route_to_human": false,
+  "task": "FIND-DX-0030"
+}
