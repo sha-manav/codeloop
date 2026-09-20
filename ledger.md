@@ -634,3 +634,31 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: PR #1 (branch codeloop/FIND-DX-0030, gated head 9d30187: not-assessed rule for FIND-DX-0006, -0020, -0023, -0030) merged into main by the build agent at the owner's direction: the agent reported the gate results and the open points, asked the owner to merge or to say the agent should, and the owner answered 'keep going' (2026-09-20). Gate PASS x4 and CI green before the merge. Next: unit tests for the rule on main, version freeze v1, v1 drafts for batch2 with seeds 1-3, review UI redeployed for batch2.
+
+## 2026-09-20T09:11:29Z — holdout predict v1 (sealed)
+
+- actor: manavshah <manavshah03@gmail.com>
+- n: 40
+- predictions_enc_sha256: 9fcd4076a13175cf1488c6330ffaf9dce23af72807186e84951d624410a8eebf
+- traces_enc_sha256: 79ddb804d771c73d1b11176d1853a3a2ae569ba3ea4368e18943b968dd1f2848
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- tokens_in: 273923
+- tokens_out: 121726
+- cache: disabled
+- seed: 1
+
+## 2026-09-20T09:11:29Z — version freeze v1
+
+- actor: manavshah <manavshah03@gmail.com>
+- commit: c6cdceee05cb10718e29a42b18a8b412736cc62f
+- tag: v1
+- models_yaml: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_yaml: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_yaml: 47a324256764e933abb47ef82eab82f0577f18f703a2bf80e04a3385210e3b89
+- project_decisions: eef4e335d8f4f4352c3b73ebd83b977c9682b03c06a498412b6a5461e088f514
+- scoring_tree: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- config_tree: f2b502d351475e2c30577ec1a8e5e3006b3bbb11d305aadec8a4bed4c032ecd4
+- prompt_hashes: {"audit": "da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81", "cluster_findings": "4f6bceb52b30d59830a35e613e7d188e0c72cfc863f2bd3f36a354683ec12afe", "extract": "7491eb0094deeef74e820702f18ad5c728534984f3c8ed68fc99a0d47f856339", "map_dx": "ecfc8fbd2fd14049735a2a9260101ee25bac8fa974016b5a96cf4bba89233594", "map_lines": "beabf637556f179ba3c5c7acb8d16fdf306bbd5cbf20b062e49263b9625217f3", "ping": "e9a79ea28a061709d7d3838bb8dfe791b6496a74b93d4c0790c3053d559ff32f"}
+- sealed_predictions_sha256: 9fcd4076a13175cf1488c6330ffaf9dce23af72807186e84951d624410a8eebf
