@@ -159,6 +159,10 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
         )
     )
     problem_codes = {d.problem_index: d.code for d in decisions if d.code}
+    # a line justified by a symptom that was dropped as integral to a coded diagnosis points at that diagnosis
+    for i, j in integral_to.items():
+        if i not in problem_codes and j in problem_codes:
+            problem_codes[i] = problem_codes[j]
 
     # 4. map_lines (module mappers; deterministic product resolution for administrations)
     st = _stage("map_lines", [s.description for s in ex.services])
