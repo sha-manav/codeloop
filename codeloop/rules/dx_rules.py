@@ -150,16 +150,21 @@ def _definitive_msk(code: str) -> bool:
     return code[:1] in ("M", "S") and not code.startswith(_JOINT_SYMPTOMS)
 
 
-def drop_not_assessed(decisions: list[DxDecision], note_text: str, line_pointers: list[list[str]]) -> list[str]:
+def drop_not_assessed(
+    decisions: list[DxDecision], note_text: str, line_pointers: list[list[str]]
+) -> dict[str, list[str]]:
     """Un-code a diagnosis of a NOT_ASSESSED class when none of its note evidence lies in the assessment and plan.
 
     Conservative on every side: the note must have recognizable sections and the diagnosis note evidence; another
-    diagnosis must remain coded; a diagnosis that is the only thing a billed line points at stays. Returns the dropped
-    codes; the caller removes them from line pointers and from queries and gaps."""
+    diagnosis must remain coded; a billed line is never left without a pointer. For joint symptoms the line follows
+    to the definitive diagnosis that explains them (what the coder does when replacing a symptom code); for the other
+    classes a diagnosis that a line would be orphaned without stays coded.
+
+    Returns {dropped code: codes a line that pointed only at dropped codes should point at instead}."""
     ranges = assessment_plan_ranges(note_text)
     if ranges is None:
-        return []
-    dropped: list[str] = []
+        return {}
+    dropped: dict[str, list[str]] = {}
     for d in decisions:
         if not d.code:
             continue
@@ -167,13 +172,15 @@ def drop_not_assessed(decisions: list[DxDecision], note_text: str, line_pointers
         if cls is None or not d.evidence or any(in_assessment_plan(ranges, s.start) for s in d.evidence):
             continue
         others = [x.code for x in decisions if x.code and x is not d]
-        if not others or (cls[2] and not any(_definitive_msk(c) for c in others)):
+        definitive = sorted({c for c in others if _definitive_msk(c)})
+        if not others or (cls[2] and not definitive):
             continue
-        if any(ptrs and set(ptrs) <= {d.code} for ptrs in line_pointers):
+        orphans_a_line = any(ptrs and not (set(ptrs) - {d.code} - set(dropped)) for ptrs in line_pointers)
+        if orphans_a_line and not cls[2]:
             d.notes.append(f"kept although not in the assessment and plan ({cls[0]}): a billed line points only at it")
             continue
         d.notes.append(f"not coded ({cls[0]}): {d.code} is documented outside the assessment and plan only")
-        dropped.append(d.code)
+        dropped[d.code] = definitive if cls[2] else []
         d.code, d.first_listed, d.queries, d.gaps = None, False, [], []
     return dropped
 

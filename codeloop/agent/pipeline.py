@@ -223,7 +223,9 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
     not_assessed = drop_not_assessed(decisions, enc.note_text, [d.pointers for d in line_decisions if d.code])
     if not_assessed:
         for ld in line_decisions:
-            ld.pointers = [ptr for ptr in ld.pointers if ptr not in not_assessed]
+            kept = [ptr for ptr in ld.pointers if ptr not in not_assessed]
+            # a line that pointed only at dropped joint symptoms follows to the diagnosis that explains them
+            ld.pointers = kept or sorted({r for ptr in ld.pointers for r in not_assessed.get(ptr, [])})
 
         def about_dropped(field_ref: str) -> bool:
             return any(field_ref == f"dx:{c}" or field_ref.startswith(f"dx:{c}:") for c in not_assessed)
