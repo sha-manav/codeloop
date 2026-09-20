@@ -91,7 +91,17 @@ def page():
         pg.set_default_timeout(5000)
         expect.set_options(timeout=5000)
         pg.dialogs = []
-        pg.on("dialog", lambda d: (pg.dialogs.append(f"{d.type}: {d.message}"), d.accept()))
+        pg.decline = False  # set to answer the next confirm() with Cancel
+
+        def on_dialog(d):
+            pg.dialogs.append(f"{d.type}: {d.message}")
+            if d.type == "confirm" and pg.decline:
+                pg.decline = False
+                d.dismiss()
+            else:
+                d.accept()
+
+        pg.on("dialog", on_dialog)
         yield pg
         browser.close()
 
@@ -142,18 +152,24 @@ def test_review_flow_saves_every_action(served, page):
     orphan.get_by_role("button", name="✓").click()
     expect(orphan.locator(".chip.supported")).to_have_count(1)
     _grade_and_accept(page, "E119", "unsupported")
-    _grade_and_accept(page, "73562", "supported")
+    # the line pointed at the removed diagnosis: re-point it (an Accept would leave approval blocked on the pointer)
+    _card(page, "73562").get_by_role("button", name="✓").click()
+    expect(_card(page, "73562").locator(".chip.supported")).to_have_count(1)
+    page.fill("#p-line-73562-0", "E11.9")
+    page.select_option("#r-line-73562-0", "wrong_value")
+    _card(page, "73562").get_by_role("button", name="Edit").click()
+    expect(page.locator("#modebar .bad")).to_have_count(0)
     page.get_by_role("button", name="Warranted", exact=True).click()
     expect(_card(page, "synthetic question?").locator("b")).to_have_text("warranted")
     _approve(page, served, eid)
     assert page.dialogs == []
     events, rec = _stored(served, eid)
     assert [e.type for e in events] == [
-        "open", "remove", "grade_evidence", "grade_evidence", "accept", "grade_evidence", "accept", "grade_query", "approve",
+        "open", "remove", "grade_evidence", "grade_evidence", "accept", "grade_evidence", "edit", "grade_query", "approve",
     ]
-    assert [d.code for d in rec.label.diagnoses] == ["E119"] and [ln.code for ln in rec.label.lines] == ["73562"]
+    assert [d.code for d in rec.label.diagnoses] == ["E119"] and [(ln.code, ln.pointers) for ln in rec.label.lines] == [("73562", ["E11.9"])]
     assert rec.evidence_grades == {"dx:M1711#0": "supported", "dx:E119#0": "unsupported", "line:73562:0#0": "supported"}
-    assert rec.query_grades == {"query:0": "warranted"} and rec.touches == 1
+    assert rec.query_grades == {"query:0": "warranted"} and rec.touches == 2
 
 
 def test_blind_flow_reveals_the_draft_and_keeps_both_labels(served, page):
@@ -236,3 +252,41 @@ def test_refusals_reach_the_coder(served, page):
     assert "never added" in page.dialogs[4]
     events, rec = _stored(served, eid)
     assert [e.type for e in events] == ["open", "accept"] and rec.touches == 0
+
+
+def test_pointers_codes_and_modifiers_are_checked_before_anything_is_final(served, page):
+    eid = served["ids"][5]
+    _open(page, served, eid, "review")
+    # replacing a diagnosis leaves the X-ray line pointing at the removed code: shown on the card, blocks approval
+    page.select_option("#r-dx-M1711", "guideline")
+    _card(page, "M1711").get_by_role("button", name="Remove").click()
+    expect(_card(page, "73562").locator(".bad")).to_have_text("M1711 ⚠")
+    expect(page.locator("#modebar .bad")).to_have_text("line 73562 points at M1711, which is not a diagnosis on the package")
+    # a category typed where the release needs a longer code is refused, with the reason
+    page.fill("#add-dx-code", "K59.0")
+    page.select_option("#r-add-dx", "missed")
+    with page.expect_event("dialog"):
+        _card(page, "Add diagnosis").get_by_role("button", name="Add", exact=True).click()
+    assert page.dialogs[-1] == "alert: K59.0 is not a billable FY2027 ICD-10-CM code: more specific codes exist under it. Enter the full code."
+    page.fill("#add-dx-code", "K59.00")
+    page.select_option("#r-add-dx", "missed")
+    _card(page, "Add diagnosis").get_by_role("button", name="Add", exact=True).click()
+    expect(page.locator(".field b", has_text="K5900")).to_have_count(1)
+    # an unexpected modifier asks first; Cancel saves nothing
+    page.fill("#p-line-73562-0", "K59.00")
+    page.fill("#m-line-73562-0", "26,LF")
+    page.select_option("#r-line-73562-0", "wrong_value")
+    page.decline = True
+    with page.expect_event("dialog"):
+        _card(page, "73562").get_by_role("button", name="Edit").click()
+    assert page.dialogs[-1].startswith("confirm: LF is not a modifier this project expects (") and "Save it anyway?" in page.dialogs[-1]
+    events, rec = _stored(served, eid)
+    assert [e.type for e in events] == ["open", "remove", "add"] and rec.label.lines[0].pointers == ["M1711"]
+    # with the typing fixed the edit goes through and the pointer problem clears
+    page.fill("#m-line-73562-0", "26,LT")
+    _card(page, "73562").get_by_role("button", name="Edit").click()
+    expect(page.locator("#modebar .bad")).to_have_count(0)
+    expect(_card(page, "73562").locator(".bad")).to_have_count(0)
+    events, rec = _stored(served, eid)
+    assert rec.label.lines[0].modifiers == ["26", "LT"] and rec.label.lines[0].pointers == ["K59.00"] and rec.touches == 3
+

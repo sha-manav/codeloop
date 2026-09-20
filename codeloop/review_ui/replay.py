@@ -78,6 +78,12 @@ def apply_event(label: LabelPackage, e: Event) -> LabelPackage:
                         for other in label.diagnoses:
                             other.first_listed = False
                     label.diagnoses[k] = updated
+                    if updated.code != code:  # a recode: lines that pointed at this diagnosis still point at it
+                        for ln in label.lines:
+                            ln.pointers = [
+                                updated.code if str(ptr).strip().upper().replace(".", "") == code else ptr
+                                for ptr in ln.pointers
+                            ]
                     break
         elif ref.startswith("line"):
             i = _line_index(label, ref)
@@ -94,6 +100,28 @@ def field_on_label(label: LabelPackage, ref: str) -> bool:
     if parts[0] == "line":
         return _line_index(label, ref) is not None
     return ref == "first_listed"
+
+
+def pointer_problems(label: LabelPackage) -> list[str]:
+    """Lines that could not be filed as they stand: no diagnosis pointer, or a pointer at something that is not on
+    the package (typically left behind when the diagnosis it named was removed or recoded). Pointers resolve the
+    way the scorer resolves them: a letter or a 1-based number is a position in the diagnosis list, else a code."""
+    codes = [d.code for d in label.diagnoses]
+    out: list[str] = []
+    for ln in label.lines:
+        if not ln.pointers:
+            out.append(f"line {ln.code} has no diagnosis pointer")
+        for raw in ln.pointers:
+            ptr = str(raw).strip().upper()
+            if len(ptr) == 1 and "A" <= ptr <= "Z":
+                ok = ord(ptr) - ord("A") < len(codes)
+            elif ptr.isdigit():
+                ok = 0 <= int(ptr) - 1 < len(codes)
+            else:
+                ok = ptr.replace(".", "") in codes
+            if not ok:
+                out.append(f"line {ln.code} points at {raw}, which is not a diagnosis on the package")
+    return out
 
 
 def apply_touch(label: LabelPackage, e: Event) -> tuple[LabelPackage, bool]:

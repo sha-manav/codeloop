@@ -21,11 +21,13 @@ from pydantic import ValidationError
 from codeloop.ledger import utc_now
 from codeloop.paths import Paths
 from codeloop.review_ui.auth import install_basic_auth
+from codeloop.review_ui.codeset import load_billable
 from codeloop.review_ui.replay import (
     TOUCH_TYPES,
     apply_touch,
     build_blind_label,
     field_on_label,
+    pointer_problems,
     replay,
     status_of,
 )
@@ -34,10 +36,12 @@ from codeloop.schemas.encounter import Encounter, load_encounters_jsonl
 from codeloop.schemas.event import REASONS, Event
 from codeloop.schemas.label import LabelPackage, LabelRecord
 from codeloop.seal.crypto import decrypt_from_file, encrypt_to_file
+from codeloop.tools.validators import VALID_MODIFIERS
 from codeloop.util.codes import looks_like_icd10cm, normalize_icd10cm
 from codeloop.util.jsonl import read_jsonl
 
 _LINE_CODE_RE = re.compile(r"^(?:[0-9]{4}[0-9A-Z]|[A-Z][0-9]{4})$")  # CPT (incl. category II/III, PLA) or HCPCS II shape
+_MODIFIER_RE = re.compile(r"^[A-Z0-9]{2}$")
 
 
 class Refused(ValueError):
@@ -56,6 +60,7 @@ mark{background:#fde68a}
 .field.accepted{border-color:#15803d;background:#f0fdf4}.field.touched{border-color:#b45309;background:#fffbeb}
 .chip{display:inline-block;padding:.1rem .4rem;border:1px solid #9aa3ad;border-radius:10px;margin:.15rem;font-size:12px}
 .chip.supported{background:#dcfce7}.chip.unsupported{background:#fee2e2}.chip.ungraded{background:#fff;border:1px dashed #b45309}
+.bad{color:#b91c1c;font-weight:600}
 button{padding:.3rem .6rem;margin:.15rem;border-radius:4px;border:1px solid #9aa3ad;background:#fff;cursor:pointer}
 button.primary{background:#1f2937;color:#fff;border-color:#1f2937}
 select,input{padding:.25rem;margin:.15rem}
@@ -67,6 +72,7 @@ details{margin-top:.8rem}
 
 _JS = r"""
 const REASONS = %REASONS%;
+const KNOWN_MODIFIERS = %MODIFIERS%;
 let DATA = null, SPANS = {};
 async function api(path, body){
   const r = await fetch(path, {method: body ? 'POST' : 'GET', headers: {'Content-Type': 'application/json'}, body: body ? JSON.stringify(body) : undefined});
@@ -106,10 +112,16 @@ async function editDx(code){
   const after = {code: document.getElementById('c-dx-'+code).value, status: document.getElementById('s-dx-'+code).value, first_listed: document.getElementById('f-dx-'+code).checked};
   await post({type: 'edit', field_ref: 'dx:'+code, after, reason: reason || null});
 }
+// A modifier outside the project's list is more often a typing slip than a choice, and a blind label is final.
+function modifiersOk(mods){
+  const odd = mods.map(m => m.toUpperCase()).filter(m => !KNOWN_MODIFIERS.includes(m));
+  return !odd.length || confirm(`${odd.join(', ')} is not a modifier this project expects (${KNOWN_MODIFIERS.join(', ')}). Check the typing. Save it anyway?`);
+}
 async function editLine(ref, key){
   const reason = document.getElementById('r-'+key).value; if(DATA.mode==='review' && !reason){alert('choose a reason'); return;}
   const after = {code: document.getElementById('c-'+key).value, modifiers: document.getElementById('m-'+key).value.split(',').map(s=>s.trim()).filter(Boolean),
     units: parseInt(document.getElementById('u-'+key).value || '1'), pointers: document.getElementById('p-'+key).value.split(',').map(s=>s.trim()).filter(Boolean)};
+  if(!modifiersOk(after.modifiers)) return;
   await post({type: 'edit', field_ref: ref, after, reason: reason || null});
 }
 async function addDx(){
@@ -120,7 +132,8 @@ async function addDx(){
 async function addLine(){
   const reason = document.getElementById('r-add-line').value; if(DATA.mode==='review' && !reason){alert('choose a reason'); return;}
   const code = document.getElementById('add-line-code').value.trim(); if(!code){alert('code required'); return;}
-  await post({type: 'add', field_ref: 'line:'+code.toUpperCase(), after: {code, modifiers: document.getElementById('add-line-mods').value.split(',').map(s=>s.trim()).filter(Boolean), units: parseInt(document.getElementById('add-line-units').value||'1'), pointers: document.getElementById('add-line-ptr').value.split(',').map(s=>s.trim()).filter(Boolean)}, reason: reason || null});
+  const mods = document.getElementById('add-line-mods').value.split(',').map(s=>s.trim()).filter(Boolean); if(!modifiersOk(mods)) return;
+  await post({type: 'add', field_ref: 'line:'+code.toUpperCase(), after: {code, modifiers: mods, units: parseInt(document.getElementById('add-line-units').value||'1'), pointers: document.getElementById('add-line-ptr').value.split(',').map(s=>s.trim()).filter(Boolean)}, reason: reason || null});
 }
 // A code typed into an Add box but never added would be lost without a word.
 function typedNotAdded(){ return ['add-dx-code', 'add-line-code'].some(id => { const el = document.getElementById(id); return el && el.value.trim(); }); }
@@ -152,7 +165,9 @@ function renderPackage(label, draft){
   label.lines.forEach((l, i) => {
     const idx = seen[l.code] || 0; seen[l.code] = idx + 1; const ref = `line:${l.code}:${idx}`; const key = `line-${l.code}-${idx}`;
     const spans = (draft && draft.spans[ref]) || []; const cls = acc.has(ref) ? 'accepted' : (touched.has(ref) ? 'touched' : ''); SPANS[ref] = spans;
-    h += `<div class="field ${cls}" onclick="show('${esc(ref)}')"><b>${esc(l.code)}</b> mods [${esc(l.modifiers.join(','))}] units ${l.units} ptr [${esc(l.pointers.join(','))}]
+    const onPkg = p => { const c = String(p).toUpperCase().replace('.', ''); return /^[A-Z]$/.test(c) ? c.charCodeAt(0) - 65 < label.diagnoses.length : /^[0-9]+$/.test(c) ? c >= 1 && c <= label.diagnoses.length : label.diagnoses.some(d => d.code === c); };
+    const ptrs = l.pointers.length ? l.pointers.map(p => onPkg(p) ? esc(p) : `<span class="bad" title="not a diagnosis on this package">${esc(p)} ⚠</span>`).join(',') : '<span class="bad">none ⚠</span>';
+    h += `<div class="field ${cls}" onclick="show('${esc(ref)}')"><b>${esc(l.code)}</b> mods [${esc(l.modifiers.join(','))}] units ${l.units} ptr [${ptrs}]
       <div>${spanChips(ref, spans)}</div><div class="muted">${esc((draft && draft.rationales[ref]) || '')}</div>
       <div><input id="c-${key}" value="${esc(l.code)}" size="6"> mods <input id="m-${key}" value="${esc(l.modifiers.join(','))}" size="8"> units <input id="u-${key}" value="${l.units}" size="3"> ptr <input id="p-${key}" value="${esc(l.pointers.join(','))}" size="14"> ${reasonSelect('r-'+key)}
       ${DATA.mode==='review' ? `<button onclick="event.stopPropagation(); accept('${ref}')">Accept</button>` : ''}
@@ -178,9 +193,9 @@ function renderPackage(label, draft){
 }
 async function load(){
   DATA = await api('/api/encounter/' + encodeURIComponent(EID));
-  const pend = DATA.pending || {fields: [], spans: [], queries: []};
+  const pend = {fields: [], spans: [], queries: [], pointers: [], ...(DATA.pending || {})};
   const where = refs => refs.length ? ' (' + [...new Set(refs.map(x => esc(x.split('#')[0].split(':')[1])))].join(', ') + ')' : '';
-  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries`;
+  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries${pend.pointers.length ? ' · <span class="bad">' + esc(pend.pointers.join('; ')) + '</span>' : ''}`;
   document.getElementById('note').dataset.source = 'note'; document.getElementById('dialogue').dataset.source = 'dialogue';
   highlight([]);
   let right = '';
@@ -196,7 +211,7 @@ window.addEventListener('load', async () => { if(typeof EID !== 'undefined'){ aw
 
 
 def _page(title: str, body: str, eid: str | None = None) -> str:
-    js = _JS.replace("%REASONS%", json.dumps(list(REASONS)))
+    js = _JS.replace("%REASONS%", json.dumps(list(REASONS))).replace("%MODIFIERS%", json.dumps(sorted(VALID_MODIFIERS)))
     head = f"<script>const EID = {json.dumps(eid)};</script>" if eid else ""
     return f"<!doctype html><html><head><meta charset='utf-8'><title>{html.escape(title)}</title><style>{_CSS}</style>{head}</head><body>{body}<script>{js}</script></body></html>"
 
@@ -220,6 +235,7 @@ class ReviewSession:
         self._passphrase = passphrase
         self._predictions: dict[str, dict[str, Any]] | None = None
         self.predictions_loaded_for: set[str] = set()
+        self.codeset = load_billable()  # None when the list is absent: shape check only
         if holdout_labeling:
             if not passphrase:
                 raise RuntimeError("holdout labeling requires CODELOOP_SEAL_KEY")
@@ -285,9 +301,14 @@ class ReviewSession:
                 raise Refused(f"{code!r} is not shaped like a CPT or HCPCS code (five characters). Check the typing.")
             if kind != "line" and not looks_like_icd10cm(code):
                 raise Refused(f"{code!r} is not shaped like an ICD-10-CM code. Check the typing.")
+        odd = [m for m in (after.get("modifiers") or []) if not _MODIFIER_RE.match(str(m).strip().upper())]
+        if kind == "line" and odd:
+            raise Refused(f"Modifiers are two characters each, separated by commas; {odd[0]!r} is not. Check the typing.")
         label = self.current_label(ev.encounter_id)
         if ev.type in ("edit", "remove") and not field_on_label(label, ref):
             raise Refused("That field is not on the package any more. Reload the page.")
+        if kind == "dx" and "code" in after and (ev.type == "add" or normalize_icd10cm(str(after["code"])) != ref.split(":")[1]):
+            self.check_billable(str(after["code"]).strip())  # only a code the coder typed, never one merely kept
         if kind != "line" and "code" in after:
             new_code, on_label = normalize_icd10cm(str(after["code"])), {d.code for d in label.diagnoses}
             if kind == "first_listed" and new_code not in on_label:
@@ -304,6 +325,17 @@ class ReviewSession:
                 "Nothing changed, so nothing was saved. Edit saves what is in the boxes: change the value first, then "
                 "choose the reason and press Edit. If the field is right as drafted, press Accept."
             )
+
+    def check_billable(self, code: str) -> None:
+        if self.codeset is None or self.codeset.is_billable(code):
+            return
+        release = self.codeset.release or "current"
+        if self.codeset.has_more_specific(code):
+            raise Refused(
+                f"{code} is not a billable {release} ICD-10-CM code: more specific codes exist under it. "
+                "Enter the full code."
+            )
+        raise Refused(f"{code} is not in the {release} ICD-10-CM code set. Check the typing.")
 
     def record(self, payload: dict[str, Any]) -> Event:
         eid = payload["encounter_id"]
@@ -331,6 +363,9 @@ class ReviewSession:
                 "The blind label has no diagnoses yet, so it was not submitted. Type each code, press Add, check "
                 "the list, then submit. Submitting is final."
             )
+        problems = pointer_problems(label)
+        if problems:
+            raise Refused("Not submitted: " + "; ".join(problems) + ". Fix the line's pointer box (Edit), then submit.")
         ev = Event(
             ts=utc_now(),
             coder_id=self.coder_id,
@@ -385,6 +420,7 @@ class ReviewSession:
             "fields": [f for f in fields if f not in decided],
             "spans": [x for x in spans if x not in rec.evidence_grades],
             "queries": [q for q in queries if q not in rec.query_grades],
+            "pointers": pointer_problems(rec.label),
         }
 
     def state(self, eid: str) -> dict[str, Any]:
@@ -433,7 +469,9 @@ class ReviewSession:
             "evidence_grades": rec.evidence_grades if rec else {},
             "query_grades": rec.query_grades if rec else {},
             "blind_submitted": self.blind_done(eid),
-            "pending": self.pending(eid) if mode == "review" else {"fields": [], "spans": [], "queries": []},
+            "pending": self.pending(eid)
+            if mode == "review"
+            else {"fields": [], "spans": [], "queries": [], "pointers": pointer_problems(label)},
         }
 
 
@@ -456,6 +494,8 @@ def _not_ready(pending: dict[str, list[str]]) -> str:
     if pending["queries"]:
         numbers = ", ".join(str(int(q.split(":")[1]) + 1) for q in pending["queries"])
         parts.append(f"{len(pending['queries'])} provider query(ies) not graded (no. {numbers})")
+    if pending.get("pointers"):
+        parts.append("; ".join(pending["pointers"]) + " (fix the line's pointer box with Edit)")
     return "not ready to approve: " + "; ".join(parts) + "."
 
 

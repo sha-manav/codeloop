@@ -371,6 +371,16 @@ def tables_fetch(
     typer.echo(f"{len(records)} files; config/tables.yaml updated")
 
 
+@tables_app.command("export-billable")
+def tables_export_billable(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Export the billable ICD-10-CM codes of the built tables for the review UI's entry check (codes only)."""
+    from codeloop.review_ui.codeset import BILLABLE_LIST, export_billable
+
+    paths = _paths(root)
+    n = export_billable(paths.root / "data" / "tables" / "tables.sqlite")
+    typer.echo(f"{n} billable codes -> {BILLABLE_LIST}")
+
+
 @tables_app.command("build")
 def tables_build(root: Path | None = typer.Option(None, help="repository root")) -> None:
     """Parse the fetched files into data/tables/tables.sqlite (FTS5 index over ICD-10-CM)."""

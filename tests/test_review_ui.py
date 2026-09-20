@@ -4,10 +4,12 @@ import re
 from fastapi.testclient import TestClient
 
 from codeloop.review_ui.app import ReviewSession, create_review_app
+from codeloop.review_ui.codeset import parse_billable
 from codeloop.review_ui.labels import build_labels
-from codeloop.review_ui.replay import ineffective_touch_ids, replay, review_minutes
+from codeloop.review_ui.replay import ineffective_touch_ids, pointer_problems, replay, review_minutes
 from codeloop.review_ui.store import EventStore
 from codeloop.schemas.event import Event
+from codeloop.schemas.label import LabelPackage
 from codeloop.seal.crypto import decrypt_from_file
 from codeloop.seal.run import perform_seal
 from codeloop.util.jsonl import read_jsonl, write_jsonl
@@ -79,7 +81,7 @@ def test_blind_mode_never_serves_predictions_and_reveals_after_submit(tmp_path):
         {"type": "grade_query", "field_ref": "query:0", "grade": "unwarranted"},
     ):
         assert ui.post("/api/event", json={"encounter_id": blind_id, **ev}).status_code == 200
-    assert ui.get(f"/api/encounter/{blind_id}").json()["pending"] == {"fields": [], "spans": [], "queries": []}
+    assert ui.get(f"/api/encounter/{blind_id}").json()["pending"] == {"fields": [], "spans": [], "queries": [], "pointers": []}
     # labels build: only approved encounters, with touches/minutes/grades; blind label kept separately
     assert ui.post("/api/approve", json={"encounter_id": blind_id}).status_code == 200
     result = build_labels(paths, batch="spare", version="dev", store=session.store, actor="tests")
@@ -150,6 +152,84 @@ def test_guards_refuse_what_the_append_only_store_could_never_take_back(tmp_path
     assert session.events(review_id) == []
     ok = ui.post("/api/event", json={"encounter_id": review_id, "type": "edit", "field_ref": "dx:M1711", "after": {**as_drafted, "code": "M17.12"}, "reason": "specificity"})
     assert ok.status_code == 200 and ui.get(f"/api/encounter/{review_id}").json()["touches"] == 1
+
+
+def test_lines_must_point_at_diagnoses_that_are_on_the_package(tmp_path):
+    """Spec §8 structural rule, applied to the coder's label: removing or replacing a diagnosis used to leave the
+    X-ray line pointing at it, and the scorer compares pointer sets as they stand."""
+    pkg = LabelPackage.model_validate({"diagnoses": [{"code": "M17.11"}, {"code": "E11.9"}], "lines": [
+        {"code": "73562", "pointers": ["M17.11", "B", "2"]}, {"code": "73564", "pointers": []}, {"code": "73560", "pointers": ["C", "3", "I10"]}]})
+    assert pointer_problems(pkg) == [
+        "line 73564 has no diagnosis pointer",
+        "line 73560 points at C, which is not a diagnosis on the package",
+        "line 73560 points at 3, which is not a diagnosis on the package",
+        "line 73560 points at I10, which is not a diagnosis on the package",
+    ]
+    paths, config, ids = _repo(tmp_path)
+    session = ReviewSession(paths, batch="spare", version="dev", coder_id="owner", store_path=None)
+    session.store = EventStore(None)
+    ui = TestClient(create_review_app(session))
+    blind_id, review_id, recode_id = ids[0], ids[2], ids[3]
+
+    def post(eid, **ev):
+        return ui.post("/api/event", json={"encounter_id": eid, **ev})
+
+    # replace the drafted diagnosis (remove + add): the line is left pointing at the removed code until it is fixed
+    assert post(review_id, type="remove", field_ref="dx:M1711", reason="guideline").status_code == 200
+    assert post(review_id, type="add", field_ref="dx:S86912A", after={"code": "S86.912A", "first_listed": True}, reason="missed").status_code == 200
+    for ev in ({"type": "accept", "field_ref": "line:73562:0"}, {"type": "grade_query", "field_ref": "query:0", "grade": "warranted"},
+               {"type": "grade_evidence", "field_ref": "dx:M1711", "span_id": "dx:M1711#0", "grade": "supported"}):
+        assert post(review_id, **ev).status_code == 200
+    state = ui.get(f"/api/encounter/{review_id}").json()
+    assert state["pending"] == {"fields": [], "spans": [], "queries": [], "pointers": ["line 73562 points at M1711, which is not a diagnosis on the package"]}
+    r = ui.post("/api/approve", json={"encounter_id": review_id})
+    assert r.status_code == 400 and "line 73562 points at M1711" in r.json()["detail"] and "pointer box" in r.json()["detail"]
+    assert post(review_id, type="edit", field_ref="line:73562:0", after={"pointers": ["S86.912A"]}, reason="wrong_value").status_code == 200
+    assert ui.post("/api/approve", json={"encounter_id": review_id}).status_code == 200
+    # a recode is different: the line still points at the same diagnosis, so its pointer follows the new code
+    assert post(recode_id, type="edit", field_ref="dx:M1711", after={"code": "M17.12"}, reason="specificity").status_code == 200
+    state = ui.get(f"/api/encounter/{recode_id}").json()
+    assert state["label"]["lines"][0]["pointers"] == ["M1712"] and state["pending"]["pointers"] == [] and state["touches"] == 1
+    # blind: not submitted while a line has no pointer or points at nothing
+    assert post(blind_id, type="add", field_ref="dx:J069", after={"code": "J06.9", "first_listed": True}).status_code == 200
+    assert post(blind_id, type="add", field_ref="line:71046", after={"code": "71046", "modifiers": ["26"]}).status_code == 200
+    r = ui.post("/api/blind_submit", json={"encounter_id": blind_id})
+    assert r.status_code == 400 and "line 71046 has no diagnosis pointer" in r.json()["detail"] and session.mode(blind_id) == "blind"
+    assert ui.get(f"/api/encounter/{blind_id}").json()["pending"]["pointers"] == ["line 71046 has no diagnosis pointer"]
+    assert post(blind_id, type="edit", field_ref="line:71046:0", after={"pointers": ["J06.9"]}).status_code == 200
+    assert ui.post("/api/blind_submit", json={"encounter_id": blind_id}).status_code == 200
+
+
+def test_typed_codes_must_be_billable_and_modifiers_two_characters(tmp_path):
+    """Two of the first four blind labels held a category where the release needs a longer code, and a blind label
+    is final. Only a code the coder types is checked, never a drafted code that is merely kept."""
+    paths, config, ids = _repo(tmp_path)
+    session = ReviewSession(paths, batch="spare", version="dev", coder_id="owner", store_path=None)
+    session.store = EventStore(None)
+    assert session.codeset is not None and session.codeset.release == "FY2027" and len(session.codeset.codes) > 70000
+    ui = TestClient(create_review_app(session))
+    blind_id, review_id = ids[0], ids[2]
+
+    def post(eid, **ev):
+        return ui.post("/api/event", json={"encounter_id": eid, **ev})
+
+    for code in ("G35", "K95.0", "k59.0"):
+        r = post(blind_id, type="add", field_ref="dx:X", after={"code": code})
+        assert r.status_code == 400 and "more specific codes exist under it" in r.json()["detail"] and "FY2027" in r.json()["detail"], code
+    r = post(blind_id, type="add", field_ref="dx:X", after={"code": "K95.99"})
+    assert r.status_code == 400 and "is not in the FY2027 ICD-10-CM code set" in r.json()["detail"]
+    assert post(blind_id, type="add", field_ref="dx:K5900", after={"code": "K59.00", "first_listed": True}).status_code == 200
+    r = post(blind_id, type="edit", field_ref="dx:K5900", after={"code": "K59.0"})
+    assert r.status_code == 400 and "more specific" in r.json()["detail"]
+    r = post(blind_id, type="add", field_ref="line:73564", after={"code": "73564", "modifiers": ["26LT"], "pointers": ["K59.00"]})
+    assert r.status_code == 400 and "two characters each" in r.json()["detail"]
+    assert [e.type for e in session.events(blind_id)] == ["add"]
+    # a drafted code that is not in the list can still have its status changed or be accepted: it was not typed here
+    session.codeset = parse_billable("# icd10cm.release = FY2027\nE119\n")
+    assert post(review_id, type="edit", field_ref="dx:M1711", after={"code": "M17.11", "status": "historical", "first_listed": True}, reason="specificity").status_code == 200
+    assert post(review_id, type="edit", field_ref="dx:M1711", after={"code": "M17.12"}, reason="specificity").status_code == 400
+    session.codeset = None  # list absent (never the case in the image): shape check only
+    assert post(review_id, type="edit", field_ref="dx:M1711", after={"code": "M17.12"}, reason="specificity").status_code == 200
 
 
 def test_an_edit_that_changes_nothing_is_not_a_touch():
