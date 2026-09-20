@@ -1,7 +1,7 @@
 id: FIND-DX-0010
 title: guideline corrections on dx fields in core_dx (R01)
 batch_discovered: batch1
-status: eligible
+status: accepted
 pattern: reason=guideline, field_type=dx, module=core_dx, code_category=R01
 reasons:
 - guideline
@@ -34,7 +34,10 @@ occurrences:
   event_ids:
   - 998
 count: 7
-hypothesis: ''
+hypothesis: 'Physical-exam findings are extracted as problems and coded as active
+  diagnoses although the assessment and plan never address them: the draft''s note
+  evidence for R011 is in the PHYSICAL EXAM section in 7 of 7 encounters (one also
+  touches the assessment).'
 pipeline_cause: null
 targeted_eval: null
 task: null
@@ -44,5 +47,12 @@ resolution:
   before_error_rate: null
   after_error_rate: null
   batch_next_error_rate: null
-triage_notes: ''
-triage_assisted_by: null
+triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-20
+  (ledger). Basis: where the draft''s evidence for each removed code sits in the note
+  (section names and counts only), the coder''s passage grades, and what stayed on
+  the label. 7 of 7 removed with reason guideline; every note passage but one graded
+  supported, so the finding is documented and the coding rule is what removes it.
+  Shares a root cause with FIND-DX-0006, -0010, -0020, -0023 and -0030: the extract
+  -> map_dx path codes what is documented anywhere in the note rather than what is
+  assessed, managed or affecting care at the visit (coder guidelines section 3).'
+triage_assisted_by: owner+llm:claude-fable-5-1

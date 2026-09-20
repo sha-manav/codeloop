@@ -1,7 +1,7 @@
 id: FIND-LINES-0005
 title: unsupported corrections on line fields in core_lines (73501-73660)
 batch_discovered: batch1
-status: eligible
+status: candidate
 pattern: reason=unsupported, field_type=line, module=core_lines, code_category=73501-73660
 reasons:
 - unsupported
@@ -32,5 +32,13 @@ resolution:
   before_error_rate: null
   after_error_rate: null
   batch_next_error_rate: null
-triage_notes: ''
-triage_assisted_by: null
+triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-20
+  (ledger). Basis: where the draft''s evidence for each removed code sits in the note
+  (section names and counts only), the coder''s passage grades, and what stayed on
+  the label. Marked eligible at extraction with n=3, but the D2N195 occurrence (event
+  1000) is a self-correction: the coder removed line 73564 and later re-added it (event
+  1080), and the label bills it. Two net occurrences (D2N155, D2N174) are below the
+  D3 in-batch threshold, so it stays a candidate and is re-checked on batch2, where
+  this key needs 2. In both net occurrences the draft''s note evidence is in the RESULTS
+  section.'
+triage_assisted_by: owner+llm:claude-fable-5-1

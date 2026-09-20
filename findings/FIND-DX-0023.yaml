@@ -1,7 +1,7 @@
 id: FIND-DX-0023
 title: guideline corrections on dx fields in core_dx (R63)
 batch_discovered: batch1
-status: eligible
+status: accepted
 pattern: reason=guideline, field_type=dx, module=core_dx, code_category=R63
 reasons:
 - guideline
@@ -22,7 +22,8 @@ occurrences:
   event_ids:
   - 1020
 count: 3
-hypothesis: ''
+hypothesis: Weight-change symptoms mentioned in the HPI or review of systems are coded
+  although the assessment does not address them.
 pipeline_cause: null
 targeted_eval: null
 task: null
@@ -32,5 +33,11 @@ resolution:
   before_error_rate: null
   after_error_rate: null
   batch_next_error_rate: null
-triage_notes: ''
-triage_assisted_by: null
+triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-20
+  (ledger). Basis: where the draft''s evidence for each removed code sits in the note
+  (section names and counts only), the coder''s passage grades, and what stayed on
+  the label. 3 of 3 removed with reason guideline. Shares a root cause with FIND-DX-0006,
+  -0010, -0020, -0023 and -0030: the extract -> map_dx path codes what is documented
+  anywhere in the note rather than what is assessed, managed or affecting care at
+  the visit (coder guidelines section 3).'
+triage_assisted_by: owner+llm:claude-fable-5-1

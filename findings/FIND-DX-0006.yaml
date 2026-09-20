@@ -1,7 +1,7 @@
 id: FIND-DX-0006
 title: guideline corrections on dx fields in core_dx (M25)
 batch_discovered: batch1
-status: eligible
+status: accepted
 pattern: reason=guideline, field_type=dx, module=core_dx, code_category=M25
 reasons:
 - guideline
@@ -23,7 +23,9 @@ occurrences:
   event_ids:
   - 952
 count: 3
-hypothesis: ''
+hypothesis: Joint symptom and sign codes taken from the HPI, review of systems or
+  exam are coded next to the definitive diagnosis that explains them; symptoms integral
+  to a documented definitive diagnosis are not coded separately.
 pipeline_cause: null
 targeted_eval: null
 task: null
@@ -33,5 +35,12 @@ resolution:
   before_error_rate: null
   after_error_rate: null
   batch_next_error_rate: null
-triage_notes: ''
-triage_assisted_by: null
+triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-20
+  (ledger). Basis: where the draft''s evidence for each removed code sits in the note
+  (section names and counts only), the coder''s passage grades, and what stayed on
+  the label. 4 removals in 3 encounters, all reason guideline, each with a definitive
+  musculoskeletal or injury diagnosis kept on the label. Shares a root cause with
+  FIND-DX-0006, -0010, -0020, -0023 and -0030: the extract -> map_dx path codes what
+  is documented anywhere in the note rather than what is assessed, managed or affecting
+  care at the visit (coder guidelines section 3).'
+triage_assisted_by: owner+llm:claude-fable-5-1
