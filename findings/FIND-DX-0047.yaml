@@ -1,0 +1,30 @@
+id: FIND-DX-0047
+title: wrong_value corrections on dx fields in core_dx (K59)
+batch_discovered: batch1
+status: candidate
+pattern: reason=wrong_value, field_type=dx, module=core_dx, code_category=K59
+reasons:
+- wrong_value
+field_types:
+- dx
+module: core_dx
+code_category: K59
+grouping_key: wrong_value|dx|core_dx|K59
+batches_seen: []
+occurrences:
+- encounter_id: D2N028
+  event_ids:
+  - 299
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

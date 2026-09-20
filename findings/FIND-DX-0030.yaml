@@ -1,0 +1,42 @@
+id: FIND-DX-0030
+title: guideline corrections on dx fields in core_dx (Z87)
+batch_discovered: batch1
+status: eligible
+pattern: reason=guideline, field_type=dx, module=core_dx, code_category=Z87
+reasons:
+- guideline
+field_types:
+- dx
+module: core_dx
+code_category: Z87
+grouping_key: guideline|dx|core_dx|Z87
+batches_seen: []
+occurrences:
+- encounter_id: D2N019
+  event_ids:
+  - 140
+- encounter_id: D2N102
+  event_ids:
+  - 582
+- encounter_id: D2N120
+  event_ids:
+  - 708
+- encounter_id: D2N170
+  event_ids:
+  - 848
+- encounter_id: D2N201
+  event_ids:
+  - 1022
+count: 5
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

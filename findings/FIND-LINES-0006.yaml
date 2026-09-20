@@ -1,0 +1,30 @@
+id: FIND-LINES-0006
+title: wrong_value corrections on line fields in core_lines (72020-72120)
+batch_discovered: batch1
+status: candidate
+pattern: reason=wrong_value, field_type=line, module=core_lines, code_category=72020-72120
+reasons:
+- wrong_value
+field_types:
+- line
+module: core_lines
+code_category: 72020-72120
+grouping_key: wrong_value|line|core_lines|72020-72120
+batches_seen: []
+occurrences:
+- encounter_id: D2N186
+  event_ids:
+  - 940
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

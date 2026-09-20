@@ -1,0 +1,30 @@
+id: FIND-DX-0038
+title: query_needed corrections on dx fields in core_dx (R10)
+batch_discovered: batch1
+status: candidate
+pattern: reason=query_needed, field_type=dx, module=core_dx, code_category=R10
+reasons:
+- query_needed
+field_types:
+- dx
+module: core_dx
+code_category: R10
+grouping_key: query_needed|dx|core_dx|R10
+batches_seen: []
+occurrences:
+- encounter_id: D2N003
+  event_ids:
+  - 292
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

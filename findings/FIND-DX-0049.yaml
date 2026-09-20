@@ -1,0 +1,30 @@
+id: FIND-DX-0049
+title: wrong_value corrections on dx fields in core_dx (M81)
+batch_discovered: batch1
+status: candidate
+pattern: reason=wrong_value, field_type=dx, module=core_dx, code_category=M81
+reasons:
+- wrong_value
+field_types:
+- dx
+module: core_dx
+code_category: M81
+grouping_key: wrong_value|dx|core_dx|M81
+batches_seen: []
+occurrences:
+- encounter_id: D2N091
+  event_ids:
+  - 259
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

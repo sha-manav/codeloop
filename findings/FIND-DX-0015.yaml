@@ -1,0 +1,30 @@
+id: FIND-DX-0015
+title: guideline corrections on dx fields in core_dx (R14)
+batch_discovered: batch1
+status: candidate
+pattern: reason=guideline, field_type=dx, module=core_dx, code_category=R14
+reasons:
+- guideline
+field_types:
+- dx
+module: core_dx
+code_category: R14
+grouping_key: guideline|dx|core_dx|R14
+batches_seen: []
+occurrences:
+- encounter_id: D2N068
+  event_ids:
+  - 428
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

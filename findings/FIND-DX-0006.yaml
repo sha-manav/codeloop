@@ -1,0 +1,37 @@
+id: FIND-DX-0006
+title: guideline corrections on dx fields in core_dx (M25)
+batch_discovered: batch1
+status: eligible
+pattern: reason=guideline, field_type=dx, module=core_dx, code_category=M25
+reasons:
+- guideline
+field_types:
+- dx
+module: core_dx
+code_category: M25
+grouping_key: guideline|dx|core_dx|M25
+batches_seen: []
+occurrences:
+- encounter_id: D2N136
+  event_ids:
+  - 270
+- encounter_id: D2N174
+  event_ids:
+  - 869
+  - 890
+- encounter_id: D2N190
+  event_ids:
+  - 952
+count: 3
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null
