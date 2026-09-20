@@ -58,7 +58,7 @@ make data                        # rebuild data/dev from upstream using the comm
 Key commands (see `codeloop --help` and `CODELOOP_SPEC.md` Appendix A):
 
 ```bash
-codeloop run --version v0 --batch batch1            # draft packages for a batch (code must match the tag)
+codeloop run --version v0 --batch batch1 --seeds 1,2,3   # draft packages (code must match the tag; three seeds, see Operating notes)
 codeloop review serve --batch batch1 --version v0 --coder-id cpc1   # CPC review UI (blind subset first)
 codeloop labels build --batch batch1 --version v0   # replay events into data/labels/batch1.jsonl
 codeloop findings extract --batch batch1            # candidate findings (D3 thresholds)
@@ -82,6 +82,26 @@ codeloop report                                     # regenerate reports/
   predictions and run outputs are renamed with the same suffix, a correction entry is appended to `ledger.md`, and a
   fresh freeze proceeds. Push with `git push --force origin --tags` afterwards.
 - **Free-text ledger entries.** `codeloop ledger note "CPC onboarded"` appends a timestamped, attributed note.
+- **Run batch drafts with three seeds** (`codeloop run --version vK --batch batchN --seeds 1,2,3`). The coder reviews the
+  seed-1 drafts and mostly keeps them, so the labels are anchored to that one sample: on batch1, v0's dx recall is 0.946
+  on seed 1 and 0.859 / 0.902 on seeds 2 and 3 of the identical pipeline. The gate reads every stored seed of the base
+  version as one run; with only seed 1 stored, any three-seed head fails on recall for no reason of its own. Never
+  leave a partial seed file in `runs/`: it would be read as a full base run.
+- **Gating an improvement.** Work on a branch from main; `make gate TASK=…` takes the branch point as base (the
+  `base_commit` in `task.yaml` predates the packaging commit, and the path check diffs base..head). Gate at the commit
+  that holds only the code change, then commit `EXEC_PLAN.md`, `RESULTS.md`, `GATE.*` and the ledger entries. When one
+  change serves several findings, gate each task at that same commit: another task's folder in the diff is a forbidden
+  path. `tests/` is not writable for the improvement agent; tests for the change follow on main after the merge.
+- **Task environment.** Start Docker, then
+  `ANTHROPIC_API_KEY=… docker compose -f docker/compose.yaml run --rm -T task bash -lc '<command>'`. Inside it
+  `data/sealed/` is empty, `codeloop/scoring`, `config/`, `data/labels` and the eval definitions are read-only, and
+  the only reachable host is the LLM provider. Dependencies are baked into the image, so rebuild it
+  (`docker compose -f docker/compose.yaml build task`) after `uv.lock` changes.
+- **Pulling review events when `fly ssh` cannot connect:** `make fly-pull-events-exec BATCH=… VERSION=…` copies the
+  store through the Machines API and verifies it by checksum (`scripts/fly_pull_events.py`).
+- **Never try the hosted UI out by hand.** The coder id on every event is fixed by the deployment, so anything done on
+  the live site is recorded as the coder's work, and a blind submit is final. Use `make ui-e2e` (headless Chrome on the
+  synthetic corpus); `make fly-deploy-review` runs it first.
 - **Coder guidelines** live in `docs/CODER_GUIDELINES.md` and must state the same evidence policy as decision D1.
 
 ## Hosting the coder UIs on Fly.io

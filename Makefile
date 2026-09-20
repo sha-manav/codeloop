@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: install test lint ui-e2e seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events
+.PHONY: install test lint ui-e2e seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events fly-pull-events-exec
 
 install:            ## create .venv and install codeloop with dev tools
 	$(UV) sync --group dev
@@ -37,8 +37,10 @@ eval-targeted:      ## run the targeted suite of a finding at the current commit
 eval-regression:    ## run the latest regression suite at the current commit
 	$(UV) run codeloop eval run --suite $$(ls evals/suites/regression-through-*.yaml | sort | tail -1)
 
-gate:               ## merge gate for a task: BASE and HEAD default to the task's base commit and HEAD
-	$(UV) run codeloop gate check --task tasks/$(TASK) --base $${BASE:-$$(uv run python -c "import yaml;print(yaml.safe_load(open('tasks/$(TASK)/task.yaml'))['base_commit'])")} --head $${HEAD:-$$(git rev-parse HEAD)}
+gate:               ## merge gate for a task: BASE defaults to where the task branch left main, HEAD to the current commit
+	@# task.yaml's base_commit predates the packaging commit, and the path check diffs base..head, so it would flag the
+	@# packaging outputs themselves. Gate at the commit that holds only the code change; commit task documents after.
+	$(UV) run codeloop gate check --task tasks/$(TASK) --base $${BASE:-$$(git merge-base main HEAD)} --head $${HEAD:-$$(git rev-parse HEAD)}
 
 task-env:           ## open the bounded task environment (docker compose)
 	docker compose -f docker/compose.yaml run --rm task
@@ -66,3 +68,7 @@ fly-pull-events:    ## copy the review event store for BATCH=… VERSION=… int
 	rm -f runs/$(VERSION)/$(BATCH)/.pull.sqlite
 	$(FLY) ssh sftp get /data/events/$(VERSION)_$(BATCH).sqlite runs/$(VERSION)/$(BATCH)/.pull.sqlite
 	mv runs/$(VERSION)/$(BATCH)/.pull.sqlite runs/$(VERSION)/$(BATCH)/events.sqlite
+
+fly-pull-events-exec:  ## the same copy through the Machines API, for when `fly ssh` cannot connect; verified by checksum
+	@test -n "$(BATCH)" -a -n "$(VERSION)" || (echo "usage: make fly-pull-events-exec BATCH=batch2 VERSION=v1" && exit 1)
+	$(UV) run python scripts/fly_pull_events.py --batch $(BATCH) --version $(VERSION)
