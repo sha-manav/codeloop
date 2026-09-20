@@ -717,3 +717,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Coder guidelines v1.2 (docs/CODER_GUIDELINES.md, sha256 1bda4744bc1f4d06c7d67491527f99890fc6c3371829df97157e4456eca1752f), effective with batch 2 before the coder opened it: review-screen mechanics only (Edit saves what is in the boxes; typed codes and modifiers are checked; passages of removed or recoded fields stay gradable; pointer and first-listed checks before approve; blind submit is final and refuses an empty label, a missing first-listed or a line without a pointer). No coding rule changed since 1.1; the evidence policy statement is unchanged. Prepared by the build agent under the owner's standing delegation; the owner forwards it to the coder.
+
+## 2026-09-20T10:26:34Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Batch2 (v1) event store: events 1 and 2 (2026-09-20T10:12:33Z open D2N004, 10:12:40Z open D2N013) are the owner looking at the live site, confirmed by the owner, not the coder. No other action was taken; both encounters are in review mode (not blind). Effect: review_minutes for D2N004 and D2N013 starts from the owner's open and is not coder time unless the analysis takes the coder's own first open instead; nothing else is affected.
