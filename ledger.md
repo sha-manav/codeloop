@@ -927,3 +927,48 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Batch3 triage (delegated to the build agent under the owner's standing instruction): FIND-DX-0039 (J30 specificity, the only eligible finding) set to ambiguous because the coder both kept and replaced the same symptom code in batch3; no finding accepted for an improvement task until the coder answers. batch_next_error_rate for FIND-DX-0052 = 0.071 (1 missed E11 add against 13 drafted fields). Notes on the shared pain-with-injury pattern (FIND-DX-0077/-0078/-0083/-0084) and on two symptom codes introduced by the v2 retry stage and removed by the coder (FIND-DX-0080/-0082).
+
+## 2026-09-22T19:23:39Z — run v2 batch1
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v2-batch1-20260922T192321Z-f42d22
+- commit: f4d0703e04e79135512c335679446d5009f53590
+- seeds: [1, 2, 3]
+- encounters: 45
+- llm_calls: 392
+- tokens_in: 878499
+- tokens_out: 385416
+- cache_hits: 392
+- failures: 0
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "6f4ff330206f5d02ff8d09e43bf702bf699f13fa2c5a28d4bb34794783c5d068", "2": "2b6a83ce543d2dae4c8450fa164aa33ca6faaf83000877ddda32db6437979de9", "3": "25e0b58fac10ff535f17dd40690c6b34cb27c38a17431a2a5626f2e511151301"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 14.03
+
+## 2026-09-22T19:23:59Z — run v2 batch2
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v2-batch2-20260922T192342Z-3115dd
+- commit: f4d0703e04e79135512c335679446d5009f53590
+- seeds: [1, 2, 3]
+- encounters: 45
+- llm_calls: 388
+- tokens_in: 845282
+- tokens_out: 378075
+- cache_hits: 388
+- failures: 0
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "e08b4d766c24038777545ecbdbbbe68c4621eb00510689947de3efc56a778dfd", "2": "94dfec25d1ea0395bf7ea161ffed1350bf8160321090c399a5b1b878eff28895", "3": "2cacccbb537a6466fe8fbac7dd526beea7350ba689e48286ce329533fd33eba4"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 13.68
+
+## 2026-09-22T19:24:10Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: run v2 batch1 and run v2 batch2 (seeds 1,2,3) were executed in a git worktree at tag v2 (commit f4d0703; main had moved on only in codeloop/review_ui/replay.py) and their predictions, run.json and ledger entries copied here. They store the v2 base for the next regression suite (regression-through-batch3). All 780 LLM calls were cache hits from the cycle-1 gate run at 5b4e825 (same pipeline code), so the recorded cost estimates were not incurred.
