@@ -100,6 +100,7 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
     decisions = []
     gaps: list[DataGap] = []
     queries: list[ProviderQuery] = []
+    retried = 0
     if ex.problems:
         comp = ctx.llm.complete(
             "map_dx",
@@ -133,6 +134,67 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
             decisions.append(d)
             gaps.extend(d.gaps)
             queries.extend(d.queries)
+        # FIND-DX-0052: a second, smaller call for active problems the mapper left uncoded, with the head term's
+        # candidates that the first pass did not offer. The first call and every decision it made stay as they were.
+        retry_idx = [
+            i
+            for i, p in enumerate(ex.problems)
+            if decisions[i].code is None
+            and p.status not in ("ruled_out", "historical")
+            and (p_note[i] or ctx.evidence_policy != "note_only")
+        ]
+        retry_cands = {
+            i: retriever.retry_candidates(ex.problems[i].description, {c.code for c in candidates[i]})
+            for i in retry_idx
+        }
+        retry_idx = [i for i in retry_idx if retry_cands[i]]
+        if retry_idx:
+            comp2 = ctx.llm.complete(
+                "map_dx",
+                {
+                    "encounter_id": enc.id,
+                    "evidence_policy": ctx.evidence_policy,
+                    "problems_block": problems_block(
+                        [ex.problems[i] for i in retry_idx],
+                        [p_note[i] for i in retry_idx],
+                        [p_dlg[i] for i in retry_idx],
+                        [retry_cands[i] for i in retry_idx],
+                    ),
+                },
+                DxMapping,
+                seed=ctx.seed,
+            )
+            st.llm_calls.append(comp2.trace)
+            by_local = {s.problem_index: s for s in comp2.parsed.selections}
+            for local, i in enumerate(retry_idx):
+                sel = by_local.get(local)
+                if sel is None or not sel.code:
+                    continue
+                p = ex.problems[i]
+                d = apply_dx_rules(
+                    problem_index=i,
+                    problem_status=p.status,
+                    problem_laterality=p.laterality,
+                    selected_code=sel.code,
+                    first_listed=False,  # the first pass chose the first-listed diagnosis
+                    rationale=sel.rationale,
+                    laterality_basis=sel.laterality_basis,
+                    provider_query=sel.provider_query,
+                    note_spans=p_note[i],
+                    dialogue_spans=p_dlg[i],
+                    retriever=retriever,
+                    evidence_policy=ctx.evidence_policy,
+                )
+                if d.code is None:
+                    continue
+                old = decisions[i]
+                queries = [q for q in queries if q not in old.queries]
+                gaps = [g for g in gaps if g not in old.gaps]
+                d.notes.append(f"coded on retry (FIND-DX-0052): head-term candidates offered {len(retry_cands[i])}")
+                decisions[i] = d
+                gaps.extend(d.gaps)
+                queries.extend(d.queries)
+                retried += 1
         choose_first_listed(decisions)
     stages.append(
         _finish(
@@ -141,7 +203,7 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
                 {"problem_index": d.problem_index, "code": d.code, "first_listed": d.first_listed, "notes": d.notes}
                 for d in decisions
             ],
-            [f"candidates retrieved: {sum(len(c) for c in candidates)}"],
+            [f"candidates retrieved: {sum(len(c) for c in candidates)}", f"retried uncoded problems: {retried}"],
         )
     )
     problem_codes = {d.problem_index: d.code for d in decisions if d.code}
