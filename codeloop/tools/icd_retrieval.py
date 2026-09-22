@@ -11,9 +11,12 @@ from codeloop.tables import Tables
 # "... with elevated glucose") retrieves the qualifier's codes (gestational, abnormal-glucose, retinopathy) and not the
 # condition's default code, and the mapper, told to choose only from the candidates, leaves the problem uncoded.
 # The head term is the description before its first qualifier; the pipeline retries only uncoded problems with it, so
-# the first mapping call and every decision it made are unchanged.
+# the first mapping call and every decision it made are unchanged. A problem that a billed line points at gets a wider
+# retry (more hits, the head term, and the "unspecified" / "without complications" members of the retrieved
+# categories), because a line without a coded indication is structurally invalid (spec section 8).
 _HEAD_CUT = re.compile(r",|;|:| - | with | without | due to | secondary to | status post | s/p ", re.IGNORECASE)
 _PARENTHETICAL = re.compile(r"\([^)]*\)")
+_DEFAULT_WORDS = re.compile(r"unspecified|without complication", re.IGNORECASE)
 
 
 def head_term(description: str) -> str:
@@ -77,3 +80,42 @@ class IcdRetriever:
         if not head or head.lower() == description.lower():
             return []
         return [c for c in self.search(head, k=k + len(offered)) if c.code not in offered][:k]
+
+    def category_defaults(self, category: str, limit: int = 2) -> list[Candidate]:
+        """The billable default members of a 3-character category: the category itself when billable (I10), then the
+        nearest descendants whose description says unspecified or without complications (E119, I509)."""
+        out: list[Candidate] = []
+        if self.is_billable(category):
+            out.append(Candidate(category, self.description(category) or "", True))
+        frontier = [category]
+        for _ in range(4):
+            if not frontier or len(out) >= limit:
+                break
+            next_frontier: list[str] = []
+            for parent in frontier:
+                for code, desc, valid in self.tables.icd_children(parent):
+                    if valid and _DEFAULT_WORDS.search(desc):
+                        out.append(Candidate(code, desc, True))
+                    next_frontier.append(code)
+            frontier = next_frontier
+        return out[:limit]
+
+    def wide_candidates(
+        self, description: str, qualifiers: list[str], offered: set[str], k: int = 30, cap: int = 24
+    ) -> list[Candidate]:
+        """A wider net for an uncoded problem that a billed line depends on: deeper hits for the description with and
+        without its qualifiers, the head term's hits, and the retrieved categories' default codes; nothing already
+        offered on the first pass."""
+        found: dict[str, Candidate] = {}
+        queries = [description, head_term(description)]
+        if qualifiers:
+            queries.append(" ".join([description, *qualifiers]))
+        for q in dict.fromkeys(q for q in queries if q):
+            for c in self.search(q, k=k):
+                if c.code not in offered:
+                    found.setdefault(c.code, c)
+        for category in list(dict.fromkeys(c[:3] for c in list(found)[:8]))[:5]:
+            for d in self.category_defaults(category):
+                if d.code not in offered:
+                    found.setdefault(d.code, d)
+        return list(found.values())[:cap]
