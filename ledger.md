@@ -1059,3 +1059,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - scoring_tree_sha256: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
 - freeze_hash: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
 - result: match
+
+## 2026-09-22T20:39:05Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Phase 9 step 3 hosting decision (owner, 2026-09-22, option B): the coder is remote and the owner cannot keep a local server up, so the blind holdout labeling is served from a separate Fly app, codeloop-holdout, that holds CODELOOP_SEAL_KEY as a Fly secret for the labeling window only. The existing app codeloop-ui is unchanged and still never holds the key. The image carries the sealed encounter ciphertext and no predictions; labels are written encrypted to the app's own volume and pulled back checksum-verified; the app and its secrets are destroyed after the pull. Recorded because the seal key is placed on a third-party host for the duration.
