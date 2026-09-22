@@ -765,3 +765,28 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - targeted_suite: targeted-FIND-DX-0052
 - regression_suite: regression-through-batch2
 - task: tasks/FIND-DX-0052/
+
+## 2026-09-22T00:15:35Z — run v1 batch1
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v1-batch1-20260922T001518Z-0299fd
+- commit: c6cdceee05cb10718e29a42b18a8b412736cc62f
+- seeds: [1, 2, 3]
+- encounters: 45
+- llm_calls: 328
+- tokens_in: 849783
+- tokens_out: 351313
+- cache_hits: 328
+- failures: 0
+- scrubber_rule_counts: {"STRUCTURAL:error": 2}
+- compliance_failed: 0
+- predictions_sha256: {"1": "79b4db343ce93368f95120cebbf798a681db006189fb91a029a296619e46a668", "2": "6527928e70a64e760bf04f9684ad1b3e03af23e4363ff6a485803c5e598e885f", "3": "d6e47dc5c405ab42ad5a45317c41939e689534ebef5035acd8d31f650987599e"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 13.03
+
+## 2026-09-22T00:17:14Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: run v1 batch1 (seeds 1,2,3) was executed in a git worktree at tag v1 (commit c6cdcee, identical pipeline code to main at dd5543c) and its predictions, run.json and ledger entry copied here; it stores the base for the regression suite regression-through-batch2, which covers batch1 and batch2 labels. All 328 LLM calls were cache hits from the cycle-0 gate runs, so the recorded cost estimate was not incurred.
