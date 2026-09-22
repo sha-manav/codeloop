@@ -26,3 +26,6 @@ runs/**/traces/
 # external table downloads and the built sqlite are rebuilt by `make tables`
 data/tables/raw/
 data/tables/*.building
+
+# staging dir of `make fly-deploy-holdout` (sealed ciphertext copied for the image build, removed after)
+.holdout-build/

@@ -30,8 +30,10 @@ def find_root(start: Path | None = None) -> Path:
 class Paths:
     """All standard locations, derived from the repo root. Keep in sync with the spec layout."""
 
-    def __init__(self, root: Path):
+    def __init__(self, root: Path, *, sealed_dir: Path | None = None):
         self.root = Path(root).resolve()
+        # the holdout-labeling container keeps the sealed store on its volume, away from the image
+        self._sealed_dir = Path(sealed_dir).resolve() if sealed_dir is not None else None
 
     # --- top level
     @property
@@ -118,7 +120,7 @@ class Paths:
 
     @property
     def sealed(self) -> Path:
-        return self.data / "sealed"
+        return self._sealed_dir if self._sealed_dir is not None else self.data / "sealed"
 
     @property
     def holdout_content_hashes(self) -> Path:

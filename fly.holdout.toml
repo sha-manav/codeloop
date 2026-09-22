@@ -1,0 +1,30 @@
+# Fly.io app for Phase 9 holdout labeling only (spec section 15 step 3). Separate from codeloop-ui on purpose: this
+# app holds CODELOOP_SEAL_KEY as a secret for the labeling window and is destroyed after `make fly-pull-holdout`.
+#   fly secrets set -a codeloop-holdout CODELOOP_UI_USER=... CODELOOP_UI_PASS=... CODELOOP_SEAL_KEY=...
+app = "codeloop-holdout"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile.holdout"
+
+[env]
+  CODELOOP_DATA_DIR = "/data"
+  CODELOOP_HOLDOUT_SRC = "/repo/holdout-seal"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[mounts]]
+  source = "codeloop_holdout"
+  destination = "/data"
+  initial_size = "1gb"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

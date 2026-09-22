@@ -819,6 +819,20 @@ def serve(root: Path | None = typer.Option(None, help="repository root")) -> Non
         _fail(str(e))
 
 
+@app.command("serve-holdout")
+def serve_holdout(root: Path | None = typer.Option(None, help="repository root")) -> None:
+    """Container entrypoint for Phase 9 blind labeling of the sealed holdout (CODELOOP_SEAL_KEY, CODELOOP_CODER_ID,
+    CODELOOP_UI_USER/PASS, CODELOOP_DATA_DIR); labels are written encrypted to <data>/sealed on the volume."""
+    from codeloop.review_ui.serve_holdout import HoldoutServeConfigError
+    from codeloop.review_ui.serve_holdout import main as serve_main
+
+    paths = _paths(root)
+    try:
+        serve_main(paths.root)
+    except (HoldoutServeConfigError, RuntimeError) as e:
+        _fail(str(e))
+
+
 llm_app = typer.Typer(no_args_is_help=True, help="LLM client utilities.")
 app.add_typer(llm_app, name="llm")
 

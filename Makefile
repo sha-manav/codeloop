@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: install test lint ui-e2e seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events fly-pull-events-exec
+.PHONY: install test lint ui-e2e fly-deploy-holdout fly-pull-holdout seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events fly-pull-events-exec
 
 install:            ## create .venv and install codeloop with dev tools
 	$(UV) sync --group dev
@@ -72,3 +72,12 @@ fly-pull-events:    ## copy the review event store for BATCH=… VERSION=… int
 fly-pull-events-exec:  ## the same copy through the Machines API, for when `fly ssh` cannot connect; verified by checksum
 	@test -n "$(BATCH)" -a -n "$(VERSION)" || (echo "usage: make fly-pull-events-exec BATCH=batch2 VERSION=v1" && exit 1)
 	$(UV) run python scripts/fly_pull_events.py --batch $(BATCH) --version $(VERSION)
+
+fly-deploy-holdout: ui-e2e  ## Phase 9: deploy the holdout-labeling app (holds the seal key as a Fly secret; CODER_ID=cpc1)
+	rm -rf .holdout-build && mkdir -p .holdout-build
+	cp data/sealed/holdout_encounters.enc data/sealed/holdout_encounters.enc.meta.json .holdout-build/
+	$(FLY) deploy -c fly.holdout.toml -e CODELOOP_CODER_ID=$(CODER_ID); status=$$?; rm -rf .holdout-build; exit $$status
+
+fly-pull-holdout:   ## Phase 9: copy the encrypted holdout labels and the event store off the holdout app's volume (checksum-verified)
+	$(UV) run python scripts/fly_pull_holdout.py
+
