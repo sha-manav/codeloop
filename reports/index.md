@@ -1,6 +1,6 @@
 # CodeLoop reports
 
-Regenerated 2026-09-22T19:22:34Z from committed data. In-scope fields: diagnoses, first-listed, and lines in the scope allowlist; E/M is excluded.
+Regenerated 2026-09-22T20:25:36Z from committed data. In-scope fields: diagnoses, first-listed, and lines in the scope allowlist; E/M is excluded.
 
 ![curve](curve.svg)
 
@@ -20,6 +20,8 @@ Regenerated 2026-09-22T19:22:34Z from committed data. In-scope fields: diagnoses
 | v0 | batch1 | live | 0.7058 | 0.946 | 1.000 | 1.00 | 0.62 (474) | 0.46 (87) |
 | v1 | batch1 | in-sample | 0.7372 | 0.946 | 1.000 | 1.00 | 0.62 (474) | 0.46 (87) |
 | v1 | batch2 | live | 0.8733 | 0.870 | 1.000 | 1.00 | 0.97 (452) | 0.57 (94) |
+| v2 | batch1 | in-sample | 0.7196 | 0.946 | 1.000 | 1.00 | 0.62 (474) | 0.46 (87) |
+| v2 | batch2 | in-sample | 0.8649 | 0.904 | 1.000 | 1.00 | 0.97 (452) | 0.57 (94) |
 | v2 | batch3 | live | 0.8959 | 0.914 | 1.000 | 1.00 | 0.95 (539) | 0.37 (95) |
 
 ## Anchoring (blind subset)
@@ -29,6 +31,8 @@ Regenerated 2026-09-22T19:22:34Z from committed data. In-scope fields: diagnoses
 | v0 | batch1 | 4 | 0.510 | 0.308 | 0.527 |
 | v1 | batch1 | 4 | 0.510 | 0.308 | 0.527 |
 | v1 | batch2 | 5 | 0.455 | 0.254 | 0.674 |
+| v2 | batch1 | 4 | 0.510 | 0.308 | 0.527 |
+| v2 | batch2 | 5 | 0.455 | 0.267 | 0.669 |
 | v2 | batch3 | 5 | 0.524 | 0.367 | 0.798 |
 
 ## Scrubber rule-fire counts per cell
@@ -36,6 +40,8 @@ Regenerated 2026-09-22T19:22:34Z from committed data. In-scope fields: diagnoses
 - v0 on batch1: none
 - v1 on batch1: none
 - v1 on batch2: none
+- v2 on batch1: none
+- v2 on batch2: none
 - v2 on batch3: none
 
 ## Findings log
@@ -80,7 +86,7 @@ Regenerated 2026-09-22T19:22:34Z from committed data. In-scope fields: diagnoses
 | FIND-DX-0036 | candidate | batch1 | 1 | None | None | None |
 | FIND-DX-0037 | candidate | batch1 | 1 | None | None | None |
 | FIND-DX-0038 | candidate | batch1 | 1 | None | None | None |
-| FIND-DX-0039 | ambiguous | batch1 | 3 | None | None | None |
+| FIND-DX-0039 | resolved | batch1 | 3 | 1.0 | 0.75 | None |
 | FIND-DX-0040 | candidate | batch1 | 2 | None | None | None |
 | FIND-DX-0041 | candidate | batch1 | 1 | None | None | None |
 | FIND-DX-0042 | candidate | batch1 | 1 | None | None | None |

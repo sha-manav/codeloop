@@ -188,6 +188,130 @@
     },
     {
       "anchoring": {
+        "agent_vs_blind": 0.30753968253968256,
+        "agent_vs_reviewed": 0.526984126984127,
+        "blind_vs_reviewed": 0.5104166666666666,
+        "n": 4
+      },
+      "batch": "batch1",
+      "evidence_graded": 474,
+      "evidence_support_rate": 0.6181434599156118,
+      "mean_agreement": 0.7195679012345678,
+      "minutes_mean": 4.418844444444445,
+      "n": 45,
+      "per_type": {
+        "dx": {
+          "fn": 5,
+          "fp": 59,
+          "precision": 0.5958904109589042,
+          "recall": 0.9456521739130435,
+          "tp": 87
+        },
+        "first_listed": {
+          "accuracy": 0.8666666666666667,
+          "correct": 39,
+          "n": 45
+        },
+        "line": {
+          "fn": 0,
+          "fp": 4,
+          "precision": 0.7647058823529411,
+          "recall": 1.0,
+          "tp": 13
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 13,
+          "n": 13
+        },
+        "pointers": {
+          "accuracy": 0.6153846153846154,
+          "correct": 8,
+          "n": 13
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 13,
+          "n": 13
+        }
+      },
+      "queries_graded": 87,
+      "query_precision": 0.45977011494252873,
+      "scrubber_acceptance": 1.0,
+      "scrubber_rule_counts": {},
+      "tag": "in-sample",
+      "tiers": {
+        "t100": 0.3111111111111111,
+        "t75": 0.4888888888888889,
+        "t90": 0.3111111111111111
+      },
+      "touches_mean": 1.8222222222222222,
+      "version": "v2"
+    },
+    {
+      "anchoring": {
+        "agent_vs_blind": 0.26666666666666666,
+        "agent_vs_reviewed": 0.6692307692307693,
+        "blind_vs_reviewed": 0.4545454545454545,
+        "n": 5
+      },
+      "batch": "batch2",
+      "evidence_graded": 452,
+      "evidence_support_rate": 0.9690265486725663,
+      "mean_agreement": 0.8648503965170632,
+      "minutes_mean": 4.463266666666667,
+      "n": 45,
+      "per_type": {
+        "dx": {
+          "fn": 14,
+          "fp": 16,
+          "precision": 0.8918918918918919,
+          "recall": 0.9041095890410958,
+          "tp": 132
+        },
+        "first_listed": {
+          "accuracy": 0.8666666666666667,
+          "correct": 39,
+          "n": 45
+        },
+        "line": {
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "tp": 15
+        },
+        "modifiers": {
+          "accuracy": 0.9333333333333333,
+          "correct": 14,
+          "n": 15
+        },
+        "pointers": {
+          "accuracy": 0.8666666666666667,
+          "correct": 13,
+          "n": 15
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 15,
+          "n": 15
+        }
+      },
+      "queries_graded": 94,
+      "query_precision": 0.574468085106383,
+      "scrubber_acceptance": 1.0,
+      "scrubber_rule_counts": {},
+      "tag": "in-sample",
+      "tiers": {
+        "t100": 0.5777777777777777,
+        "t75": 0.8444444444444444,
+        "t90": 0.6
+      },
+      "touches_mean": 0.8222222222222222,
+      "version": "v2"
+    },
+    {
+      "anchoring": {
         "agent_vs_blind": 0.36666666666666664,
         "agent_vs_reviewed": 0.7984848484848485,
         "blind_vs_reviewed": 0.5242424242424242,
@@ -792,13 +916,13 @@
       "count": 3,
       "id": "FIND-DX-0039",
       "resolution": {
-        "after_error_rate": null,
+        "after_error_rate": 0.75,
         "batch_next_error_rate": null,
-        "before_error_rate": null,
-        "pr": null,
-        "version": null
+        "before_error_rate": 1.0,
+        "pr": "https://github.com/sha-manav/codeloop/pull/3",
+        "version": "v3"
       },
-      "status": "ambiguous",
+      "status": "resolved",
       "title": "specificity corrections on dx fields in core_dx (J30)"
     },
     {
@@ -1698,5 +1822,5 @@
       "title": "specificity corrections on line fields in core_lines (73501-73660)"
     }
   ],
-  "generated_at": "2026-09-22T19:22:34Z"
+  "generated_at": "2026-09-22T20:25:36Z"
 }
