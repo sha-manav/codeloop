@@ -1,0 +1,15 @@
+{
+  "aad": "predictions_v2",
+  "cipher": "AES-256-GCM",
+  "ciphertext_sha256": "ebb207d197e4cecac328fc6527576a90d0d95e0074cadc7e484661e79cefa1f4",
+  "format": "CLSEAL01",
+  "kdf": "scrypt",
+  "kdf_params": {
+    "length": 32,
+    "n": 131072,
+    "p": 1,
+    "r": 8
+  },
+  "nonce_hex": "d6c1f4f6aec47c70f9a3c42e",
+  "salt_hex": "d02704d251930f2162024933d5d1deb2"
+}

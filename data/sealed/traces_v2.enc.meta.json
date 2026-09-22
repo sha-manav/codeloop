@@ -1,0 +1,15 @@
+{
+  "aad": "traces_v2",
+  "cipher": "AES-256-GCM",
+  "ciphertext_sha256": "797986b86af4b1c65f9f994a804cb5d8d95a4a1890c618463e8335343d6f84b2",
+  "format": "CLSEAL01",
+  "kdf": "scrypt",
+  "kdf_params": {
+    "length": 32,
+    "n": 131072,
+    "p": 1,
+    "r": 8
+  },
+  "nonce_hex": "432e0e73aee1eee77b0e29b5",
+  "salt_hex": "a8e89f2091d65502201c809bd72f23cd"
+}

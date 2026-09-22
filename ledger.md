@@ -822,3 +822,32 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: PR #2 (branch codeloop/FIND-DX-0052, gated head 5b4e825: map_dx retry for uncoded problems with head-term candidates, wider net for a line's uncoded indication, no pointer-less lines) merged into main by the build agent at the owner's direction: the agent reported the gate table and asked the owner to merge or say so; the owner answered 'merge it' (2026-09-22). Gate PASS on the third attempt (first two recorded above) and CI green before the merge.
+
+## 2026-09-22T01:32:10Z — holdout predict v2 (sealed)
+
+- actor: manavshah <manavshah03@gmail.com>
+- n: 40
+- predictions_enc_sha256: ebb207d197e4cecac328fc6527576a90d0d95e0074cadc7e484661e79cefa1f4
+- traces_enc_sha256: 797986b86af4b1c65f9f994a804cb5d8d95a4a1890c618463e8335343d6f84b2
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- tokens_in: 282758
+- tokens_out: 130007
+- cache: disabled
+- seed: 1
+
+## 2026-09-22T01:32:37Z — version freeze v2
+
+- actor: manavshah <manavshah03@gmail.com>
+- commit: f4d0703e04e79135512c335679446d5009f53590
+- tag: v2
+- models_yaml: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_yaml: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_yaml: 47a324256764e933abb47ef82eab82f0577f18f703a2bf80e04a3385210e3b89
+- project_decisions: eef4e335d8f4f4352c3b73ebd83b977c9682b03c06a498412b6a5461e088f514
+- scoring_tree: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- config_tree: f2b502d351475e2c30577ec1a8e5e3006b3bbb11d305aadec8a4bed4c032ecd4
+- prompt_hashes: {"audit": "da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81", "cluster_findings": "4f6bceb52b30d59830a35e613e7d188e0c72cfc863f2bd3f36a354683ec12afe", "extract": "7491eb0094deeef74e820702f18ad5c728534984f3c8ed68fc99a0d47f856339", "map_dx": "ecfc8fbd2fd14049735a2a9260101ee25bac8fa974016b5a96cf4bba89233594", "map_lines": "beabf637556f179ba3c5c7acb8d16fdf306bbd5cbf20b062e49263b9625217f3", "ping": "e9a79ea28a061709d7d3838bb8dfe791b6496a74b93d4c0790c3053d559ff32f"}
+- sealed_predictions_sha256: ebb207d197e4cecac328fc6527576a90d0d95e0074cadc7e484661e79cefa1f4
+- note: written by the build agent after `codeloop holdout predict --version v2 --sealed` succeeded on a second attempt; `codeloop version freeze v2` had created the tag and VERSION.md (commit f4d0703) and then reported 1 holdout encounter failed (content-free), writing nothing. The API was healthy on a ping; the dev run of v2 on batch3 in progress at the time showed no failures. Hashes recomputed from the same tree, which is unchanged since the tag.
