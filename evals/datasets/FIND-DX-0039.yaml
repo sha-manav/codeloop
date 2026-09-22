@@ -5,3 +5,11 @@ cases:
   field_refs:
   - dx:J302
   - dx:J309
+- encounter_id: D2N095
+  gold: data/labels/batch3.jsonl#D2N095
+  field_refs:
+  - dx:J309
+- encounter_id: D2N130
+  gold: data/labels/batch3.jsonl#D2N130
+  field_refs:
+  - dx:J309

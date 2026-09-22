@@ -54,17 +54,22 @@ def package_finding(
     batch = finding.batch_discovered
     labels = read_jsonl(paths.labels_file(batch))
     version = labels[0]["version_reviewed"]
-    if store is None:
-        store = EventStore.from_jsonl(paths.review_dir(version, batch) / "events.jsonl")
     scope = Scope.load(paths.scope_yaml)
-    refs = field_refs_for(store, finding, scope)
-    dataset = EvalDataset(
-        finding=finding.id,
-        cases=[
-            EvalCase(encounter_id=eid, gold=f"data/labels/{batch}.jsonl#{eid}", field_refs=refs.get(eid, []))
+    # a finding seen in several batches has occurrences in each batch's event store; every occurrence becomes a case
+    batches = [batch] + [b for b in finding.batches_seen if b != batch and paths.labels_file(b).exists()]
+    cases: list[EvalCase] = []
+    for b in batches:
+        if store is not None and b == batch:
+            b_store = store
+        else:
+            b_version = read_jsonl(paths.labels_file(b))[0]["version_reviewed"]
+            b_store = EventStore.from_jsonl(paths.review_dir(b_version, b) / "events.jsonl")
+        refs = field_refs_for(b_store, finding, scope)
+        cases += [
+            EvalCase(encounter_id=eid, gold=f"data/labels/{b}.jsonl#{eid}", field_refs=refs.get(eid, []))
             for eid in sorted(refs)
-        ],
-    )
+        ]
+    dataset = EvalDataset(finding=finding.id, cases=cases)
     ds_path = paths.evals / "datasets" / f"{finding.id}.yaml"
     dataset.save(ds_path)
     runs = int(config.decisions["D4"].value.get("runs", 3))
