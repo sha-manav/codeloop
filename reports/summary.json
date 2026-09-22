@@ -61,6 +61,192 @@
       },
       "touches_mean": 1.8222222222222222,
       "version": "v0"
+    },
+    {
+      "anchoring": {
+        "agent_vs_blind": 0.30753968253968256,
+        "agent_vs_reviewed": 0.526984126984127,
+        "blind_vs_reviewed": 0.5104166666666666,
+        "n": 4
+      },
+      "batch": "batch1",
+      "evidence_graded": 474,
+      "evidence_support_rate": 0.6181434599156118,
+      "mean_agreement": 0.7372398589065255,
+      "minutes_mean": 4.418844444444445,
+      "n": 45,
+      "per_type": {
+        "dx": {
+          "fn": 5,
+          "fp": 52,
+          "precision": 0.6258992805755396,
+          "recall": 0.9456521739130435,
+          "tp": 87
+        },
+        "first_listed": {
+          "accuracy": 0.8666666666666667,
+          "correct": 39,
+          "n": 45
+        },
+        "line": {
+          "fn": 0,
+          "fp": 4,
+          "precision": 0.7647058823529411,
+          "recall": 1.0,
+          "tp": 13
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 13,
+          "n": 13
+        },
+        "pointers": {
+          "accuracy": 0.6153846153846154,
+          "correct": 8,
+          "n": 13
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 13,
+          "n": 13
+        }
+      },
+      "queries_graded": 87,
+      "query_precision": 0.45977011494252873,
+      "scrubber_acceptance": 1.0,
+      "scrubber_rule_counts": {},
+      "tag": "in-sample",
+      "tiers": {
+        "t100": 0.3333333333333333,
+        "t75": 0.5555555555555556,
+        "t90": 0.3333333333333333
+      },
+      "touches_mean": 1.8222222222222222,
+      "version": "v1"
+    },
+    {
+      "anchoring": {
+        "agent_vs_blind": 0.25396825396825395,
+        "agent_vs_reviewed": 0.6738461538461539,
+        "blind_vs_reviewed": 0.4545454545454545,
+        "n": 5
+      },
+      "batch": "batch2",
+      "evidence_graded": 452,
+      "evidence_support_rate": 0.9690265486725663,
+      "mean_agreement": 0.8732828899495566,
+      "minutes_mean": 4.463266666666667,
+      "n": 45,
+      "per_type": {
+        "dx": {
+          "fn": 19,
+          "fp": 7,
+          "precision": 0.9477611940298507,
+          "recall": 0.8698630136986302,
+          "tp": 127
+        },
+        "first_listed": {
+          "accuracy": 0.8666666666666667,
+          "correct": 39,
+          "n": 45
+        },
+        "line": {
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "tp": 15
+        },
+        "modifiers": {
+          "accuracy": 0.9333333333333333,
+          "correct": 14,
+          "n": 15
+        },
+        "pointers": {
+          "accuracy": 0.8666666666666667,
+          "correct": 13,
+          "n": 15
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 15,
+          "n": 15
+        }
+      },
+      "queries_graded": 94,
+      "query_precision": 0.574468085106383,
+      "scrubber_acceptance": 1.0,
+      "scrubber_rule_counts": {},
+      "tag": "live",
+      "tiers": {
+        "t100": 0.6222222222222222,
+        "t75": 0.8444444444444444,
+        "t90": 0.6222222222222222
+      },
+      "touches_mean": 0.8222222222222222,
+      "version": "v1"
+    },
+    {
+      "anchoring": {
+        "agent_vs_blind": 0.36666666666666664,
+        "agent_vs_reviewed": 0.7984848484848485,
+        "blind_vs_reviewed": 0.5242424242424242,
+        "n": 5
+      },
+      "batch": "batch3",
+      "evidence_graded": 539,
+      "evidence_support_rate": 0.9499072356215214,
+      "mean_agreement": 0.8958633958633958,
+      "minutes_mean": 2.721111111111111,
+      "n": 45,
+      "per_type": {
+        "dx": {
+          "fn": 15,
+          "fp": 9,
+          "precision": 0.9467455621301775,
+          "recall": 0.9142857142857143,
+          "tp": 160
+        },
+        "first_listed": {
+          "accuracy": 0.9111111111111111,
+          "correct": 41,
+          "n": 45
+        },
+        "line": {
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "tp": 15
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 15,
+          "n": 15
+        },
+        "pointers": {
+          "accuracy": 0.9333333333333333,
+          "correct": 14,
+          "n": 15
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 15,
+          "n": 15
+        }
+      },
+      "queries_graded": 95,
+      "query_precision": 0.3684210526315789,
+      "scrubber_acceptance": 1.0,
+      "scrubber_rule_counts": {},
+      "tag": "live",
+      "tiers": {
+        "t100": 0.6222222222222222,
+        "t75": 0.8666666666666667,
+        "t90": 0.6666666666666666
+      },
+      "touches_mean": 0.6888888888888889,
+      "version": "v2"
     }
   ],
   "difficulty": {
@@ -145,7 +331,7 @@
       "id": "FIND-DX-0006",
       "resolution": {
         "after_error_rate": 0.1667,
-        "batch_next_error_rate": null,
+        "batch_next_error_rate": 0.25,
         "before_error_rate": 0.5833,
         "pr": "https://github.com/sha-manav/codeloop/pull/1",
         "version": "v1"
@@ -206,7 +392,7 @@
         "pr": null,
         "version": null
       },
-      "status": "ambiguous",
+      "status": "rejected",
       "title": "guideline corrections on dx fields in core_dx (R01)"
     },
     {
@@ -341,7 +527,7 @@
       "id": "FIND-DX-0020",
       "resolution": {
         "after_error_rate": 0.2222,
-        "batch_next_error_rate": null,
+        "batch_next_error_rate": 0.0,
         "before_error_rate": 0.8889,
         "pr": "https://github.com/sha-manav/codeloop/pull/1",
         "version": "v1"
@@ -383,7 +569,7 @@
       "id": "FIND-DX-0023",
       "resolution": {
         "after_error_rate": 0.0,
-        "batch_next_error_rate": null,
+        "batch_next_error_rate": 0.0,
         "before_error_rate": 1.0,
         "pr": "https://github.com/sha-manav/codeloop/pull/1",
         "version": "v1"
@@ -481,7 +667,7 @@
       "id": "FIND-DX-0030",
       "resolution": {
         "after_error_rate": 0.4,
-        "batch_next_error_rate": null,
+        "batch_next_error_rate": 0.0,
         "before_error_rate": 1.0,
         "pr": "https://github.com/sha-manav/codeloop/pull/1",
         "version": "v1"
@@ -603,7 +789,7 @@
     },
     {
       "batch": "batch1",
-      "count": 1,
+      "count": 3,
       "id": "FIND-DX-0039",
       "resolution": {
         "after_error_rate": null,
@@ -612,12 +798,12 @@
         "pr": null,
         "version": null
       },
-      "status": "candidate",
+      "status": "ambiguous",
       "title": "specificity corrections on dx fields in core_dx (J30)"
     },
     {
       "batch": "batch1",
-      "count": 1,
+      "count": 2,
       "id": "FIND-DX-0040",
       "resolution": {
         "after_error_rate": null,
@@ -756,6 +942,580 @@
       "title": "wrong_value corrections on dx fields in core_dx (M81)"
     },
     {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0050",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (D29)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0051",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (E10)"
+    },
+    {
+      "batch": "batch2",
+      "count": 5,
+      "id": "FIND-DX-0052",
+      "resolution": {
+        "after_error_rate": 0.333,
+        "batch_next_error_rate": 0.071,
+        "before_error_rate": 0.917,
+        "pr": "https://github.com/sha-manav/codeloop/pull/2",
+        "version": "v2"
+      },
+      "status": "resolved",
+      "title": "missed corrections on dx fields in core_dx (E11)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0053",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (G40)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0054",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (H93)"
+    },
+    {
+      "batch": "batch2",
+      "count": 3,
+      "id": "FIND-DX-0055",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (I10)"
+    },
+    {
+      "batch": "batch2",
+      "count": 2,
+      "id": "FIND-DX-0056",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (I50)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0057",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (M54)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0058",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (M75)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0059",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (S39)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0060",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (S42)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0061",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (S93)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0062",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (Z79)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0063",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (M75)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0064",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "unsupported corrections on dx fields in core_dx (M25)"
+    },
+    {
+      "batch": "batch2",
+      "count": 2,
+      "id": "FIND-DX-0065",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "unsupported corrections on dx fields in core_dx (M79)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0066",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "unsupported corrections on dx fields in core_dx (R06)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0067",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "unsupported corrections on dx fields in core_dx (R19)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0068",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "wrong_value corrections on dx fields in core_dx (I1A)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-DX-0069",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "wrong_value corrections on dx fields in core_dx (R73)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0070",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (F41)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0071",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (G82)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0072",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (M10)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0073",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (M11)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0074",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (R35)"
+    },
+    {
+      "batch": "batch3",
+      "count": 2,
+      "id": "FIND-DX-0075",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (Z96)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0076",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on dx fields in core_dx (Z98)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0077",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (M25)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0078",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (M79)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0079",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (R03)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0080",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (R05)"
+    },
+    {
+      "batch": "batch3",
+      "count": 2,
+      "id": "FIND-DX-0081",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (R09)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0082",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (R10)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0083",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (S82)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0084",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on dx fields in core_dx (S83)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0085",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "unsupported corrections on dx fields in core_dx (D05)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0086",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "unsupported corrections on dx fields in core_dx (Z85)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0087",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "wrong_value corrections on dx fields in core_dx (N20)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0088",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "wrong_value corrections on dx fields in core_dx (Z85)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0089",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "wrong_value corrections on dx fields in core_dx (Z96)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-DX-0090",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "wrong_value corrections on dx fields in core_dx (Z98)"
+    },
+    {
       "batch": "batch1",
       "count": 1,
       "id": "FIND-LINES-0001",
@@ -799,7 +1559,7 @@
     },
     {
       "batch": "batch1",
-      "count": 1,
+      "count": 2,
       "id": "FIND-LINES-0004",
       "resolution": {
         "after_error_rate": null,
@@ -866,7 +1626,77 @@
       },
       "status": "candidate",
       "title": "wrong_value corrections on line fields in core_lines (74018-74022)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-LINES-0009",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on line fields in core_lines (73000-73140)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-LINES-0010",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on line fields in core_lines (I5022)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-LINES-0011",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "missed corrections on line fields in core_lines (I5522)"
+    },
+    {
+      "batch": "batch2",
+      "count": 1,
+      "id": "FIND-LINES-0012",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on line fields in core_lines (73000-73140)"
+    },
+    {
+      "batch": "batch3",
+      "count": 1,
+      "id": "FIND-LINES-0013",
+      "resolution": {
+        "after_error_rate": null,
+        "batch_next_error_rate": null,
+        "before_error_rate": null,
+        "pr": null,
+        "version": null
+      },
+      "status": "candidate",
+      "title": "specificity corrections on line fields in core_lines (73501-73660)"
     }
   ],
-  "generated_at": "2026-09-20T09:29:56Z"
+  "generated_at": "2026-09-22T19:22:34Z"
 }
