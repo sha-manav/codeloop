@@ -1,0 +1,12 @@
+name: regression-through-batch3
+kind: regression
+gold:
+- data/labels/batch1.jsonl
+- data/labels/batch2.jsonl
+- data/labels/batch3.jsonl
+base_version: v0
+runs: 3
+seeds:
+- 1
+- 2
+- 3

@@ -972,3 +972,16 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: run v2 batch1 and run v2 batch2 (seeds 1,2,3) were executed in a git worktree at tag v2 (commit f4d0703; main had moved on only in codeloop/review_ui/replay.py) and their predictions, run.json and ledger entries copied here. They store the v2 base for the next regression suite (regression-through-batch3). All 780 LLM calls were cache hits from the cycle-1 gate run at 5b4e825 (same pipeline code), so the recorded cost estimates were not incurred.
+
+## 2026-09-22T20:07:02Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Coder's answer relayed by the owner on 2026-09-22 to the batch3 question (symptom documented as due to a named condition): 'I usually code the cause if the cause is documented.' FIND-DX-0039 moves from ambiguous to accepted on that basis; the two batch3 labels that kept the symptom code (D2N008, D2N089) stand as labeled.
+
+## 2026-09-22T20:07:02Z — findings package FIND-DX-0039
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0039.yaml
+- targeted_suite: targeted-FIND-DX-0039
+- regression_suite: regression-through-batch3
+- task: tasks/FIND-DX-0039/

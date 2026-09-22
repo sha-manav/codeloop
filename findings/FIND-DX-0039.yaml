@@ -1,7 +1,7 @@
 id: FIND-DX-0039
 title: specificity corrections on dx fields in core_dx (J30)
 batch_discovered: batch1
-status: ambiguous
+status: accepted
 pattern: reason=specificity, field_type=dx, module=core_dx, code_category=J30
 reasons:
 - specificity
@@ -23,10 +23,15 @@ occurrences:
   event_ids:
   - 649
 count: 3
-hypothesis: ''
-pipeline_cause: null
-targeted_eval: null
-task: null
+hypothesis: 'The extractor frames the problem as the symptom and puts its documented
+  cause in the same description (''Nasal congestion attributed to seasonal allergies'');
+  the candidates are retrieved for the whole description, the symptom code ranks first,
+  and the mapper selects it. The coder''s rule (confirmed 2026-09-22): code the cause
+  when it is documented. Pattern shared with the pain-with-a-documented-injury cases
+  (FIND-DX-0077/-0078/-0083/-0084).'
+pipeline_cause: model_reasoning
+targeted_eval: evals/datasets/FIND-DX-0039.yaml
+task: tasks/FIND-DX-0039/
 resolution:
   version: null
   pr: null
@@ -43,5 +48,11 @@ triage_notes: '| batch3 (2026-09-22): Eligible under D3 (D2N138 in batch1; D2N09
   as due to a named condition, is the condition coded instead of the symptom? If yes,
   the fix is a cause-term retry (a second map_dx call for symptom-coded problems whose
   description names a cause; first call unchanged) and D2N008/D2N089 would change
-  too.'
+  too. | 2026-09-22, later: coder answered ''I usually code the cause if the cause
+  is documented'' -> ACCEPTED. Fix: a cause-term retry, a second map_dx call for symptom-coded
+  problems whose description names a cause, offering candidates for the cause term;
+  the first call is unchanged and a retry result is taken only when it is a definitive
+  condition code (not a symptom, status or external-cause code). Expected to flip
+  D2N008 and D2N089 against their labels; accepted as the cost of the coder''s stated
+  rule.'
 triage_assisted_by: owner+llm:claude-fable-5-1

@@ -1,0 +1,7 @@
+finding: FIND-DX-0039
+cases:
+- encounter_id: D2N138
+  gold: data/labels/batch1.jsonl#D2N138
+  field_refs:
+  - dx:J302
+  - dx:J309

@@ -1,0 +1,52 @@
+finding: FIND-DX-0039
+title: specificity corrections on dx fields in core_dx (J30)
+base_commit: dd99dd07992488c71545e462f90ec58700a64f66
+base_version: v0
+writable:
+- codeloop/agent/
+- codeloop/schemas/
+- codeloop/mappers/
+- codeloop/rules/
+- codeloop/tools/
+- prompts/
+- tasks/FIND-DX-0039/
+writable_with_sign_off:
+- evals/graders/
+read_only:
+- codeloop/scoring/
+- codeloop/compliance/
+- codeloop/scrubber/
+- config/
+- data/
+- runs/
+- evals/datasets/
+- evals/suites/
+- findings/
+not_mounted:
+- data/sealed/
+network: LLM provider API host(s) only, via docker/allowlist proxy
+commands:
+- make eval-targeted TASK=FIND-DX-0039
+- make eval-regression
+- make gate TASK=FIND-DX-0039
+targeted_suite: evals/suites/targeted-FIND-DX-0039.yaml
+regression_suite: evals/suites/regression-through-batch3.yaml
+success_criteria:
+  targeted_relative_error_reduction_min: 0.25
+  targeted_no_run_may_rise: true
+  regression_mean_agreement_drop_max_pp: 1.0
+  regression_per_type_recall_drop_max_pp: 2.0
+  scrubber_errors: non_increasing
+  compliance_escalation_check: required
+definition_of_done:
+- 'RESULTS.md complete: targeted before/after, regression before/after, scrubber delta,
+  escalations, diff summary'
+- gate PASS, or an explicit ambiguity note
+- branch codeloop/FIND-DX-0039 pushed
+prohibited:
+- changing scope
+- touching codeloop/scoring
+- adding CPT descriptors
+- reading holdout material
+- weakening the compliance policy
+- editing config/, findings/, evals/datasets/, evals/suites/
