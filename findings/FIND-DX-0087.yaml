@@ -1,25 +1,21 @@
-id: FIND-DX-0040
-title: specificity corrections on dx fields in core_dx (N20)
-batch_discovered: batch1
+id: FIND-DX-0087
+title: wrong_value corrections on dx fields in core_dx (N20)
+batch_discovered: batch3
 status: candidate
-pattern: reason=specificity, field_type=dx, module=core_dx, code_category=N20
+pattern: reason=wrong_value, field_type=dx, module=core_dx, code_category=N20
 reasons:
-- specificity
+- wrong_value
 field_types:
 - dx
 module: core_dx
 code_category: N20
-grouping_key: specificity|dx|core_dx|N20
-batches_seen:
-- batch3
+grouping_key: wrong_value|dx|core_dx|N20
+batches_seen: []
 occurrences:
-- encounter_id: D2N052
-  event_ids:
-  - 332
 - encounter_id: D2N206
   event_ids:
-  - 988
-count: 2
+  - 987
+count: 1
 hypothesis: ''
 pipeline_cause: null
 targeted_eval: null

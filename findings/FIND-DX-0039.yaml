@@ -1,7 +1,7 @@
 id: FIND-DX-0039
 title: specificity corrections on dx fields in core_dx (J30)
 batch_discovered: batch1
-status: candidate
+status: ambiguous
 pattern: reason=specificity, field_type=dx, module=core_dx, code_category=J30
 reasons:
 - specificity
@@ -10,12 +10,19 @@ field_types:
 module: core_dx
 code_category: J30
 grouping_key: specificity|dx|core_dx|J30
-batches_seen: []
+batches_seen:
+- batch3
 occurrences:
 - encounter_id: D2N138
   event_ids:
   - 731
-count: 1
+- encounter_id: D2N095
+  event_ids:
+  - 573
+- encounter_id: D2N130
+  event_ids:
+  - 649
+count: 3
 hypothesis: ''
 pipeline_cause: null
 targeted_eval: null
@@ -26,5 +33,15 @@ resolution:
   before_error_rate: null
   after_error_rate: null
   batch_next_error_rate: null
-triage_notes: ''
-triage_assisted_by: null
+triage_notes: '| batch3 (2026-09-22): Eligible under D3 (D2N138 in batch1; D2N095,
+  D2N130 in batch3: R0981 replaced by J309, reason specificity). Set to AMBIGUOUS,
+  not accepted: in the same batch the coder kept R0981 in D2N008 and D2N089, whose
+  v2 problem descriptions have the same shape (nasal congestion attributed to allergies)
+  and whose note evidence sits in the same kind of section (outside the assessment
+  and plan in all four; no rhinitis wording in any of the four assessment/plan sections).
+  A rule cannot reproduce both. Question for the coder: when a symptom is documented
+  as due to a named condition, is the condition coded instead of the symptom? If yes,
+  the fix is a cause-term retry (a second map_dx call for symptom-coded problems whose
+  description names a cause; first call unchanged) and D2N008/D2N089 would change
+  too.'
+triage_assisted_by: owner+llm:claude-fable-5-1

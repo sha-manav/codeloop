@@ -1,0 +1,31 @@
+id: FIND-DX-0084
+title: specificity corrections on dx fields in core_dx (S83)
+batch_discovered: batch3
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=S83
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: S83
+grouping_key: specificity|dx|core_dx|S83
+batches_seen: []
+occurrences:
+- encounter_id: D2N150
+  event_ids:
+  - 721
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch3 (2026-09-22): D2N150: the sprain code the coder added in place
+  of M25561. See FIND-DX-0077.'
+triage_assisted_by: owner+llm:claude-fable-5-1

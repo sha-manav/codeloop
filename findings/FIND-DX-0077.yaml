@@ -1,0 +1,35 @@
+id: FIND-DX-0077
+title: specificity corrections on dx fields in core_dx (M25)
+batch_discovered: batch3
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=M25
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: M25
+grouping_key: specificity|dx|core_dx|M25
+batches_seen: []
+occurrences:
+- encounter_id: D2N150
+  event_ids:
+  - 720
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch3 (2026-09-22): D2N150: v2 coded knee pain (M25561) and left
+  the suspected ligament tear uncoded as possible; the coder coded the sprain S8391XA.
+  Pain-with-a-documented-injury pattern shared with FIND-DX-0078/-0083/-0084; the
+  pain problem''s evidence is in the assessment and plan and the plan names the injury.
+  Two encounters only (D2N054, D2N150); D2N088 (knee pain attributed to lifting, no
+  injury diagnosis) was kept as pain.'
+triage_assisted_by: owner+llm:claude-fable-5-1

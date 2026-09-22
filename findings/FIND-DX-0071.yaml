@@ -1,0 +1,30 @@
+id: FIND-DX-0071
+title: missed corrections on dx fields in core_dx (G82)
+batch_discovered: batch3
+status: candidate
+pattern: reason=missed, field_type=dx, module=core_dx, code_category=G82
+reasons:
+- missed
+field_types:
+- dx
+module: core_dx
+code_category: G82
+grouping_key: missed|dx|core_dx|G82
+batches_seen: []
+occurrences:
+- encounter_id: D2N182
+  event_ids:
+  - 905
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

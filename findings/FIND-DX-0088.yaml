@@ -1,0 +1,30 @@
+id: FIND-DX-0088
+title: wrong_value corrections on dx fields in core_dx (Z85)
+batch_discovered: batch3
+status: candidate
+pattern: reason=wrong_value, field_type=dx, module=core_dx, code_category=Z85
+reasons:
+- wrong_value
+field_types:
+- dx
+module: core_dx
+code_category: Z85
+grouping_key: wrong_value|dx|core_dx|Z85
+batches_seen: []
+occurrences:
+- encounter_id: D2N031
+  event_ids:
+  - 108
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

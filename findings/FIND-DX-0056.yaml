@@ -33,5 +33,6 @@ resolution:
 triage_notes: '| batch2 (2026-09-22): I50 missed in D2N004 and D2N093: same retrieval
   cause as FIND-DX-0052 (no unspecified heart-failure candidate offered; every candidate
   specified a type); stays candidate under D3, expected to move with the FIND-DX-0052
-  change.'
+  change. | batch3 (2026-09-22): no occurrence in batch3 (v2 drafted I50 once, kept).
+  Stays candidate.'
 triage_assisted_by: owner+llm:claude-fable-5-1

@@ -1,0 +1,36 @@
+id: FIND-DX-0080
+title: specificity corrections on dx fields in core_dx (R05)
+batch_discovered: batch3
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=R05
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: R05
+grouping_key: specificity|dx|core_dx|R05
+batches_seen: []
+occurrences:
+- encounter_id: D2N056
+  event_ids:
+  - 260
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch3 (2026-09-22): D2N056: R058 was coded by the v2 retry stage
+  (the first pass left the cough uncoded); the coder removed it as integral to the
+  coded pneumonitis. The retry prompt shows only the retried problems, not the encounter''s
+  coded diagnoses, so it cannot apply the integral-symptom rule. Same in D2N146 (FIND-DX-0082,
+  R109 beside cholecystitis). Two of the 14 retry-coded diagnoses in batch3 seed 1;
+  the other 11 the coder kept. A cycle-3 fix is to pass the coded diagnoses as context
+  in the retry call.'
+triage_assisted_by: owner+llm:claude-fable-5-1

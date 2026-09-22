@@ -1,0 +1,30 @@
+id: FIND-DX-0085
+title: unsupported corrections on dx fields in core_dx (D05)
+batch_discovered: batch3
+status: candidate
+pattern: reason=unsupported, field_type=dx, module=core_dx, code_category=D05
+reasons:
+- unsupported
+field_types:
+- dx
+module: core_dx
+code_category: D05
+grouping_key: unsupported|dx|core_dx|D05
+batches_seen: []
+occurrences:
+- encounter_id: D2N031
+  event_ids:
+  - 107
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

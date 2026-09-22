@@ -12,6 +12,7 @@ code_category: E11
 grouping_key: missed|dx|core_dx|E11
 batches_seen:
 - batch2
+- batch3
 occurrences:
 - encounter_id: D2N046
   event_ids:
@@ -25,7 +26,10 @@ occurrences:
 - encounter_id: D2N193
   event_ids:
   - 900
-count: 4
+- encounter_id: D2N086
+  event_ids:
+  - 458
+count: 5
 hypothesis: 'The extractor lists the diabetes problem every time (4 of 4, status active;
   note quotes present in 3 of 4), but the lexical ICD-10-CM retrieval does not put
   E119 (or any E11 code) among the candidates when the problem description carries
@@ -45,7 +49,7 @@ resolution:
   pr: https://github.com/sha-manav/codeloop/pull/2
   before_error_rate: 0.917
   after_error_rate: 0.333
-  batch_next_error_rate: null
+  batch_next_error_rate: 0.071
 triage_notes: 'Triage delegated by the owner to the build agent on 2026-09-22 (ledger).
   Basis: v1 seed-1 traces (extract problems, map_dx selections, cached model rationales),
   the retriever re-run offline on the same problem descriptions, and the coder''s
@@ -59,5 +63,9 @@ triage_notes: 'Triage delegated by the owner to the build agent on 2026-09-22 (l
   5b4e825, third attempt): a map_dx retry for uncoded problems with head-term candidates;
   targeted error 0.917 -> 0.333 (D2N135 stays wrong: coded R7309 on the first pass,
   FIND-DX-0069). Regression: agreement 0.741 -> 0.735, dx recall 0.833 -> 0.867, scrubber
-  errors 1.667 -> 0, escalations 0. batch_next_error_rate to be filled from batch3.'
+  errors 1.667 -> 0, escalations 0. batch_next_error_rate to be filled from batch3.
+  | batch3 (2026-09-22): batch_next_error_rate = E11 codes the coder added as missed
+  / (those + v2-drafted E11 fields) = 1 / (1 + 13) = 0.071; the one add is a complication
+  code (D2N086, E11621) beside no drafted E11 code. v2 drafted E11 in 13 encounters
+  and the coder removed none.'
 triage_assisted_by: owner+llm:claude-fable-5-1

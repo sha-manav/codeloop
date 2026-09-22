@@ -1,0 +1,30 @@
+id: FIND-DX-0079
+title: specificity corrections on dx fields in core_dx (R03)
+batch_discovered: batch3
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=R03
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: R03
+grouping_key: specificity|dx|core_dx|R03
+batches_seen: []
+occurrences:
+- encounter_id: D2N164
+  event_ids:
+  - 759
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

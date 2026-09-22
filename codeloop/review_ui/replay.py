@@ -89,6 +89,8 @@ def apply_event(label: LabelPackage, e: Event) -> LabelPackage:
             i = _line_index(label, ref)
             if i is not None:
                 label.lines[i] = LabelLine.model_validate({**label.lines[i].model_dump(), **e.after})
+    for ln in label.lines:  # typed pointers are stored as the coder typed them; the label carries scorer-form codes
+        ln.pointers = [str(x).strip().upper().replace(".", "") for x in ln.pointers]
     return label
 
 

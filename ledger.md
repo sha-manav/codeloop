@@ -876,3 +876,54 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Review UI redeployed for batch3 / v2 at 2026-09-22T01:44Z (coder cpc1): /health reports mode review, batch batch3, version v2; the blind five (D2N075 D2N082 D2N150 D2N178 D2N180) are served in blind mode; the event store /data/events/v2_batch3.sqlite holds 0 events. Verified read-only (GET only). The batch1 and batch2 stores stay on the volume.
+
+## 2026-09-22T19:18:07Z — labels build batch3
+
+- actor: manavshah <manavshah03@gmail.com>
+- version_reviewed: v2
+- approved: 45
+- pending: 0
+- coders: ["cpc1"]
+- labels_sha256: e2ca97e4ba15dac0d1b4566e7f889920750b8a43021ede6d828d44a4bf4c2d59
+- events_sha256: 0bfce601fdcf01fcaa5fd8437bc4bab66a796c5288dfc2d4f61e5798eb98e36d
+- mean_touches: 0.689
+- mean_review_minutes: 2.721
+
+## 2026-09-22T19:18:07Z — findings extract batch3
+
+- actor: manavshah <manavshah03@gmail.com>
+- findings: [["FIND-DX-0052", "resolved", 5], ["FIND-DX-0070", "candidate", 1], ["FIND-DX-0071", "candidate", 1], ["FIND-DX-0055", "candidate", 3], ["FIND-DX-0072", "candidate", 1], ["FIND-DX-0073", "candidate", 1], ["FIND-DX-0074", "candidate", 1], ["FIND-DX-0075", "candidate", 2], ["FIND-DX-0076", "candidate", 1], ["FIND-DX-0039", "eligible", 3], ["FIND-DX-0077", "candidate", 1], ["FIND-DX-0078", "candidate", 1], ["FIND-DX-0040", "candidate", 2], ["FIND-DX-0079", "candidate", 1], ["FIND-DX-0080", "candidate", 1], ["FIND-DX-0081", "candidate", 2], ["FIND-DX-0082", "candidate", 1], ["FIND-DX-0083", "candidate", 1], ["FIND-DX-0084", "candidate", 1], ["FIND-LINES-0013", "candidate", 1], ["FIND-DX-0085", "candidate", 1], ["FIND-DX-0086", "candidate", 1], ["FIND-DX-0087", "candidate", 1], ["FIND-DX-0088", "candidate", 1], ["FIND-DX-0089", "candidate", 1], ["FIND-DX-0090", "candidate", 1]]
+
+## 2026-09-22T19:20:16Z — labels build batch3
+
+- actor: manavshah <manavshah03@gmail.com>
+- version_reviewed: v2
+- approved: 45
+- pending: 0
+- coders: ["cpc1"]
+- labels_sha256: e2ca97e4ba15dac0d1b4566e7f889920750b8a43021ede6d828d44a4bf4c2d59
+- events_sha256: 0bfce601fdcf01fcaa5fd8437bc4bab66a796c5288dfc2d4f61e5798eb98e36d
+- mean_touches: 0.689
+- mean_review_minutes: 2.721
+
+## 2026-09-22T19:22:07Z — labels build batch3
+
+- actor: manavshah <manavshah03@gmail.com>
+- version_reviewed: v2
+- approved: 45
+- pending: 0
+- coders: ["cpc1"]
+- labels_sha256: ffea0aeac2c01d23ab515d2dc3e4d181207bff1bce61ea90b19cc1ba9b190ea6
+- events_sha256: 0bfce601fdcf01fcaa5fd8437bc4bab66a796c5288dfc2d4f61e5798eb98e36d
+- mean_touches: 0.689
+- mean_review_minutes: 2.721
+
+## 2026-09-22T19:22:07Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: labels build batch3 was run three times (19:13Z, 19:20Z, and now): the first showed that a line pointer typed with a dot (D2N054, line 73620) was stored verbatim and did not resolve to the diagnosis in scorer form; codeloop/review_ui/replay.py now normalizes every pointer to the code form at the end of the replay (first attempt covered only the draft loader). Only that pointer changed between the builds; the last entry is the valid one.
+
+## 2026-09-22T19:22:07Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Batch3 triage (delegated to the build agent under the owner's standing instruction): FIND-DX-0039 (J30 specificity, the only eligible finding) set to ambiguous because the coder both kept and replaced the same symptom code in batch3; no finding accepted for an improvement task until the coder answers. batch_next_error_rate for FIND-DX-0052 = 0.071 (1 missed E11 add against 13 drafted fields). Notes on the shared pain-with-injury pattern (FIND-DX-0077/-0078/-0083/-0084) and on two symptom codes introduced by the v2 retry stage and removed by the coder (FIND-DX-0080/-0082).

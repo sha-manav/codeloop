@@ -1,0 +1,32 @@
+id: FIND-DX-0083
+title: specificity corrections on dx fields in core_dx (S82)
+batch_discovered: batch3
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=S82
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: S82
+grouping_key: specificity|dx|core_dx|S82
+batches_seen: []
+occurrences:
+- encounter_id: D2N054
+  event_ids:
+  - 234
+  - 252
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch3 (2026-09-22): D2N054: the fracture code the coder added in
+  place of M79671. See FIND-DX-0077.'
+triage_assisted_by: owner+llm:claude-fable-5-1

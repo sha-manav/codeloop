@@ -1,0 +1,32 @@
+id: FIND-DX-0078
+title: specificity corrections on dx fields in core_dx (M79)
+batch_discovered: batch3
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=M79
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: M79
+grouping_key: specificity|dx|core_dx|M79
+batches_seen: []
+occurrences:
+- encounter_id: D2N054
+  event_ids:
+  - 233
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch3 (2026-09-22): D2N054: v2 coded foot pain (M79671) although
+  the problem description names the fracture as its cause; the coder coded the fracture
+  sequela. See FIND-DX-0077.'
+triage_assisted_by: owner+llm:claude-fable-5-1

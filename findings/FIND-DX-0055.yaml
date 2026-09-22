@@ -12,6 +12,7 @@ code_category: I10
 grouping_key: missed|dx|core_dx|I10
 batches_seen:
 - batch2
+- batch3
 occurrences:
 - encounter_id: D2N168
   event_ids:
@@ -19,7 +20,10 @@ occurrences:
 - encounter_id: D2N172
   event_ids:
   - 833
-count: 2
+- encounter_id: D2N164
+  event_ids:
+  - 739
+count: 3
 hypothesis: ''
 pipeline_cause: null
 targeted_eval: null
@@ -32,5 +36,9 @@ resolution:
   batch_next_error_rate: null
 triage_notes: '| batch2 (2026-09-22): I10 missed in D2N168 and D2N172: same retrieval
   cause as FIND-DX-0052 (the model''s rationale says no essential-hypertension candidate
-  was offered); stays candidate under D3, expected to move with the FIND-DX-0052 change.'
+  was offered); stays candidate under D3, expected to move with the FIND-DX-0052 change.
+  | batch3 (2026-09-22): one more occurrence (D2N164: v2 coded R030 for a blood-pressure
+  trend the note calls not formally diagnosed; the coder recoded to I10). v2 drafted
+  I10 in 11 batch3 encounters and the coder removed none. Stays candidate under D3
+  (1 in this batch).'
 triage_assisted_by: owner+llm:claude-fable-5-1

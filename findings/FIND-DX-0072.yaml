@@ -1,0 +1,30 @@
+id: FIND-DX-0072
+title: missed corrections on dx fields in core_dx (M10)
+batch_discovered: batch3
+status: candidate
+pattern: reason=missed, field_type=dx, module=core_dx, code_category=M10
+reasons:
+- missed
+field_types:
+- dx
+module: core_dx
+code_category: M10
+grouping_key: missed|dx|core_dx|M10
+batches_seen: []
+occurrences:
+- encounter_id: D2N043
+  event_ids:
+  - 177
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null
