@@ -1024,3 +1024,31 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: PR #3 (branch codeloop/FIND-DX-0039, gated head 330e940: cause-term retry, symptom recoded to its documented cause) merged into main by the build agent at the owner's direction: the agent reported the gate table and asked the owner to merge or say so; the owner answered 'keep going' (2026-09-22), the same form of direction as for PR #1. Gate PASS against the v2 base on the second run (the first run's base was mis-packaged and is void) and CI green before the merge.
+
+## 2026-09-22T20:25:09Z — holdout predict v3 (sealed)
+
+- actor: manavshah <manavshah03@gmail.com>
+- n: 40
+- predictions_enc_sha256: 91155b5e2f75d05894ffabe3a204af4ee15702b2be9194af6f4200750861c8a9
+- traces_enc_sha256: 8f73968165704c52633566811545e3665c0d8a94806e225134010279ecb1f467
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- tokens_in: 282079
+- tokens_out: 125040
+- cache: disabled
+- seed: 1
+
+## 2026-09-22T20:25:09Z — version freeze v3
+
+- actor: manavshah <manavshah03@gmail.com>
+- commit: 612255e4d675ea8bad340efb846957da6f790fac
+- tag: v3
+- models_yaml: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_yaml: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_yaml: 47a324256764e933abb47ef82eab82f0577f18f703a2bf80e04a3385210e3b89
+- project_decisions: eef4e335d8f4f4352c3b73ebd83b977c9682b03c06a498412b6a5461e088f514
+- scoring_tree: df376e926e0db2c576209b15c630a37f9ada644023453ad862ddc947d24a7411
+- config_tree: f2b502d351475e2c30577ec1a8e5e3006b3bbb11d305aadec8a4bed4c032ecd4
+- prompt_hashes: {"audit": "da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81", "cluster_findings": "4f6bceb52b30d59830a35e613e7d188e0c72cfc863f2bd3f36a354683ec12afe", "extract": "7491eb0094deeef74e820702f18ad5c728534984f3c8ed68fc99a0d47f856339", "map_dx": "ecfc8fbd2fd14049735a2a9260101ee25bac8fa974016b5a96cf4bba89233594", "map_lines": "beabf637556f179ba3c5c7acb8d16fdf306bbd5cbf20b062e49263b9625217f3", "ping": "e9a79ea28a061709d7d3838bb8dfe791b6496a74b93d4c0790c3053d559ff32f"}
+- sealed_predictions_sha256: 91155b5e2f75d05894ffabe3a204af4ee15702b2be9194af6f4200750861c8a9
