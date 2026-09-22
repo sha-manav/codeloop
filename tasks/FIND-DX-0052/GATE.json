@@ -1,0 +1,61 @@
+{
+  "base": "2904fa86191747bd5d94307bd57b791e57b20409",
+  "changed_paths": [
+    "codeloop/agent/pipeline.py",
+    "codeloop/tools/icd_retrieval.py",
+    "tasks/FIND-DX-0052/EXEC_PLAN.md"
+  ],
+  "checks": [
+    {
+      "detail": "only permitted paths changed",
+      "name": "paths",
+      "passed": true
+    },
+    {
+      "detail": "error rate base 0.917 -> head 0.333 (need <= 0.688); runs [0.5, 0.25, 0.25]",
+      "name": "targeted",
+      "passed": true
+    },
+    {
+      "detail": "mean agreement base 0.7406612523279189 -> head 0.7348076614743282 (max drop 0.010)",
+      "name": "regression_agreement",
+      "passed": true
+    },
+    {
+      "detail": "dx_recall base 0.8333333333333334 -> head 0.8669467787114846 (max drop 0.020)",
+      "name": "regression_dx_recall",
+      "passed": true
+    },
+    {
+      "detail": "line_recall base 0.9880952380952381 -> head 0.9880952380952381 (max drop 0.020)",
+      "name": "regression_line_recall",
+      "passed": true
+    },
+    {
+      "detail": "error-severity failures base 1.6666666666666667 -> head 0.0 (non-increasing)",
+      "name": "scrubber",
+      "passed": true
+    },
+    {
+      "detail": "escalation failures across runs: 0",
+      "name": "compliance_escalation",
+      "passed": true
+    }
+  ],
+  "head": "5b4e825ba5d3375de874d409da1f7d5868b9954b",
+  "numbers": {
+    "base_agreement": 0.7406612523279189,
+    "base_runs": 3,
+    "base_scrubber_errors": 1.6666666666666667,
+    "base_targeted_error": 0.9166666666666666,
+    "escalation_failures": 0,
+    "head_agreement": 0.7348076614743282,
+    "head_runs": 3,
+    "head_scrubber_errors": 0.0,
+    "head_targeted_error": 0.3333333333333333
+  },
+  "passed": true,
+  "ran_at": "2026-09-22T00:56:25Z",
+  "route_to_human": false,
+  "task": "FIND-DX-0052"
+}
