@@ -1,8 +1,9 @@
 {
-  "base": "45c7beeb734eeeca37c05383437062b92f4cae8e",
+  "base": "78a231713b878d29793583edb39294d4e7e62a5c",
   "changed_paths": [
     "codeloop/agent/pipeline.py",
-    "codeloop/tools/icd_retrieval.py"
+    "codeloop/tools/icd_retrieval.py",
+    "tasks/FIND-DX-0039/EXEC_PLAN.md"
   ],
   "checks": [
     {
@@ -16,22 +17,22 @@
       "passed": true
     },
     {
-      "detail": "mean agreement base 0.22838337930930522 -> head 0.7631241803464025 (max drop 0.010)",
+      "detail": "mean agreement base 0.7637071707442078 -> head 0.7631241803464025 (max drop 0.010)",
       "name": "regression_agreement",
       "passed": true
     },
     {
-      "detail": "dx_recall base 0.2009685230024213 -> head 0.8595641646489104 (max drop 0.020)",
+      "detail": "dx_recall base 0.8603712671509282 -> head 0.8595641646489104 (max drop 0.020)",
       "name": "regression_dx_recall",
       "passed": true
     },
     {
-      "detail": "line_recall base 0.3023255813953488 -> head 0.9767441860465116 (max drop 0.020)",
+      "detail": "line_recall base 0.9767441860465116 -> head 0.9767441860465116 (max drop 0.020)",
       "name": "regression_line_recall",
       "passed": true
     },
     {
-      "detail": "error-severity failures base 0.6666666666666666 -> head 0.0 (non-increasing)",
+      "detail": "error-severity failures base 0.0 -> head 0.0 (non-increasing)",
       "name": "scrubber",
       "passed": true
     },
@@ -41,11 +42,11 @@
       "passed": true
     }
   ],
-  "head": "dc1ce88e861e4e1257a2e03f9481034b3fc1e2dd",
+  "head": "330e9403c954c5b7013b586486ef80f78c595044",
   "numbers": {
-    "base_agreement": 0.22838337930930522,
+    "base_agreement": 0.7637071707442078,
     "base_runs": 3,
-    "base_scrubber_errors": 0.6666666666666666,
+    "base_scrubber_errors": 0.0,
     "base_targeted_error": 1.0,
     "escalation_failures": 0,
     "head_agreement": 0.7631241803464025,
@@ -54,7 +55,7 @@
     "head_targeted_error": 0.75
   },
   "passed": true,
-  "ran_at": "2026-09-22T20:11:41Z",
+  "ran_at": "2026-09-22T20:14:54Z",
   "route_to_human": false,
   "task": "FIND-DX-0039"
 }
