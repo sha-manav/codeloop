@@ -1,7 +1,7 @@
 finding: FIND-DX-0039
 title: specificity corrections on dx fields in core_dx (J30)
-base_commit: f4e8860ed3b3e46d2e0ee37e281191e787288c49
-base_version: v0
+base_commit: 45c7beeb734eeeca37c05383437062b92f4cae8e
+base_version: v2
 writable:
 - codeloop/agent/
 - codeloop/schemas/

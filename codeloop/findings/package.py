@@ -52,8 +52,9 @@ def package_finding(
             f"{finding_id} has status {finding.status}; only accepted (or eligible) findings are packaged"
         )
     batch = finding.batch_discovered
-    labels = read_jsonl(paths.labels_file(batch))
-    version = labels[0]["version_reviewed"]
+    # the base the gate compares against is the version under review now (the latest labeled batch's), not the
+    # version that drafted the batch the finding was first seen in
+    version = read_jsonl(paths.labels_file(labeled_batches(paths)[-1]))[0]["version_reviewed"]
     scope = Scope.load(paths.scope_yaml)
     # a finding seen in several batches has occurrences in each batch's event store; every occurrence becomes a case
     batches = [batch] + [b for b in finding.batches_seen if b != batch and paths.labels_file(b).exists()]
