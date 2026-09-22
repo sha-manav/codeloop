@@ -1064,3 +1064,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Phase 9 step 3 hosting decision (owner, 2026-09-22, option B): the coder is remote and the owner cannot keep a local server up, so the blind holdout labeling is served from a separate Fly app, codeloop-holdout, that holds CODELOOP_SEAL_KEY as a Fly secret for the labeling window only. The existing app codeloop-ui is unchanged and still never holds the key. The image carries the sealed encounter ciphertext and no predictions; labels are written encrypted to the app's own volume and pulled back checksum-verified; the app and its secrets are destroyed after the pull. Recorded because the seal key is placed on a third-party host for the duration.
+
+## 2026-09-22T20:41:04Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Holdout-labeling app deployed 2026-09-22 (~21:15Z): https://codeloop-holdout.fly.dev, app codeloop-holdout, machine 8e755ea77d9208, volume codeloop_holdout (iad), coder cpc1. Verified by GET only: /health behind basic auth reports mode holdout, 40 encounters, 0 labeled; the index lists 40 encounters, all in holdout (blind) mode; the image holds the sealed ciphertext and no runs/ directory; the volume holds the ciphertext copy and nothing else yet. codeloop-ui still serves review/batch3/v2 unchanged.
