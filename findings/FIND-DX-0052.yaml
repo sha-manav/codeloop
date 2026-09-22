@@ -1,7 +1,7 @@
 id: FIND-DX-0052
 title: missed corrections on dx fields in core_dx (E11)
 batch_discovered: batch2
-status: accepted
+status: resolved
 pattern: reason=missed, field_type=dx, module=core_dx, code_category=E11
 reasons:
 - missed
@@ -41,10 +41,10 @@ pipeline_cause: retrieval
 targeted_eval: evals/datasets/FIND-DX-0052.yaml
 task: tasks/FIND-DX-0052/
 resolution:
-  version: null
-  pr: null
-  before_error_rate: null
-  after_error_rate: null
+  version: v2
+  pr: https://github.com/sha-manav/codeloop/pull/2
+  before_error_rate: 0.917
+  after_error_rate: 0.333
   batch_next_error_rate: null
 triage_notes: 'Triage delegated by the owner to the build agent on 2026-09-22 (ledger).
   Basis: v1 seed-1 traces (extract problems, map_dx selections, cached model rationales),
@@ -55,5 +55,9 @@ triage_notes: 'Triage delegated by the owner to the build agent on 2026-09-22 (l
   7 of these 8 problems the model''s rationale says the unspecified or without-complication
   code of the named condition was not offered. A deterministic retrieval change (head-term
   query plus category defaults) is expected to move all three; only FIND-DX-0052 is
-  packaged, the others are checked on batch3.'
+  packaged, the others are checked on batch3. | Resolved in v2 (PR #2, gated head
+  5b4e825, third attempt): a map_dx retry for uncoded problems with head-term candidates;
+  targeted error 0.917 -> 0.333 (D2N135 stays wrong: coded R7309 on the first pass,
+  FIND-DX-0069). Regression: agreement 0.741 -> 0.735, dx recall 0.833 -> 0.867, scrubber
+  errors 1.667 -> 0, escalations 0. batch_next_error_rate to be filled from batch3.'
 triage_assisted_by: owner+llm:claude-fable-5-1

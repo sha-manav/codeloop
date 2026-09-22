@@ -817,3 +817,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - result: PASS
 - route_to_human: false
 - numbers: {"base_agreement": 0.7406612523279189, "base_runs": 3, "base_scrubber_errors": 1.6666666666666667, "base_targeted_error": 0.9166666666666666, "escalation_failures": 0, "head_agreement": 0.7348076614743282, "head_runs": 3, "head_scrubber_errors": 0.0, "head_targeted_error": 0.3333333333333333}
+
+## 2026-09-22T01:12:53Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: PR #2 (branch codeloop/FIND-DX-0052, gated head 5b4e825: map_dx retry for uncoded problems with head-term candidates, wider net for a line's uncoded indication, no pointer-less lines) merged into main by the build agent at the owner's direction: the agent reported the gate table and asked the owner to merge or say so; the owner answered 'merge it' (2026-09-22). Gate PASS on the third attempt (first two recorded above) and CI green before the merge.
