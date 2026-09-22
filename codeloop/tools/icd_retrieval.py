@@ -14,9 +14,41 @@ from codeloop.tables import Tables
 # the first mapping call and every decision it made are unchanged. A problem that a billed line points at gets a wider
 # retry (more hits, the head term, and the "unspecified" / "without complications" members of the retrieved
 # categories), because a line without a coded indication is structurally invalid (spec section 8).
+# FIND-DX-0039: the extractor frames a problem as the symptom and names its documented cause in the same description
+# ("Nasal congestion attributed to seasonal allergies"); candidates are retrieved for the whole description, the symptom
+# code ranks first and the mapper takes it. The coder codes the cause when it is documented. The cause term is the text
+# after the causal phrase; "from" counts only when it is not part of "unchanged from", "shifted from", "from ... to".
+_CAUSE = re.compile(
+    r"\b(?:attributed to|due to|secondary to|caused by|related to|(?<!unchanged )(?<!shifted )(?<!changed )from)\s+"
+    r"(?P<cause>[^,;(]+)",
+    re.IGNORECASE,
+)
+_SYMPTOM_PREFIXES = ("R", "M255", "M256", "M796")  # signs and symptoms; joint and limb pain
+_DEFINITIVE_FIRST = set("ABCDEFGHIJKLMNOPQST")  # diseases and injuries: not R (symptoms), U, V-Y (external), Z (status)
+
 _HEAD_CUT = re.compile(r",|;|:| - | with | without | due to | secondary to | status post | s/p ", re.IGNORECASE)
 _PARENTHETICAL = re.compile(r"\([^)]*\)")
 _DEFAULT_WORDS = re.compile(r"unspecified|without complication", re.IGNORECASE)
+
+
+def cause_term(description: str) -> str | None:
+    """The documented cause named in a symptom's description, or None: 'Foot pain due to Lisfranc fracture' ->
+    'Lisfranc fracture'; 'Murmur, unchanged from prior exam' -> None; 'Pain from elbow up to the neck' -> None."""
+    m = _CAUSE.search(_PARENTHETICAL.sub(" ", description))
+    if not m:
+        return None
+    cause = re.sub(r"\s+", " ", m.group("cause")).strip(" .")
+    if not cause or re.search(r"\bto\b", cause) or len(cause.split()) > 6:
+        return None
+    return cause
+
+
+def is_symptom_code(code: str) -> bool:
+    return code.startswith(_SYMPTOM_PREFIXES)
+
+
+def is_definitive_code(code: str) -> bool:
+    return bool(code) and code[0] in _DEFINITIVE_FIRST and not is_symptom_code(code)
 
 
 def head_term(description: str) -> str:
@@ -119,3 +151,32 @@ class IcdRetriever:
                 if d.code not in offered:
                     found.setdefault(d.code, d)
         return list(found.values())[:cap]
+
+    def cause_candidates(self, cause: str, k: int = 12, cap: int = 16) -> list[Candidate]:
+        """FIND-DX-0039: candidates for a symptom's documented cause, plus the default codes of the categories they
+        fall in ('seasonal allergies' offers J302 and J309 alike). The query carries light inflection variants,
+        because the FTS index has no stemmer ('allergies' -> 'allergy', 'allergic'). Definitive codes only."""
+        found: dict[str, Candidate] = {}
+        for c in self.search(" ".join(_with_variants(cause)), k=k):
+            if is_definitive_code(c.code):
+                found.setdefault(c.code, c)
+        for category in list(dict.fromkeys(c[:3] for c in list(found)[:6]))[:3]:
+            for d in self.category_defaults(category):
+                if is_definitive_code(d.code):
+                    found.setdefault(d.code, d)
+        return list(found.values())[:cap]
+
+
+def _with_variants(text: str) -> list[str]:
+    out: list[str] = []
+    for tok in re.findall(r"[A-Za-z][A-Za-z\-]+", text):
+        low = tok.lower()
+        out.append(low)
+        if len(low) >= 5:
+            if low.endswith("ies"):
+                out += [low[:-3] + "y", low[:-3] + "ic"]
+            elif low.endswith("y"):
+                out += [low[:-1] + "ies", low[:-1] + "ic"]
+            elif low.endswith("s"):
+                out.append(low[:-1])
+    return list(dict.fromkeys(out))

@@ -20,7 +20,7 @@ from codeloop.schemas.trace import StageTrace, Trace
 from codeloop.scoring import Scope
 from codeloop.scrubber import scrub
 from codeloop.tables import Tables
-from codeloop.tools.icd_retrieval import IcdRetriever
+from codeloop.tools.icd_retrieval import IcdRetriever, cause_term, is_definitive_code, is_symptom_code
 from codeloop.tools.product_data import ProductResolution, resolve_product
 from codeloop.util.hashing import sha256_text
 
@@ -298,6 +298,76 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
             )
         choose_first_listed(decisions)
         problem_codes = {d.problem_index: d.code for d in decisions if d.code}
+    # 4a-ii. FIND-DX-0039: a symptom coded where its documented cause is named in the same description. A separate,
+    # small map_dx call offers candidates for the cause term; the symptom decision is replaced only when the mapper
+    # selects a definitive condition code (never a symptom, status or external-cause code). The first call and the
+    # 4a retry above are unchanged.
+    cause_idx = [
+        i
+        for i, p in enumerate(ex.problems)
+        if decisions[i].code
+        and is_symptom_code(decisions[i].code)
+        and p.status == "active"
+        and cause_term(p.description)
+        and (p_note[i] or ctx.evidence_policy != "note_only")
+    ]
+    cause_cands = {i: retriever.cause_candidates(cause_term(ex.problems[i].description) or "") for i in cause_idx}
+    cause_idx = [i for i in cause_idx if cause_cands[i]]
+    recoded = 0
+    if cause_idx:
+        comp = ctx.llm.complete(
+            "map_dx",
+            {
+                "encounter_id": enc.id,
+                "evidence_policy": ctx.evidence_policy,
+                "problems_block": problems_block(
+                    [ex.problems[i] for i in cause_idx],
+                    [p_note[i] for i in cause_idx],
+                    [p_dlg[i] for i in cause_idx],
+                    [cause_cands[i] for i in cause_idx],
+                ),
+            },
+            DxMapping,
+            seed=ctx.seed,
+        )
+        st.llm_calls.append(comp.trace)
+        by_local = {s.problem_index: s for s in comp.parsed.selections}
+        for local, i in enumerate(cause_idx):
+            sel = by_local.get(local)
+            old = decisions[i]
+            new_code = None
+            if sel is not None and sel.code:
+                p = ex.problems[i]
+                d = apply_dx_rules(
+                    problem_index=i,
+                    problem_status=p.status,
+                    problem_laterality=p.laterality,
+                    selected_code=sel.code,
+                    first_listed=old.first_listed,
+                    rationale=sel.rationale,
+                    laterality_basis=sel.laterality_basis,
+                    provider_query=sel.provider_query,
+                    note_spans=p_note[i],
+                    dialogue_spans=p_dlg[i],
+                    retriever=retriever,
+                    evidence_policy=ctx.evidence_policy,
+                )
+                if d.code and d.code != old.code and is_definitive_code(d.code):
+                    queries = [x for x in queries if x not in old.queries]
+                    gaps = [g for g in gaps if g not in old.gaps]
+                    d.notes.append(f"recoded to the documented cause (FIND-DX-0039): {old.code} -> {d.code}")
+                    decisions[i] = d
+                    gaps.extend(d.gaps)
+                    queries.extend(d.queries)
+                    for ld in line_decisions:
+                        ld.pointers = sorted({d.code if ptr == old.code else ptr for ptr in ld.pointers})
+                    new_code = d.code
+                    recoded += 1
+            retry_out.append({"problem_index": i, "kind": "cause", "candidates": len(cause_cands[i]), "code": new_code})
+        if recoded:
+            choose_first_listed(decisions)
+            problem_codes = {d.problem_index: d.code for d in decisions if d.code}
+
     # a line whose indication was coded on retry gets its pointer. One whose indication still has no code points at
     # the first-listed diagnosis with a data gap saying so (the coder re-points it in review); a package with a
     # pointer-less line is structurally invalid (spec section 8), and dropping the line would bill nothing for a
@@ -328,13 +398,14 @@ def run_encounter(enc: Encounter, ctx: RunContext) -> Trace:
                 continue
         kept_lines.append(ld)
     line_decisions = kept_lines
-    if retry_idx or repointed or defaulted or dropped_lines:  # the stage appears only when it did something
+    if retry_idx or cause_idx or repointed or defaulted or dropped_lines:  # the stage appears only when it acted
         stages.append(
             _finish(
                 st,
                 retry_out,
                 [
                     f"retried uncoded problems: {len(retry_idx)}",
+                    f"symptoms with a documented cause retried: {len(cause_idx)}, recoded: {recoded}",
                     f"lines re-pointed: {repointed}",
                     f"lines pointed at the first-listed diagnosis: {defaulted}",
                     f"lines dropped for want of any coded diagnosis: {dropped_lines}",
