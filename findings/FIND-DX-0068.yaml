@@ -1,0 +1,31 @@
+id: FIND-DX-0068
+title: wrong_value corrections on dx fields in core_dx (I1A)
+batch_discovered: batch2
+status: candidate
+pattern: reason=wrong_value, field_type=dx, module=core_dx, code_category=I1A
+reasons:
+- wrong_value
+field_types:
+- dx
+module: core_dx
+code_category: I1A
+grouping_key: wrong_value|dx|core_dx|I1A
+batches_seen:
+- batch2
+occurrences:
+- encounter_id: D2N139
+  event_ids:
+  - 699
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

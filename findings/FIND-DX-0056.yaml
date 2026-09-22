@@ -1,0 +1,37 @@
+id: FIND-DX-0056
+title: missed corrections on dx fields in core_dx (I50)
+batch_discovered: batch2
+status: candidate
+pattern: reason=missed, field_type=dx, module=core_dx, code_category=I50
+reasons:
+- missed
+field_types:
+- dx
+module: core_dx
+code_category: I50
+grouping_key: missed|dx|core_dx|I50
+batches_seen:
+- batch2
+occurrences:
+- encounter_id: D2N004
+  event_ids:
+  - 30
+- encounter_id: D2N093
+  event_ids:
+  - 391
+count: 2
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch2 (2026-09-22): I50 missed in D2N004 and D2N093: same retrieval
+  cause as FIND-DX-0052 (no unspecified heart-failure candidate offered; every candidate
+  specified a type); stays candidate under D3, expected to move with the FIND-DX-0052
+  change.'
+triage_assisted_by: owner+llm:claude-fable-5-1

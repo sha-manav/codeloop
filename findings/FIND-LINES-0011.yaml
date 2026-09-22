@@ -1,0 +1,34 @@
+id: FIND-LINES-0011
+title: missed corrections on line fields in core_lines (I5522)
+batch_discovered: batch2
+status: candidate
+pattern: reason=missed, field_type=line, module=core_lines, code_category=I5522
+reasons:
+- missed
+field_types:
+- line
+module: core_lines
+code_category: I5522
+grouping_key: missed|line|core_lines|I5522
+batches_seen:
+- batch2
+occurrences:
+- encounter_id: D2N004
+  event_ids:
+  - 26
+  - 29
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: '| batch2 (2026-09-22): D2N004: a diagnosis code typed into the line
+  field and removed by the coder 2 min later (events 27, 29); a phantom, not a line
+  correction.'
+triage_assisted_by: owner+llm:claude-fable-5-1

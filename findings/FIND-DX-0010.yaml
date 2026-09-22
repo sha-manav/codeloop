@@ -1,7 +1,7 @@
 id: FIND-DX-0010
 title: guideline corrections on dx fields in core_dx (R01)
 batch_discovered: batch1
-status: ambiguous
+status: rejected
 pattern: reason=guideline, field_type=dx, module=core_dx, code_category=R01
 reasons:
 - guideline
@@ -63,5 +63,10 @@ triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-
   three kept codes and fails the gate on dx recall; one that reproduces both does
   not exist. Routed to the owner: ask the coder which is right. If he removes the
   three, adding the R01 class to codeloop/rules/dx_rules.NOT_ASSESSED_CLASSES fixes
-  6 of 7 with no kept code lost.'
+  6 of 7 with no kept code lost. | batch2 (2026-09-22): v1 drafted an R01 code in
+  12 batch2 encounters and the coder kept all 12 (0 removals, 0 edits). Together with
+  the three kept in batch1 this reads as the coder coding an examination-found murmur;
+  the 7 batch1 removals are not reproducible as a rule. Rejected: no pipeline change.
+  Set by the build agent under the owner''s standing delegation; the owner can reopen
+  it if the coder says otherwise.'
 triage_assisted_by: owner+llm:claude-fable-5-1

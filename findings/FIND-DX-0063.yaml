@@ -1,0 +1,31 @@
+id: FIND-DX-0063
+title: specificity corrections on dx fields in core_dx (M75)
+batch_discovered: batch2
+status: candidate
+pattern: reason=specificity, field_type=dx, module=core_dx, code_category=M75
+reasons:
+- specificity
+field_types:
+- dx
+module: core_dx
+code_category: M75
+grouping_key: specificity|dx|core_dx|M75
+batches_seen:
+- batch2
+occurrences:
+- encounter_id: D2N116
+  event_ids:
+  - 488
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

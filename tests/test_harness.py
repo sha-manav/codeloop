@@ -119,6 +119,9 @@ def test_findings_package_gate_end_to_end(tmp_path):
     # a second extract on the same batch is idempotent (same ids, same counts)
     again = extract_findings(paths, config, batch=BATCH)
     assert {f.id: f.count for f in again} == {f.id: f.count for f in findings}
+    # ... and does not promote a same-batch candidate as if the key had been seen in a prior batch
+    assert {f.id: f.status for f in again} == {f.id: f.status for f in findings}
+    assert {f.grouping_key: f for f in again}["unsupported|dx|core_dx|R50"].status == "candidate"
     out = package_finding(paths, config, spec.id, store=store)
     task_dir = paths.tasks / spec.id
     assert (task_dir / "task.yaml").exists() and (task_dir / "EXEC_PLAN.md").exists() and (task_dir / "RESULTS.md").exists()

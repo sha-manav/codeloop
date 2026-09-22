@@ -1,0 +1,32 @@
+id: FIND-DX-0060
+title: missed corrections on dx fields in core_dx (S42)
+batch_discovered: batch2
+status: candidate
+pattern: reason=missed, field_type=dx, module=core_dx, code_category=S42
+reasons:
+- missed
+field_types:
+- dx
+module: core_dx
+code_category: S42
+grouping_key: missed|dx|core_dx|S42
+batches_seen:
+- batch2
+occurrences:
+- encounter_id: D2N018
+  event_ids:
+  - 80
+  - 81
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

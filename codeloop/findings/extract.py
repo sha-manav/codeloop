@@ -158,13 +158,20 @@ def extract_findings(
     for k, g in sorted(groups.items()):
         n = len(g.occurrences)
         prior = by_key.get(k)
-        threshold = min_repeat if prior is not None else min_new
+        # D3: the lower threshold applies only when the key was seen in an earlier batch; a finding this same run
+        # created (or a re-run over the same batch) does not count as prior evidence
+        seen_before = prior is not None and (
+            prior.batch_discovered != batch or any(b != batch for b in prior.batches_seen)
+        )
+        threshold = min_repeat if seen_before else min_new
         occ = [Occurrence(encounter_id=eid, event_ids=sorted(ids)) for eid, ids in sorted(g.occurrences.items())]
         if prior is not None:
             seen = {o.encounter_id for o in prior.occurrences}
             prior.occurrences.extend(o for o in occ if o.encounter_id not in seen)
             prior.count = len({o.encounter_id for o in prior.occurrences})
-            if prior.status == "candidate" and n >= threshold:
+            if prior.status in ("candidate", "eligible") and prior.batch_discovered == batch and not seen_before:
+                prior.status = "eligible" if n >= threshold else "candidate"  # idempotent re-run of this batch
+            elif prior.status == "candidate" and n >= threshold:
                 prior.status = "eligible"
             prior.batches_seen = sorted(set(prior.batches_seen) | {batch})
             save_finding(paths, prior)

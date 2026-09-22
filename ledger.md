@@ -722,3 +722,30 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Batch2 (v1) event store: events 1 and 2 (2026-09-20T10:12:33Z open D2N004, 10:12:40Z open D2N013) are the owner looking at the live site, confirmed by the owner, not the coder. No other action was taken; both encounters are in review mode (not blind). Effect: review_minutes for D2N004 and D2N013 starts from the owner's open and is not coder time unless the analysis takes the coder's own first open instead; nothing else is affected.
+
+## 2026-09-22T00:00:24Z — labels build batch2
+
+- actor: manavshah <manavshah03@gmail.com>
+- version_reviewed: v1
+- approved: 45
+- pending: 0
+- coders: ["cpc1"]
+- labels_sha256: 02f81c897f274bc0f8fc3463cc0bc2c8d9f75e5de0c9d0808e8f574a49d01d7f
+- events_sha256: 956e00df2ff6a1089f78d7d25e35021909b5d1d243de1c54c82f5a904e0af75e
+- mean_touches: 0.822
+- mean_review_minutes: 4.463
+
+## 2026-09-22T00:00:42Z — findings extract batch2
+
+- actor: manavshah <manavshah03@gmail.com>
+- findings: [["FIND-DX-0050", "candidate", 1], ["FIND-DX-0051", "candidate", 1], ["FIND-DX-0052", "eligible", 4], ["FIND-DX-0053", "candidate", 1], ["FIND-DX-0054", "candidate", 1], ["FIND-DX-0055", "candidate", 2], ["FIND-DX-0056", "candidate", 2], ["FIND-DX-0057", "candidate", 1], ["FIND-DX-0058", "candidate", 1], ["FIND-DX-0059", "candidate", 1], ["FIND-DX-0060", "candidate", 1], ["FIND-DX-0061", "candidate", 1], ["FIND-DX-0062", "candidate", 1], ["FIND-LINES-0009", "candidate", 1], ["FIND-LINES-0010", "candidate", 1], ["FIND-LINES-0011", "candidate", 1], ["FIND-DX-0063", "candidate", 1], ["FIND-LINES-0012", "candidate", 1], ["FIND-DX-0064", "candidate", 1], ["FIND-DX-0065", "candidate", 2], ["FIND-DX-0066", "candidate", 1], ["FIND-DX-0067", "candidate", 1], ["FIND-LINES-0004", "candidate", 2], ["FIND-DX-0068", "candidate", 1], ["FIND-DX-0069", "candidate", 1]]
+
+## 2026-09-22T00:00:50Z — findings extract batch2
+
+- actor: manavshah <manavshah03@gmail.com>
+- findings: [["FIND-DX-0050", "candidate", 1], ["FIND-DX-0051", "candidate", 1], ["FIND-DX-0052", "eligible", 4], ["FIND-DX-0053", "candidate", 1], ["FIND-DX-0054", "candidate", 1], ["FIND-DX-0055", "eligible", 2], ["FIND-DX-0056", "eligible", 2], ["FIND-DX-0057", "candidate", 1], ["FIND-DX-0058", "candidate", 1], ["FIND-DX-0059", "candidate", 1], ["FIND-DX-0060", "candidate", 1], ["FIND-DX-0061", "candidate", 1], ["FIND-DX-0062", "candidate", 1], ["FIND-LINES-0009", "candidate", 1], ["FIND-LINES-0010", "candidate", 1], ["FIND-LINES-0011", "candidate", 1], ["FIND-DX-0063", "candidate", 1], ["FIND-LINES-0012", "candidate", 1], ["FIND-DX-0064", "candidate", 1], ["FIND-DX-0065", "eligible", 2], ["FIND-DX-0066", "candidate", 1], ["FIND-DX-0067", "candidate", 1], ["FIND-LINES-0004", "candidate", 2], ["FIND-DX-0068", "candidate", 1], ["FIND-DX-0069", "candidate", 1]]
+
+## 2026-09-22T00:12:15Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: findings extract batch2 was run twice in a row (00:00:42Z and 00:00:50Z). On the second run the extractor treated the findings it had just created as prior-batch evidence and promoted FIND-DX-0055, FIND-DX-0056 and FIND-DX-0065 (n=2 each, new in batch2) to eligible, against D3 (3 in a new batch). Their status was set back to candidate by hand and codeloop/findings/extract.py now applies the lower threshold only when the key was seen in an earlier batch (test extended). The first extract entry is the valid one: eligible = FIND-DX-0052 only.

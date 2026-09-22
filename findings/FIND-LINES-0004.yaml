@@ -10,12 +10,19 @@ field_types:
 module: core_lines
 code_category: 73000-73140
 grouping_key: unsupported|line|core_lines|73000-73140
-batches_seen: []
+batches_seen:
+- batch2
 occurrences:
 - encounter_id: D2N077
   event_ids:
   - 1090
-count: 1
+- encounter_id: D2N018
+  event_ids:
+  - 95
+  - 96
+  - 98
+  - 99
+count: 2
 hypothesis: ''
 pipeline_cause: null
 targeted_eval: null
@@ -26,5 +33,7 @@ resolution:
   before_error_rate: null
   after_error_rate: null
   batch_next_error_rate: null
-triage_notes: ''
-triage_assisted_by: null
+triage_notes: '| batch2 (2026-09-22): batch2 occurrence D2N018 (events 95, 96, 98,
+  99) is a remove-then-re-add of the same line 73060 to fix its pointer, not a disagreement
+  with the drafted line; real batch2 count 0.'
+triage_assisted_by: owner+llm:claude-fable-5-1

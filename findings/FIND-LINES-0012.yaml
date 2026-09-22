@@ -1,0 +1,31 @@
+id: FIND-LINES-0012
+title: specificity corrections on line fields in core_lines (73000-73140)
+batch_discovered: batch2
+status: candidate
+pattern: reason=specificity, field_type=line, module=core_lines, code_category=73000-73140
+reasons:
+- specificity
+field_types:
+- line
+module: core_lines
+code_category: 73000-73140
+grouping_key: specificity|line|core_lines|73000-73140
+batches_seen:
+- batch2
+occurrences:
+- encounter_id: D2N116
+  event_ids:
+  - 484
+count: 1
+hypothesis: ''
+pipeline_cause: null
+targeted_eval: null
+task: null
+resolution:
+  version: null
+  pr: null
+  before_error_rate: null
+  after_error_rate: null
+  batch_next_error_rate: null
+triage_notes: ''
+triage_assisted_by: null

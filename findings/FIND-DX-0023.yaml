@@ -32,12 +32,18 @@ resolution:
   pr: https://github.com/sha-manav/codeloop/pull/1
   before_error_rate: 1.0
   after_error_rate: 0.0
-  batch_next_error_rate: null
+  batch_next_error_rate: 0.0
 triage_notes: 'Triage call delegated by the owner to the build agent on 2026-09-20
   (ledger). Basis: where the draft''s evidence for each removed code sits in the note
   (section names and counts only), the coder''s passage grades, and what stayed on
   the label. 3 of 3 removed with reason guideline. Shares a root cause with FIND-DX-0006,
   -0010, -0020, -0023 and -0030: the extract -> map_dx path codes what is documented
   anywhere in the note rather than what is assessed, managed or affecting care at
-  the visit (coder guidelines section 3).'
+  the visit (coder guidelines section 3). | batch2 (2026-09-22): batch_next_error_rate
+  = fraction of the v1-drafted diagnosis fields of this finding''s ICD-10-CM category
+  on the next batch (batch2, 45 encounters) that the coder removed or recoded for
+  any non-judgment reason; the coder''s reason vocabulary shifted from ''guideline''
+  to ''unsupported'' in batch2, so the reason is not required to match. R63: 0 drafted
+  fields and 0 coder adds of R63 codes, so no error in either direction; recorded
+  as 0.0 with zero exposure.'
 triage_assisted_by: owner+llm:claude-fable-5-1
