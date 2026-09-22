@@ -1,0 +1,78 @@
+{
+  "commit": "c347e898dc6b0b623dcf53da74277bc8af18b31e",
+  "kind": "regression",
+  "mean": {
+    "dx_recall": 0.8669467787114846,
+    "escalation_failures": 0.6666666666666666,
+    "line_recall": 0.9880952380952381,
+    "mean_agreement": 0.7324706877484655,
+    "scrubber_errors": 1.6666666666666667,
+    "targeted_error_rate": null
+  },
+  "n_encounters": 90,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "89b79c3ab5bc87b9955deed4246d4ebea51d6d73a55b18b3325cae7f3c5b29fe",
+    "2": "2e317238be6883adadc0c8db9ae0cd7b74753bcfdff7830fa0368a80d5bfa7d5",
+    "3": "a31356a67abee718ddb502990e6caa305363e8df35b6681103b7c770b410b40a"
+  },
+  "ran_at": "2026-09-22T00:48:38Z",
+  "runs": [
+    {
+      "dx_recall": 0.9201680672268907,
+      "escalation_checked": 90,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.7922091488758156,
+      "n": 90,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": null,
+      "targeted_fields": 0,
+      "targeted_wrong": 0
+    },
+    {
+      "dx_recall": 0.8445378151260504,
+      "escalation_checked": 90,
+      "escalation_failures": 1,
+      "failures": [],
+      "line_recall": 0.9642857142857143,
+      "mean_agreement": 0.7041182274515607,
+      "n": 90,
+      "scrubber_errors": 3,
+      "seed": 2,
+      "targeted_error_rate": null,
+      "targeted_fields": 0,
+      "targeted_wrong": 0
+    },
+    {
+      "dx_recall": 0.8361344537815126,
+      "escalation_checked": 90,
+      "escalation_failures": 1,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.7010846869180203,
+      "n": 90,
+      "scrubber_errors": 2,
+      "seed": 3,
+      "targeted_error_rate": null,
+      "targeted_fields": 0,
+      "targeted_wrong": 0
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "regression-through-batch2",
+  "variance": {
+    "dx_recall": 0.0014280221892678617,
+    "escalation_failures": 0.2222222222222222,
+    "line_recall": 0.0002834467120181403,
+    "mean_agreement": 0.0017858755969600635,
+    "scrubber_errors": 1.5555555555555556,
+    "targeted_error_rate": null
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "commit": "4c947459016955301213b9216c8762e695fff3b9",
+  "kind": "targeted",
+  "mean": {
+    "dx_recall": 0.75,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.665244708994709,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.3333333333333333
+  },
+  "n_encounters": 4,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "c1ee128413d01755af1f33fd9d1c4dcaf3a3b3ed60b18e113e7828b8d166c531",
+    "2": "d252b5fcce07cc7428352052438d92aa8d34cf4fd4a147c5eb18c1bdabfe3a1c",
+    "3": "981bfdced550093df6350d8047192dedc586a8fa923ba92f063524c079c0835e"
+  },
+  "ran_at": "2026-09-22T00:20:16Z",
+  "runs": [
+    {
+      "dx_recall": 0.75,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.66875,
+      "n": 4,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": 0.5,
+      "targeted_fields": 4,
+      "targeted_wrong": 2
+    },
+    {
+      "dx_recall": 0.6875,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.5734126984126984,
+      "n": 4,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": 0.25,
+      "targeted_fields": 4,
+      "targeted_wrong": 1
+    },
+    {
+      "dx_recall": 0.8125,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.7535714285714286,
+      "n": 4,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": 0.25,
+      "targeted_fields": 4,
+      "targeted_wrong": 1
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "targeted-FIND-DX-0052",
+  "variance": {
+    "dx_recall": 0.0026041666666666665,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.005415671541250246,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.013888888888888888
+  }
+}

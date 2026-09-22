@@ -1,0 +1,78 @@
+{
+  "commit": "5b4e825ba5d3375de874d409da1f7d5868b9954b",
+  "kind": "targeted",
+  "mean": {
+    "dx_recall": 0.875,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.7450396825396824,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.3333333333333333
+  },
+  "n_encounters": 4,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "aad5d24d287ae2107fb68a737c2a3bbfbc873f16f1b35ae8ee83f60ffc581d6b",
+    "2": "0098d362f235bed667d9478b10be20ebb3229953690048048e4ed0ed8e3d781d",
+    "3": "d904400fd3e6de69057fda90a811e67a94a98069eed5242505f778aaa20ecd17"
+  },
+  "ran_at": "2026-09-22T00:55:26Z",
+  "runs": [
+    {
+      "dx_recall": 0.875,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.7291666666666666,
+      "n": 4,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": 0.5,
+      "targeted_fields": 4,
+      "targeted_wrong": 2
+    },
+    {
+      "dx_recall": 0.875,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.7559523809523809,
+      "n": 4,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": 0.25,
+      "targeted_fields": 4,
+      "targeted_wrong": 1
+    },
+    {
+      "dx_recall": 0.875,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.75,
+      "n": 4,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": 0.25,
+      "targeted_fields": 4,
+      "targeted_wrong": 1
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "targeted-FIND-DX-0052",
+  "variance": {
+    "dx_recall": 0.0,
+    "escalation_failures": 0.0,
+    "line_recall": 0.0,
+    "mean_agreement": 0.00013188145628621842,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.013888888888888888
+  }
+}
