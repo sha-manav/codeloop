@@ -1,0 +1,78 @@
+{
+  "commit": "dc1ce88e861e4e1257a2e03f9481034b3fc1e2dd",
+  "kind": "regression",
+  "mean": {
+    "dx_recall": 0.8595641646489104,
+    "escalation_failures": 0.0,
+    "line_recall": 0.9767441860465116,
+    "mean_agreement": 0.7631241803464025,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": null
+  },
+  "n_encounters": 135,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "6c343de9066af472fac9b4ab806f05a50632188e6b0b1bdb5de1d0fe9370f2ff",
+    "2": "7d32236c5f277bb9687b9dbe1e17fa74b2cea575c315002cb516c90f8220dd64",
+    "3": "7858d32f26781af5068a52f4850f497077fd88a7f753a4a4ec980c741713bfad"
+  },
+  "ran_at": "2026-09-22T20:11:41Z",
+  "runs": [
+    {
+      "dx_recall": 0.9152542372881356,
+      "escalation_checked": 45,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.8246441624219402,
+      "n": 135,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": null,
+      "targeted_fields": 0,
+      "targeted_wrong": 0
+    },
+    {
+      "dx_recall": 0.8280871670702179,
+      "escalation_checked": 45,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.9534883720930233,
+      "mean_agreement": 0.7262065095398428,
+      "n": 135,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": null,
+      "targeted_fields": 0,
+      "targeted_wrong": 0
+    },
+    {
+      "dx_recall": 0.8353510895883777,
+      "escalation_checked": 45,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.9767441860465116,
+      "mean_agreement": 0.7385218690774247,
+      "n": 135,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": null,
+      "targeted_fields": 0,
+      "targeted_wrong": 0
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "regression-through-batch3",
+  "variance": {
+    "dx_recall": 0.0015594861903393948,
+    "escalation_failures": 0.0,
+    "line_recall": 0.00036055525509284255,
+    "mean_agreement": 0.0019176321107105534,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": null
+  }
+}

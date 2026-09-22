@@ -1,7 +1,7 @@
 id: FIND-DX-0039
 title: specificity corrections on dx fields in core_dx (J30)
 batch_discovered: batch1
-status: accepted
+status: resolved
 pattern: reason=specificity, field_type=dx, module=core_dx, code_category=J30
 reasons:
 - specificity
@@ -33,10 +33,10 @@ pipeline_cause: model_reasoning
 targeted_eval: evals/datasets/FIND-DX-0039.yaml
 task: tasks/FIND-DX-0039/
 resolution:
-  version: null
-  pr: null
-  before_error_rate: null
-  after_error_rate: null
+  version: v3
+  pr: https://github.com/sha-manav/codeloop/pull/3
+  before_error_rate: 1.0
+  after_error_rate: 0.75
   batch_next_error_rate: null
 triage_notes: '| batch3 (2026-09-22): Eligible under D3 (D2N138 in batch1; D2N095,
   D2N130 in batch3: R0981 replaced by J309, reason specificity). Set to AMBIGUOUS,
@@ -54,5 +54,10 @@ triage_notes: '| batch3 (2026-09-22): Eligible under D3 (D2N138 in batch1; D2N09
   the first call is unchanged and a retry result is taken only when it is a definitive
   condition code (not a symptom, status or external-cause code). Expected to flip
   D2N008 and D2N089 against their labels; accepted as the cost of the coder''s stated
-  rule.'
+  rule. | Resolved in v3 (PR #3, gated head 330e940 against the v2 base): cause-term
+  retry; targeted error 1.0 -> 0.75 (D2N130 fixed; D2N095 J302 for the coder''s J309;
+  D2N138''s two fields are a J309->J302 edit this change does not address). Regression:
+  agreement 0.7637 -> 0.7631, recalls unchanged, scrubber 0, escalations 0. No next
+  batch exists to measure batch_next_error_rate; the holdout is scored once for all
+  versions.'
 triage_assisted_by: owner+llm:claude-fable-5-1

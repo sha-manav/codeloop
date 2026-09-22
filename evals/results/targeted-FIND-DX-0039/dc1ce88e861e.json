@@ -1,0 +1,78 @@
+{
+  "commit": "dc1ce88e861e4e1257a2e03f9481034b3fc1e2dd",
+  "kind": "targeted",
+  "mean": {
+    "dx_recall": 0.8571428571428571,
+    "escalation_failures": 0.0,
+    "line_recall": 0.3333333333333333,
+    "mean_agreement": 0.7714285714285715,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.75
+  },
+  "n_encounters": 3,
+  "notes": [],
+  "predictions_sha256": {
+    "1": "abc9ff2d1a0778ecf8d5f6cf07115271dcf53b12eeeef6bf29369ad428710987",
+    "2": "587f39928cca7e5e30f0fc902dc7521442d6096fd89830732708aa7b4446b18e",
+    "3": "d2c257a275edaea09b593d94fed80479e4553f3b346d73598a1d8c585a887124"
+  },
+  "ran_at": "2026-09-22T20:10:09Z",
+  "runs": [
+    {
+      "dx_recall": 0.8571428571428571,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 1.0,
+      "mean_agreement": 0.8380952380952381,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 1,
+      "targeted_error_rate": 0.75,
+      "targeted_fields": 4,
+      "targeted_wrong": 3
+    },
+    {
+      "dx_recall": 0.8571428571428571,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.7380952380952381,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 2,
+      "targeted_error_rate": 0.75,
+      "targeted_fields": 4,
+      "targeted_wrong": 3
+    },
+    {
+      "dx_recall": 0.8571428571428571,
+      "escalation_checked": 0,
+      "escalation_failures": 0,
+      "failures": [],
+      "line_recall": 0.0,
+      "mean_agreement": 0.7380952380952381,
+      "n": 3,
+      "scrubber_errors": 0,
+      "seed": 3,
+      "targeted_error_rate": 0.75,
+      "targeted_fields": 4,
+      "targeted_wrong": 3
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "suite": "targeted-FIND-DX-0039",
+  "variance": {
+    "dx_recall": 0.0,
+    "escalation_failures": 0.0,
+    "line_recall": 0.2222222222222222,
+    "mean_agreement": 0.0022222222222222214,
+    "scrubber_errors": 0.0,
+    "targeted_error_rate": 0.0
+  }
+}

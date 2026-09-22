@@ -1019,3 +1019,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - result: PASS
 - route_to_human: false
 - numbers: {"base_agreement": 0.7637071707442078, "base_runs": 3, "base_scrubber_errors": 0.0, "base_targeted_error": 1.0, "escalation_failures": 0, "head_agreement": 0.7631241803464025, "head_runs": 3, "head_scrubber_errors": 0.0, "head_targeted_error": 0.75}
+
+## 2026-09-22T20:17:57Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: PR #3 (branch codeloop/FIND-DX-0039, gated head 330e940: cause-term retry, symptom recoded to its documented cause) merged into main by the build agent at the owner's direction: the agent reported the gate table and asked the owner to merge or say so; the owner answered 'keep going' (2026-09-22), the same form of direction as for PR #1. Gate PASS against the v2 base on the second run (the first run's base was mis-packaged and is void) and CI green before the merge.
