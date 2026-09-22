@@ -790,3 +790,30 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: run v1 batch1 (seeds 1,2,3) was executed in a git worktree at tag v1 (commit c6cdcee, identical pipeline code to main at dd5543c) and its predictions, run.json and ledger entry copied here; it stores the base for the regression suite regression-through-batch2, which covers batch1 and batch2 labels. All 328 LLM calls were cache hits from the cycle-0 gate runs, so the recorded cost estimate was not incurred.
+
+## 2026-09-22T00:39:27Z — gate FIND-DX-0052
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 2904fa86191747bd5d94307bd57b791e57b20409
+- head: 4c947459016955301213b9216c8762e695fff3b9
+- result: FAIL
+- route_to_human: false
+- numbers: {"base_agreement": 0.7406612523279189, "base_runs": 3, "base_scrubber_errors": 1.6666666666666667, "base_targeted_error": 0.9166666666666666, "escalation_failures": 1, "head_agreement": 0.7017582417582418, "head_runs": 3, "head_scrubber_errors": 1.0, "head_targeted_error": 0.3333333333333333}
+
+## 2026-09-22T00:48:38Z — gate FIND-DX-0052
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 2904fa86191747bd5d94307bd57b791e57b20409
+- head: c347e898dc6b0b623dcf53da74277bc8af18b31e
+- result: FAIL
+- route_to_human: false
+- numbers: {"base_agreement": 0.7406612523279189, "base_runs": 3, "base_scrubber_errors": 1.6666666666666667, "base_targeted_error": 0.9166666666666666, "escalation_failures": 2, "head_agreement": 0.7324706877484655, "head_runs": 3, "head_scrubber_errors": 1.6666666666666667, "head_targeted_error": 0.3333333333333333}
+
+## 2026-09-22T00:56:25Z — gate FIND-DX-0052
+
+- actor: manavshah <manavshah03@gmail.com>
+- base: 2904fa86191747bd5d94307bd57b791e57b20409
+- head: 5b4e825ba5d3375de874d409da1f7d5868b9954b
+- result: PASS
+- route_to_human: false
+- numbers: {"base_agreement": 0.7406612523279189, "base_runs": 3, "base_scrubber_errors": 1.6666666666666667, "base_targeted_error": 0.9166666666666666, "escalation_failures": 0, "head_agreement": 0.7348076614743282, "head_runs": 3, "head_scrubber_errors": 0.0, "head_targeted_error": 0.3333333333333333}
