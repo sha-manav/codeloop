@@ -851,3 +851,23 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - prompt_hashes: {"audit": "da9371916f1de85ea606500dc2b011571814856a5c966211bd5c5e271d54ac81", "cluster_findings": "4f6bceb52b30d59830a35e613e7d188e0c72cfc863f2bd3f36a354683ec12afe", "extract": "7491eb0094deeef74e820702f18ad5c728534984f3c8ed68fc99a0d47f856339", "map_dx": "ecfc8fbd2fd14049735a2a9260101ee25bac8fa974016b5a96cf4bba89233594", "map_lines": "beabf637556f179ba3c5c7acb8d16fdf306bbd5cbf20b062e49263b9625217f3", "ping": "e9a79ea28a061709d7d3838bb8dfe791b6496a74b93d4c0790c3053d559ff32f"}
 - sealed_predictions_sha256: ebb207d197e4cecac328fc6527576a90d0d95e0074cadc7e484661e79cefa1f4
 - note: written by the build agent after `codeloop holdout predict --version v2 --sealed` succeeded on a second attempt; `codeloop version freeze v2` had created the tag and VERSION.md (commit f4d0703) and then reported 1 holdout encounter failed (content-free), writing nothing. The API was healthy on a ping; the dev run of v2 on batch3 in progress at the time showed no failures. Hashes recomputed from the same tree, which is unchanged since the tag.
+
+## 2026-09-22T01:42:36Z — run v2 batch3
+
+- actor: manavshah <manavshah03@gmail.com>
+- run_id: v2-batch3-20260922T012355Z-8bb9e0
+- commit: f4d0703e04e79135512c335679446d5009f53590
+- seeds: [1, 2, 3]
+- encounters: 45
+- llm_calls: 382
+- tokens_in: 874059
+- tokens_out: 369705
+- cache_hits: 17
+- failures: 0
+- scrubber_rule_counts: {}
+- compliance_failed: 0
+- predictions_sha256: {"1": "46a75e9b68b49bc43999abf9066ed7bdf6073f6a1ebb69306644cb40c9ba7371", "2": "6ce9dde051d048351c897f38443437c57632c14ad6db3dc0efba4004ae38c3fa", "3": "4e5bb9e64b99bd7bd7241ce4cfa5da943e76e7404d62587cf49ba2d02dbe9f4a"}
+- models_yaml_sha256: 767fe2cc00c4895a4a431bc8722cc440b828cd8b1c15596f24707af96c525bb3
+- scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
+- tables_version: tables.yaml:47a324256764e933/parser:1
+- estimated_cost_usd: 13.61
