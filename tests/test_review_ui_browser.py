@@ -173,7 +173,7 @@ def test_review_flow_saves_every_action(served, page):
         "open", "remove", "grade_evidence", "grade_evidence", "accept", "grade_evidence", "edit", "edit", "grade_query", "approve",
     ]
     assert [(d.code, d.first_listed) for d in rec.label.diagnoses] == [("E119", True)]
-    assert [(ln.code, ln.pointers) for ln in rec.label.lines] == [("73562", ["E11.9"])]
+    assert [(ln.code, ln.pointers) for ln in rec.label.lines] == [("73562", ["E119"])]  # typed with a dot; label holds the code form
     assert rec.evidence_grades == {"dx:M1711#0": "supported", "dx:E119#0": "unsupported", "line:73562:0#0": "supported"}
     assert rec.query_grades == {"query:0": "warranted"} and rec.touches == 3
 
@@ -300,6 +300,6 @@ def test_pointers_codes_and_modifiers_are_checked_before_anything_is_final(serve
     _card(page, "K5900").get_by_role("button", name="Edit").click()
     expect(page.locator("#modebar .bad")).to_have_count(0)
     events, rec = _stored(served, eid)
-    assert rec.label.lines[0].modifiers == ["26", "LT"] and rec.label.lines[0].pointers == ["K59.00"] and rec.touches == 4
+    assert rec.label.lines[0].modifiers == ["26", "LT"] and rec.label.lines[0].pointers == ["K5900"] and rec.touches == 4
     assert [(d.code, d.first_listed) for d in rec.label.diagnoses] == [("E119", False), ("K5900", True)]
 
