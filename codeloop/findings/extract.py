@@ -210,8 +210,8 @@ def field_refs_for(store: EventStore, finding: Finding, scope: Scope) -> dict[st
                 code = str(e.after["code"]).upper().replace(".", "")
                 new_ref = f"dx:{code}" if ref.startswith("dx") else f"line:{code}"
                 refs[e.encounter_id].add(_scorer_ref(new_ref))
-                if e.type == "add":
-                    refs[e.encounter_id].discard(_scorer_ref(ref))
+                if e.type == "add" and _scorer_ref(new_ref) != _scorer_ref(ref):
+                    refs[e.encounter_id].discard(_scorer_ref(ref))  # placeholder ref of the add form, not the code
     return {k: sorted(v) for k, v in refs.items()}
 
 

@@ -38,8 +38,8 @@ hypothesis: 'The extractor lists the diabetes problem every time (4 of 4, status
   policy the draft is by design and the coder''s add is a judgment about evidence,
   not a retrieval miss.'
 pipeline_cause: retrieval
-targeted_eval: null
-task: null
+targeted_eval: evals/datasets/FIND-DX-0052.yaml
+task: tasks/FIND-DX-0052/
 resolution:
   version: null
   pr: null

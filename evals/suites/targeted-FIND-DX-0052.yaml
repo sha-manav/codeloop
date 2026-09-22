@@ -1,0 +1,10 @@
+name: targeted-FIND-DX-0052
+kind: targeted
+dataset: evals/datasets/FIND-DX-0052.yaml
+gold: []
+runs: 3
+seeds:
+- 1
+- 2
+- 3
+finding: FIND-DX-0052

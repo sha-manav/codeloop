@@ -749,3 +749,19 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: findings extract batch2 was run twice in a row (00:00:42Z and 00:00:50Z). On the second run the extractor treated the findings it had just created as prior-batch evidence and promoted FIND-DX-0055, FIND-DX-0056 and FIND-DX-0065 (n=2 each, new in batch2) to eligible, against D3 (3 in a new batch). Their status was set back to candidate by hand and codeloop/findings/extract.py now applies the lower threshold only when the key was seen in an earlier batch (test extended). The first extract entry is the valid one: eligible = FIND-DX-0052 only.
+
+## 2026-09-22T00:13:25Z — findings package FIND-DX-0052
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0052.yaml
+- targeted_suite: targeted-FIND-DX-0052
+- regression_suite: regression-through-batch2
+- task: tasks/FIND-DX-0052/
+
+## 2026-09-22T00:14:03Z — findings package FIND-DX-0052
+
+- actor: manavshah <manavshah03@gmail.com>
+- dataset: evals/datasets/FIND-DX-0052.yaml
+- targeted_suite: targeted-FIND-DX-0052
+- regression_suite: regression-through-batch2
+- task: tasks/FIND-DX-0052/
