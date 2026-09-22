@@ -871,3 +871,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - scope_sha256: f49fd4c2f2334f933255485d97915aa387cb89da53b584fe5d470d91571e74bd
 - tables_version: tables.yaml:47a324256764e933/parser:1
 - estimated_cost_usd: 13.61
+
+## 2026-09-22T01:45:20Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Review UI redeployed for batch3 / v2 at 2026-09-22T01:44Z (coder cpc1): /health reports mode review, batch batch3, version v2; the blind five (D2N075 D2N082 D2N150 D2N178 D2N180) are served in blind mode; the event store /data/events/v2_batch3.sqlite holds 0 events. Verified read-only (GET only). The batch1 and batch2 stores stay on the volume.
