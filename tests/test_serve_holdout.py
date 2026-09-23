@@ -62,6 +62,14 @@ def test_holdout_app_stages_ciphertext_labels_on_the_volume_and_never_loads_pred
     assert ui.post("/api/event", auth=auth, json=ev).status_code == 200
     assert ui.post("/api/blind_submit", auth=auth, json={"encounter_id": hid}).status_code == 200
     assert ui.get("/health", auth=auth).json()["labeled"] == 1
+    # a holdout label is final: a second submit is refused, the page state says submitted and points at the next one
+    again = ui.post("/api/blind_submit", auth=auth, json={"encounter_id": hid})
+    assert again.status_code == 400 and "already submitted" in again.json()["detail"]
+    st = ui.get(f"/api/encounter/{hid}", auth=auth).json()
+    assert st["blind_submitted"] and st["submitted_count"] == 1 and st["total"] == 40
+    assert st["next_unlabeled"] in holdout_ids and st["next_unlabeled"] != hid
+    index = ui.get("/", auth=auth).text
+    assert "1/40 submitted" in index and index.count("<td>submitted</td>") == 1 and index.count("<td>not submitted</td>") == 39
     # every sealed artefact is on the volume, encrypted; nothing under the repo's data/sealed or data/labels changed
     enc = vol / "sealed" / "holdout_labels.enc"
     assert enc.read_bytes().startswith(b"CLSEAL01") and not paths.holdout_labels_enc.exists()

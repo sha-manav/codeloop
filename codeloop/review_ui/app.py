@@ -197,11 +197,18 @@ async function load(){
   const pend = {fields: [], spans: [], queries: [], pointers: [], first_listed: [], ...(DATA.pending || {})};
   const structure = [...pend.pointers, ...pend.first_listed];
   const where = refs => refs.length ? ' (' + [...new Set(refs.map(x => esc(x.split('#')[0].split(':')[1])))].join(', ') + ')' : '';
-  document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries${structure.length ? ' · <span class="bad">' + esc(structure.join('; ')) + '</span>' : ''}`;
+  if(DATA.mode === 'holdout'){
+    document.getElementById('modebar').innerHTML = `mode: <b>holdout</b> · ${DATA.blind_submitted ? '<b>submitted</b> (final)' : 'not submitted yet'} · ${DATA.submitted_count}/${DATA.total} submitted${structure.length ? ' · <span class="bad">' + esc(structure.join('; ')) + '</span>' : ''}`;
+  } else {
+    document.getElementById('modebar').innerHTML = `mode: <b>${DATA.mode}</b> · status: ${DATA.status} · touches: ${DATA.touches} · pending before approve: ${pend.fields.length} fields${where(pend.fields)}, ${pend.spans.length} passages${where(pend.spans)}, ${pend.queries.length} queries${structure.length ? ' · <span class="bad">' + esc(structure.join('; ')) + '</span>' : ''}`;
+  }
   document.getElementById('note').dataset.source = 'note'; document.getElementById('dialogue').dataset.source = 'dialogue';
   highlight([]);
   let right = '';
-  if(DATA.mode === 'blind' || DATA.mode === 'holdout'){
+  if(DATA.mode === 'holdout' && DATA.blind_submitted){
+    const next = DATA.next_unlabeled ? `<a class="primary" href="/encounter/${encodeURIComponent(DATA.next_unlabeled)}">Next encounter → ${esc(DATA.next_unlabeled)}</a>` : '<b>All encounters submitted. Thank you.</b>';
+    right = `<div class="banner"><b>Submitted.</b> This blind label is final and cannot be changed. ${DATA.submitted_count} of ${DATA.total} done.</div>` + renderPackage(DATA.label, null) + `<p>${next} · <a href="/">queue</a></p>`;
+  } else if(DATA.mode === 'blind' || DATA.mode === 'holdout'){
     right = `<div class="banner">Blind coding: build the package from the note and transcript. No draft is available.</div>` + renderPackage(DATA.label, null) + `<p><button class="primary" onclick="blindSubmit()">Submit blind label</button></p>`;
   } else {
     right = renderPackage(DATA.label, DATA.draft) + `<p><button class="primary" onclick="approve()">Approve encounter</button></p>`;
@@ -359,6 +366,11 @@ class ReviewSession:
 
     def blind_submit(self, eid: str) -> LabelRecord:
         events = self.events(eid)
+        if self.holdout and any(e.type == "blind_submit" for e in events):
+            raise Refused(
+                "This encounter's blind label was already submitted and is final. Use the queue link to go to the "
+                "next encounter."
+            )
         label = build_blind_label(events)
         if not label.diagnoses:  # final and unrepeatable once the draft is revealed, so never by accident
             raise Refused(
@@ -478,6 +490,9 @@ class ReviewSession:
             "evidence_grades": rec.evidence_grades if rec else {},
             "query_grades": rec.query_grades if rec else {},
             "blind_submitted": self.blind_done(eid),
+            "submitted_count": sum(1 for x in self.order if self.blind_done(x)),
+            "total": len(self.order),
+            "next_unlabeled": next((x for x in self.order if not self.blind_done(x)), None),
             "pending": self.pending(eid)
             if mode == "review"
             else {
@@ -523,15 +538,20 @@ def create_review_app(session: ReviewSession, *, auth: bool = True) -> FastAPI:
         rows = []
         done = 0
         for eid in session.order:
-            st = status_of(session.events(eid))
-            done += st == "approved"
+            if session.holdout:
+                st = "submitted" if session.blind_done(eid) else "not submitted"
+                done += st == "submitted"
+            else:
+                st = status_of(session.events(eid))
+                done += st == "approved"
             rows.append(
                 f"<tr><td><a href='/encounter/{html.escape(eid)}'>{html.escape(eid)}</a></td><td>{session.mode(eid)}</td><td>{st}</td></tr>"
             )
         title = "Holdout blind labeling" if session.holdout else f"Review {session.version} · {session.batch}"
+        word = "submitted" if session.holdout else "approved"
         body = (
             f"<header><strong>CodeLoop · {html.escape(title)}</strong><span>coder: {html.escape(session.coder_id)}</span>"
-            f"<span>{done}/{len(session.order)} approved</span></header><main style='grid-template-columns:1fr'><div class='pane'>"
+            f"<span>{done}/{len(session.order)} {word}</span></header><main style='grid-template-columns:1fr'><div class='pane'>"
             "<table><tr><th>Encounter</th><th>Mode</th><th>Status</th></tr>" + "".join(rows) + "</table></div></main>"
         )
         return _page(title, body)
