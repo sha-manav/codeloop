@@ -95,6 +95,18 @@ def _iter_records(path: Path) -> Iterator[Any]:
             return
 
 
+# Spec section 15 step 4: `codeloop holdout score` exports the holdout labels and predictions in plaintext alongside
+# the results, once, after writing data/sealed/SCORED.lock. Those files are the reveal, not a leak; they are exempt
+# only while the lock exists.
+_REVEAL_PATHS = ("runs/holdout/", "reports/holdout.json", "reports/holdout.md")
+
+
+def _is_reveal(rel: str, root: Path) -> bool:
+    return (root / "data" / "sealed" / "SCORED.lock").exists() and any(
+        rel == r or rel.startswith(r) for r in _REVEAL_PATHS
+    )
+
+
 def _iter_files(root: Path, scan_dirs: Iterable[str]) -> Iterator[Path]:
     for rel in scan_dirs:
         base = root / rel
@@ -104,6 +116,8 @@ def _iter_files(root: Path, scan_dirs: Iterable[str]) -> Iterator[Path]:
             if not p.is_file() or p.name in _SKIP_NAMES:
                 continue
             if any(part in _SKIP_DIRS for part in p.relative_to(root).parts):
+                continue
+            if _is_reveal(p.relative_to(root).as_posix(), root):
                 continue
             yield p
 
