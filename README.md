@@ -10,7 +10,8 @@ bounded task environment, and changes merge only through a gate. Four frozen ver
 are compared on 40 sealed, blind-coded holdout encounters.
 
 The full specification is `CODELOOP_SPEC.md`; the rules for agents working here are `CLAUDE.md`;
-decisions are `DECISIONS.md` (rendered from `config/project.yaml`); the chronology is `ledger.md`.
+decisions are `DECISIONS.md` (rendered from `config/project.yaml`); the chronology is `ledger.md`; the
+result is `docs/STUDY.md`.
 
 ## Things to state plainly
 
@@ -135,9 +136,9 @@ Pull events after a session ends (the coder tells you), not while they are worki
 | 5 Scrubber and compliance | done (NCCI 2026Q4, MUE, MPFS RVU26D, ICD-10-CM FY2027) |
 | 6 Review UI | done; deployed on Fly.io (`codeloop serve`) |
 | 7 Harness | done; `v0` frozen with sealed holdout predictions |
-| 8 Cycles | Cycle 0 done: batch1 reviewed by the CPC (45/45, 2026-09-20), 57 findings, four resolved in `v1` through the gate (PR #1: diagnoses documented only outside the assessment and plan), one ambiguous (FIND-DX-0010, a question for the coder); `v1` frozen with sealed holdout predictions. Cycle 1: v1 drafts for batch2 served at https://codeloop-ui.fly.dev; **CPC review of batch2 pending**. Open: v1 seeds 2 and 3 on batch2 (base runs for the next gate) |
-| 9 Holdout | blind labeling and single-shot scoring await the CPC after v3 |
-| 10 Reports | `codeloop report` regenerates everything that exists |
+| 8 Cycles | done. Cycle 0 (batch1 -> `v1`, PR #1): four findings with one cause, diagnoses documented only outside the assessment and plan. Cycle 1 (batch2 -> `v2`, PR #2): E11 missed because the ICD candidate search dropped the default code; a retry call for uncoded problems. Cycle 2 (batch3 -> `v3`, PR #3): symptom coded where its documented cause was named; a cause-term retry. Every merge gated (three seeds), `v0`-`v3` frozen with sealed holdout predictions |
+| 9 Holdout | done 2026-09-23: scorer hash verified, 40 encounters coded blind by the CPC on a separate, since destroyed, Fly app, scored once (`data/sealed/SCORED.lock`). No version differs from another on the holdout (mean agreement 0.35-0.37, every pairwise 95% CI spans zero); see `docs/STUDY.md` |
+| 10 Reports | done; `reports/holdout.md`, `reports/index.md`; the write-up is `docs/STUDY.md` |
 
 ## Phases
 
