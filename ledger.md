@@ -1069,3 +1069,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Holdout-labeling app deployed 2026-09-22 (~21:15Z): https://codeloop-holdout.fly.dev, app codeloop-holdout, machine 8e755ea77d9208, volume codeloop_holdout (iad), coder cpc1. Verified by GET only: /health behind basic auth reports mode holdout, 40 encounters, 0 labeled; the index lists 40 encounters, all in holdout (blind) mode; the image holds the sealed ciphertext and no runs/ directory; the volume holds the ciphertext copy and nothing else yet. codeloop-ui still serves review/batch3/v2 unchanged.
+
+## 2026-09-23T01:27:25Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Holdout labeling incident 2026-09-23 ~00:19-00:31Z: in holdout mode the encounter page re-rendered the blind form after a successful submit, so the coder pressed Submit repeatedly (28 blind_submit events over the first two encounters, all 200 OK; the sealed label file keeps one label per coder and encounter, so the stored labels are simply the last submitted copy) and reported that he could not submit. Fixed and redeployed ~01:05Z (commit on main: second submit refused as final; page shows the submitted state, the running count and a link to the next unlabeled encounter; queue shows submitted / not submitted). Between 00:36Z and 00:49Z an Apple-device browser also failed the login three times (401 on GET /); no credential was changed. Volume state after the redeploy: 2 of 40 submitted. Diagnosed from status codes in the app logs with encounter IDs masked and from event counts; no label content or encounter ID was read.
