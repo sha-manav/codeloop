@@ -1,6 +1,6 @@
 # CodeLoop reports
 
-Regenerated 2026-09-22T20:25:36Z from committed data. In-scope fields: diagnoses, first-listed, and lines in the scope allowlist; E/M is excluded.
+Regenerated 2026-09-23T20:28:50Z from committed data. In-scope fields: diagnoses, first-listed, and lines in the scope allowlist; E/M is excluded.
 
 ![curve](curve.svg)
 
@@ -11,7 +11,10 @@ Regenerated 2026-09-22T20:25:36Z from committed data. In-scope fields: diagnoses
 | v0 | batch1 | live | 45 | 0.7058 | 0.51 | 0.29 | 0.29 | 1.82 | 4.42 |
 | v1 | batch2 | live | 45 | 0.8733 | 0.84 | 0.62 | 0.62 | 0.82 | 4.46 |
 | v2 | batch3 | live | 45 | 0.8959 | 0.87 | 0.67 | 0.62 | 0.69 | 2.72 |
-| — | holdout | not scored yet | | | | | | | |
+| v0 | holdout | holdout | 40 | 0.3686 | 0.10 | 0.07 | 0.07 | — | — |
+| v1 | holdout | holdout | 40 | 0.3616 | 0.15 | 0.10 | 0.10 | — | — |
+| v2 | holdout | holdout | 40 | 0.3680 | 0.10 | 0.10 | 0.10 | — | — |
+| v3 | holdout | holdout | 40 | 0.3456 | 0.12 | 0.07 | 0.07 | — | — |
 
 ## Appendix: version × batch (all cells, tagged)
 
@@ -156,5 +159,5 @@ Regenerated 2026-09-22T20:25:36Z from committed data. In-scope fields: diagnoses
 
 - [Audit](audit.md)
 - [Ingest](ingest.md)
-- Holdout: not scored yet
+- [Holdout](holdout.md)
 - [calibration_dev_seed](calibration_dev_seed.md)
