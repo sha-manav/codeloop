@@ -1084,3 +1084,13 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: HUMAN GATE before holdout scoring (spec Phase 9): the build agent laid out the four sealed prediction hashes (file .sha256 against the ledger freeze entries, all equal) and the scorer tree hash (equal to the freeze hash, verified 2026-09-22); the owner answered 'keep going' (2026-09-23), the same form of direction used for the PR merges. Scoring proceeds once.
+
+## 2026-09-23T20:28:15Z — holdout score
+
+- actor: manavshah <manavshah03@gmail.com>
+- versions: ["v0", "v1", "v2", "v3"]
+- n: 40
+- primary_coder: cpc1
+- mean_agreement: {"v0": 0.36863906926406925, "v1": 0.3616224747474747, "v2": 0.36800685425685425, "v3": 0.3456132756132756}
+- report_sha256: 14e35ee467c45339a31c7e04a0fecedebf48db04de09c9b297a19a66a68b0780
+- lock: data/sealed/SCORED.lock

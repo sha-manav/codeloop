@@ -1,0 +1,357 @@
+{
+  "n": 40,
+  "pairwise": {
+    "v0->v1": {
+      "ci_high": 0.03317020652958153,
+      "ci_low": -0.049381110209235156,
+      "diff": -0.007016594516594532,
+      "level": 0.95,
+      "mean_a": 0.36863906926406925,
+      "mean_b": 0.3616224747474747,
+      "n": 40,
+      "n_resamples": 10000,
+      "seed": 20260921
+    },
+    "v0->v2": {
+      "ci_high": 0.030499526515151507,
+      "ci_low": -0.03306748286435786,
+      "diff": -0.0006322150072149979,
+      "level": 0.95,
+      "mean_a": 0.36863906926406925,
+      "mean_b": 0.36800685425685425,
+      "n": 40,
+      "n_resamples": 10000,
+      "seed": 20260921
+    },
+    "v0->v3": {
+      "ci_high": 0.015317009379509377,
+      "ci_low": -0.06053711219336218,
+      "diff": -0.023025793650793658,
+      "level": 0.95,
+      "mean_a": 0.36863906926406925,
+      "mean_b": 0.3456132756132756,
+      "n": 40,
+      "n_resamples": 10000,
+      "seed": 20260921
+    },
+    "v1->v2": {
+      "ci_high": 0.041960926226551204,
+      "ci_low": -0.028541666666666667,
+      "diff": 0.006384379509379534,
+      "level": 0.95,
+      "mean_a": 0.3616224747474747,
+      "mean_b": 0.36800685425685425,
+      "n": 40,
+      "n_resamples": 10000,
+      "seed": 20260921
+    },
+    "v1->v3": {
+      "ci_high": 0.02076438492063491,
+      "ci_low": -0.05745490620490621,
+      "diff": -0.016009199134199126,
+      "level": 0.95,
+      "mean_a": 0.3616224747474747,
+      "mean_b": 0.3456132756132756,
+      "n": 40,
+      "n_resamples": 10000,
+      "seed": 20260921
+    },
+    "v2->v3": {
+      "ci_high": 0.009210294913419893,
+      "ci_low": -0.054034158549783544,
+      "diff": -0.02239357864357866,
+      "level": 0.95,
+      "mean_a": 0.36800685425685425,
+      "mean_b": 0.3456132756132756,
+      "n": 40,
+      "n_resamples": 10000,
+      "seed": 20260921
+    }
+  },
+  "per_version": {
+    "v0": {
+      "core_lines": {
+        "line_field_agreement": 0.6785714285714286,
+        "n": 10
+      },
+      "mean_agreement": 0.36863906926406925,
+      "mean_hier_agreement": 0.41563277000777,
+      "missing_predictions": 0,
+      "no_in_scope_fields": 0,
+      "per_type": {
+        "dx": {
+          "fn": 53,
+          "fp": 121,
+          "precision": 0.33516483516483514,
+          "recall": 0.5350877192982456,
+          "tp": 61
+        },
+        "first_listed": {
+          "accuracy": 0.475,
+          "correct": 19,
+          "n": 40
+        },
+        "line": {
+          "fn": 0,
+          "fp": 4,
+          "precision": 0.6,
+          "recall": 1.0,
+          "tp": 6
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 6,
+          "n": 6
+        },
+        "pointers": {
+          "accuracy": 0.16666666666666666,
+          "correct": 1,
+          "n": 6
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 6,
+          "n": 6
+        }
+      },
+      "tiers": {
+        "t100": {
+          "count": 3,
+          "n": 40,
+          "share": 0.075,
+          "wilson_high": 0.19864233524310543,
+          "wilson_low": 0.025836025774588198
+        },
+        "t75": {
+          "count": 4,
+          "n": 40,
+          "share": 0.1,
+          "wilson_high": 0.23051775227522298,
+          "wilson_low": 0.03957952868260638
+        },
+        "t90": {
+          "count": 3,
+          "n": 40,
+          "share": 0.075,
+          "wilson_high": 0.19864233524310543,
+          "wilson_low": 0.025836025774588198
+        }
+      }
+    },
+    "v1": {
+      "core_lines": {
+        "line_field_agreement": 0.6538461538461539,
+        "n": 10
+      },
+      "mean_agreement": 0.3616224747474747,
+      "mean_hier_agreement": 0.4078544372294372,
+      "missing_predictions": 0,
+      "no_in_scope_fields": 0,
+      "per_type": {
+        "dx": {
+          "fn": 56,
+          "fp": 103,
+          "precision": 0.36024844720496896,
+          "recall": 0.5087719298245614,
+          "tp": 58
+        },
+        "first_listed": {
+          "accuracy": 0.4,
+          "correct": 16,
+          "n": 40
+        },
+        "line": {
+          "fn": 1,
+          "fp": 5,
+          "precision": 0.5,
+          "recall": 0.8333333333333334,
+          "tp": 5
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 5,
+          "n": 5
+        },
+        "pointers": {
+          "accuracy": 0.4,
+          "correct": 2,
+          "n": 5
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 5,
+          "n": 5
+        }
+      },
+      "tiers": {
+        "t100": {
+          "count": 4,
+          "n": 40,
+          "share": 0.1,
+          "wilson_high": 0.23051775227522298,
+          "wilson_low": 0.03957952868260638
+        },
+        "t75": {
+          "count": 6,
+          "n": 40,
+          "share": 0.15,
+          "wilson_high": 0.2907232436648971,
+          "wilson_low": 0.07061187717320358
+        },
+        "t90": {
+          "count": 4,
+          "n": 40,
+          "share": 0.1,
+          "wilson_high": 0.23051775227522298,
+          "wilson_low": 0.03957952868260638
+        }
+      }
+    },
+    "v2": {
+      "core_lines": {
+        "line_field_agreement": 0.6785714285714286,
+        "n": 10
+      },
+      "mean_agreement": 0.36800685425685425,
+      "mean_hier_agreement": 0.4221139971139971,
+      "missing_predictions": 0,
+      "no_in_scope_fields": 0,
+      "per_type": {
+        "dx": {
+          "fn": 51,
+          "fp": 116,
+          "precision": 0.35195530726256985,
+          "recall": 0.5526315789473685,
+          "tp": 63
+        },
+        "first_listed": {
+          "accuracy": 0.4,
+          "correct": 16,
+          "n": 40
+        },
+        "line": {
+          "fn": 0,
+          "fp": 4,
+          "precision": 0.6,
+          "recall": 1.0,
+          "tp": 6
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 6,
+          "n": 6
+        },
+        "pointers": {
+          "accuracy": 0.16666666666666666,
+          "correct": 1,
+          "n": 6
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 6,
+          "n": 6
+        }
+      },
+      "tiers": {
+        "t100": {
+          "count": 4,
+          "n": 40,
+          "share": 0.1,
+          "wilson_high": 0.23051775227522298,
+          "wilson_low": 0.03957952868260638
+        },
+        "t75": {
+          "count": 4,
+          "n": 40,
+          "share": 0.1,
+          "wilson_high": 0.23051775227522298,
+          "wilson_low": 0.03957952868260638
+        },
+        "t90": {
+          "count": 4,
+          "n": 40,
+          "share": 0.1,
+          "wilson_high": 0.23051775227522298,
+          "wilson_low": 0.03957952868260638
+        }
+      }
+    },
+    "v3": {
+      "core_lines": {
+        "line_field_agreement": 0.6551724137931034,
+        "n": 10
+      },
+      "mean_agreement": 0.3456132756132756,
+      "mean_hier_agreement": 0.39475378787878784,
+      "missing_predictions": 0,
+      "no_in_scope_fields": 0,
+      "per_type": {
+        "dx": {
+          "fn": 55,
+          "fp": 120,
+          "precision": 0.329608938547486,
+          "recall": 0.5175438596491229,
+          "tp": 59
+        },
+        "first_listed": {
+          "accuracy": 0.325,
+          "correct": 13,
+          "n": 40
+        },
+        "line": {
+          "fn": 0,
+          "fp": 5,
+          "precision": 0.5454545454545454,
+          "recall": 1.0,
+          "tp": 6
+        },
+        "modifiers": {
+          "accuracy": 1.0,
+          "correct": 6,
+          "n": 6
+        },
+        "pointers": {
+          "accuracy": 0.16666666666666666,
+          "correct": 1,
+          "n": 6
+        },
+        "units": {
+          "accuracy": 1.0,
+          "correct": 6,
+          "n": 6
+        }
+      },
+      "tiers": {
+        "t100": {
+          "count": 3,
+          "n": 40,
+          "share": 0.075,
+          "wilson_high": 0.19864233524310543,
+          "wilson_low": 0.025836025774588198
+        },
+        "t75": {
+          "count": 5,
+          "n": 40,
+          "share": 0.125,
+          "wilson_high": 0.261121198388511,
+          "wilson_low": 0.05459500250945401
+        },
+        "t90": {
+          "count": 3,
+          "n": 40,
+          "share": 0.075,
+          "wilson_high": 0.19864233524310543,
+          "wilson_low": 0.025836025774588198
+        }
+      }
+    }
+  },
+  "primary_coder": "cpc1",
+  "scored_at": "2026-09-23T20:28:14Z",
+  "versions": [
+    "v0",
+    "v1",
+    "v2",
+    "v3"
+  ]
+}
