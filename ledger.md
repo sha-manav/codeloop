@@ -1094,3 +1094,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 - mean_agreement: {"v0": 0.36863906926406925, "v1": 0.3616224747474747, "v2": 0.36800685425685425, "v3": 0.3456132756132756}
 - report_sha256: 14e35ee467c45339a31c7e04a0fecedebf48db04de09c9b297a19a66a68b0780
 - lock: data/sealed/SCORED.lock
+
+## 2026-09-23T20:28:50Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: Study complete 2026-09-23: holdout scored once (SCORED.lock). Mean per-encounter field agreement with the coder's blind holdout labels: v0 0.3686, v1 0.3616, v2 0.3680, v3 0.3456 (n=40); every pairwise difference has a paired-bootstrap 95% CI spanning zero (largest |diff| v0->v3 -0.023, CI -0.061 to +0.015). The live-batch agreements (v0 batch1 0.706, v1 batch2 0.873, v2 batch3 0.896) were measured against labels the coder built by reviewing each version's own drafts; the blind holdout does not reproduce that trend. The anchoring analysis on the 14 blind-subset encounters had already pointed this way (agent vs blind 0.31-0.37 against agent vs reviewed 0.53-0.80). Reports regenerated. The seal key stayed in the owner's keychain except for the labeling window on codeloop-holdout (destroyed).
