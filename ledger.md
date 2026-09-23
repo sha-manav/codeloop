@@ -1079,3 +1079,8 @@ Entries are appended by `codeloop` commands and never edited or deleted; a corre
 
 - actor: manavshah <manavshah03@gmail.com>
 - text: Phase 9 step 3 complete 2026-09-23: the coder (cpc1) submitted blind labels for all 40 holdout encounters between 2026-09-22T23:26Z and 2026-09-23T17:46Z (263 events, 66 blind_submit events of which 28 were the repeat presses of the first two encounters before the fix; the sealed label file holds one label per encounter). Pulled with make fly-pull-holdout: holdout_labels.enc sha256 8c51d844457c5259f4d52fdfc1b9904eeca1af2ef7ff3247ff942ece44c4fecd (23480 bytes), holdout_events.sqlite sha256 bd2e0606b68797b1783235ff3630d3d082e6fd92db008b95b299b92366359709 (kept locally under data/sealed, not committed). The Fly app codeloop-holdout was then destroyed with its volume and secrets, so the seal key no longer exists on Fly. No second coder was arranged. Nothing was decrypted; no label content or encounter ID was read. NEXT: human gate (owner confirms the four sealed prediction hashes and the scorer hash), then codeloop holdout score, once.
+
+## 2026-09-23T20:28:03Z — note
+
+- actor: manavshah <manavshah03@gmail.com>
+- text: HUMAN GATE before holdout scoring (spec Phase 9): the build agent laid out the four sealed prediction hashes (file .sha256 against the ledger freeze entries, all equal) and the scorer tree hash (equal to the freeze hash, verified 2026-09-22); the owner answered 'keep going' (2026-09-23), the same form of direction used for the PR merges. Scoring proceeds once.
