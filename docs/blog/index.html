@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a self-improving medical-coding agent | CodeLoop</title>
+<style>
+:root{color-scheme:light;--surface:#fcfcfb;--surface-2:#f3f2ef;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#8a8985;--rule:#e4e2dc;--grid:#ebe9e4;
+  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--accent:#2a78d6}
+@media (prefers-color-scheme: dark){:root:where(:not([data-theme="light"])){color-scheme:dark;--surface:#1a1a19;--surface-2:#232322;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#8f8e86;--rule:#33322f;--grid:#2c2b28;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--accent:#3987e5}}
+:root[data-theme="dark"]{color-scheme:dark;--surface:#1a1a19;--surface-2:#232322;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#8f8e86;--rule:#33322f;--grid:#2c2b28;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--accent:#3987e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface);color:var(--ink);font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+header.top{border-bottom:1px solid var(--rule);padding:14px 24px;font-size:14px;color:var(--ink-2);display:flex;justify-content:space-between}
+main{max-width:760px;margin:0 auto;padding:40px 20px 80px}
+.kicker{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+h1{font-size:40px;line-height:1.15;margin:8px 0 14px;font-weight:650;letter-spacing:-.01em}
+.byline{color:var(--ink-2);font-size:15px;margin-bottom:34px}
+h2{font-size:26px;margin:44px 0 12px;font-weight:650;letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px;font-weight:650}
+p{margin:0 0 16px}
+.lede{font-size:20px;line-height:1.5;color:var(--ink)}
+figure{margin:28px 0;padding:18px 18px 12px;background:var(--surface-2);border-radius:12px}
+figure h4{margin:0 0 4px;font-size:16px;font-weight:650}
+figure .sub{margin:0 0 10px;font-size:13.5px;color:var(--ink-2)}
+figcaption{font-size:13.5px;color:var(--ink-2);margin-top:8px}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--ink-2);margin:6px 0 2px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:18px;height:2px;vertical-align:middle;margin-right:7px;background:currentColor}
+.legend .k1{color:var(--s1)}.legend .k2{color:var(--s2)}.legend .k3{color:var(--s3)}
+.legend span b{color:var(--ink-2);font-weight:500}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.grid line{stroke:var(--grid);stroke-width:1}
+.axis text{fill:var(--ink-3);font-size:12px}
+.axis line,.axis path{stroke:var(--rule)}
+.series path{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.series circle{stroke:var(--surface);stroke-width:2}
+.endlabel{font-size:12.5px;fill:var(--ink-2);font-weight:600}
+.bar{rx:4}
+.barlabel{font-size:12.5px;fill:var(--ink-2);font-weight:600}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12.5px;padding:8px 10px;border-radius:8px;line-height:1.4;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tip b{font-weight:700}
+.tip .key{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:6px}
+.wrap{position:relative}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:14px 0 22px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:650;color:var(--ink-2);font-size:13.5px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+pre{background:var(--surface-2);border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.5;overflow:auto;color:var(--ink)}
+.callout{border-left:3px solid var(--accent);padding:4px 16px;margin:22px 0;color:var(--ink-2)}
+ol li,ul li{margin-bottom:8px}
+.toc{font-size:14px;color:var(--ink-2);margin:0 0 30px;padding:14px 18px;background:var(--surface-2);border-radius:12px}
+.toc a{color:inherit;text-decoration:none;display:block;padding:2px 0}
+.toc a:hover{color:var(--ink)}
+a{color:var(--accent)}
+.note{font-size:14.5px;color:var(--ink-2)}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<header class="top"><span>CodeLoop</span><span>Engineering · September 2026</span></header>
+<main>
+<div class="kicker">Engineering</div>
+<h1>Building a self-improving medical-coding agent</h1>
+<div class="byline">How a certified coder's corrections became findings, findings became evals, and an improvement agent climbed them inside a gated loop, three cycles, one repository, every step in a ledger.</div>
+
+<nav class="toc" aria-label="Contents">
+<a href="#measurable">Measurable self-improvement</a>
+<a href="#problem">The problem</a>
+<a href="#approach">Our approach: a three-part loop</a>
+<a href="#example">Missed-diabetes example</a>
+<a href="#build">How the loop is built</a>
+<a href="#cycles">Expanding across cycles</a>
+<a href="#also">What we also checked</a>
+</nav>
+
+<p class="lede">Real-world coding systems fail in ways that are hard to anticipate. A draft that looks complete to an engineer is wrong to a coder for reasons that only show up once someone who bills for a living corrects it. CodeLoop is an outpatient professional-coding agent wrapped in a harness that turns those corrections into evidence, evidence into targeted evals, and evals into bounded engineering tasks for an improvement agent. Merges happen only through a gate, and a human approves each one.</p>
+
+<p>The agent reads the visit transcript and the clinical note and drafts a coding package: ICD-10-CM diagnoses with specificity, laterality and active-versus-historical status, in-scope imaging lines with modifiers and diagnosis pointers, and an evidence span for every field. A certified professional coder (CPC) reviews each draft in a web tool. Over three cycles the harness produced three frozen versions, v1 through v3, from the original v0, and the drafts the coder had to change shrank with each one.</p>
+
+<h2 id="measurable">Measurable self-improvement</h2>
+<p>We measure a draft by how much of it the coder keeps. Each cycle's version drafted a fresh batch of 45 encounters; the coder reviewed every draft; and we score the share of encounters whose fields were at least 75%, at least 90%, or 100% in agreement with the label the coder approved. These tiers give a practical view of how much follow-up a draft still needs.</p>
+<p>At cycle 0, half of the drafts cleared the 75% tier and under a third were fully correct. Two cycles later, 87% cleared 75% and 62% needed no change at all.</p>
+
+<figure>
+<h4>Drafts the coder kept, by cycle</h4>
+<p class="sub">Share of the 45 encounters in each cycle's live batch at or above the agreement tier, against the coder's reviewed label.</p>
+<div class="legend"><span class="k1"><b>≥75% agreement</b></span><span class="k2"><b>≥90% agreement</b></span><span class="k3"><b>100% agreement</b></span></div>
+<div class="wrap" id="tiers"></div>
+<figcaption>v0 on batch 1, v1 on batch 2, v2 on batch 3: each version scored on the batch it drafted for review. The ≥90% and 100% tiers coincide at cycles 0 and 1, so their lines overlap there. Hover for values.</figcaption>
+</figure>
+
+<p>The coder's effort moved the same way. Touches per encounter, the edits, additions and removals he made to a draft, fell from 1.82 to 0.69. Zero-touch encounters went from 13 of 45 to 28 of 45.</p>
+
+<figure>
+<h4>Coder effort per encounter, by cycle</h4>
+<p class="sub">Left: corrections the coder made per draft. Right: mean review minutes per encounter.</p>
+<div class="two"><div class="wrap" id="touches"></div><div class="wrap" id="minutes"></div></div>
+<figcaption>Review minutes are measured from the event log with a 120-second idle cap, so they undercount reading time; the trend is what matters.</figcaption>
+</figure>
+
+<h2 id="problem">The problem</h2>
+<p>Early on, most correction was invisible to engineering. The coder could fix a draft, but a changed code might mean a genuine miss, a lookup problem, a guideline the pipeline did not know, or the coder's own judgment call. Sorting those apart still needed an engineer reading traces one encounter at a time. The signal to pick the right hill to climb did not exist.</p>
+<p>The harder question was structural: could the product make its own failures visible, grouped and actionable, so that a coding agent could act on them without an engineer in the middle of every fix?</p>
+
+<h2 id="approach">Our approach: a three-part loop</h2>
+<ol>
+<li><b>Stay close to the practitioner.</b> The coder's corrections steer what the product learns. His guidelines, not ours, define what a visit is coded for, and when a pattern was ambiguous the question went back to him rather than through the loop.</li>
+<li><b>Build the product so review creates evidence.</b> Every action in the review tool is an append-only event with the field, the before and after values and a reason: <em>missed</em>, <em>unsupported</em>, <em>specificity</em>, <em>wrong value</em>, <em>guideline</em>, or <em>judgment</em>. Labels are rebuilt by replaying events, so nothing is lost and nothing can be quietly changed.</li>
+<li><b>Create an agent-driven improvement loop.</b> Corrections that recur become findings; findings become targeted evals with representative encounters and expected fields; an improvement agent investigates inside a bounded task environment, changes the pipeline, validates against the targeted and regression suites, and surfaces a pull request. A gate decides what may merge; a human merges.</li>
+</ol>
+
+<h2 id="example">Missed-diabetes example</h2>
+<p>Type 2 diabetes is one of the most common chronic conditions in these visits. The task is simple to describe and easy to get wrong: find the condition in the note, pick the right ICD-10-CM code from several hundred candidates, and keep enough evidence that a coder can approve or correct it.</p>
+
+<h3>1. A practitioner correction reveals a failure</h3>
+<p>In cycle 1, the coder added the type 2 diabetes code E11.9 to four drafts that did not have it. Each of the four notes named the condition. Four of the same correction across a batch of 45 clears the recurrence threshold, so the harness raised a finding: <code>FIND-DX-0052</code>, <em>missed corrections on diagnosis fields, E11</em>.</p>
+
+<h3>2. Product traces turn corrections into evals</h3>
+<p>Every draft carries a full trace: what the extractor listed as problems, which candidate codes the lookup offered for each, what the mapper selected and why. The finding was packaged into a targeted eval: the four encounters, the coder's labels as gold, and the field <code>dx:E119</code> as the thing that must be right. Alongside it, a regression suite of every labeled encounter so far, three seeded runs each, scores whether anything else moves.</p>
+
+<h3>3. The finding becomes a hill to climb</h3>
+<p>The improvement agent works inside a container that mounts the repository with the sealed data absent, the scorer and config read-only, and network egress only to the model provider. It read the four traces and found the cause in the lookup step, not the model. The extractor had listed the diabetes problem every time, but the candidate search ran on the whole description, and a phrase such as <em>"diabetes, currently under control"</em> pulled in gestational-diabetes codes on the word <em>control</em> while E11.9 never made the list. The mapper is instructed to choose only from the list, so it returned nothing. Its own cached rationale said so in each case.</p>
+<p>The fix that passed the gate leaves the first mapping call exactly as it was and adds a second, small call only for problems the mapper left uncoded, offering candidates for the head of the phrase, here just <em>diabetes</em>. A first attempt that lengthened every candidate list was rejected by the gate: it re-sampled decisions that were already right and cost regression agreement.</p>
+
+<table>
+<tr><th>Gate check</th><th class="num">Before (v1)</th><th class="num">After (v2)</th></tr>
+<tr><td>Targeted error rate, the four E11.9 fields</td><td class="num">0.917</td><td class="num">0.333</td></tr>
+<tr><td>Regression mean agreement, 90 encounters</td><td class="num">0.741</td><td class="num">0.735</td></tr>
+<tr><td>Diagnosis recall</td><td class="num">0.833</td><td class="num">0.867</td></tr>
+<tr><td>Scrubber errors per run</td><td class="num">1.667</td><td class="num">0.0</td></tr>
+<tr><td>Compliance escalation failures</td><td class="num">—</td><td class="num">0</td></tr>
+</table>
+
+<p>On the next batch the miss essentially stopped: one E11 code added by the coder against thirteen drafted and kept. The finding was marked resolved with its before, after and next-batch error rates.</p>
+
+<div class="callout">If the evidence is ambiguous, the case routes back to a human. In cycle 2 the only eligible finding was set aside because the coder had both kept and replaced the same symptom code in the same batch. It went to him as a question, he stated the rule he follows, and only then did it become a task.</div>
+
+<h2 id="build">How the loop is built</h2>
+<p>A finding does not become a task automatically. A correction may be a miss, a lookup gap, a guideline the pipeline does not encode, or the coder's judgment. Only after repeated corrections have been grouped and triaged does the harness produce a bounded task with a clear success condition. For the improvement agent, the result is not an alert but a scoped engineering task with evidence, editable surfaces and explicit validation gates:</p>
+
+<pre>tasks/FIND-DX-0052/
+├── task.yaml              finding, base commit, writable paths, success criteria
+├── EXEC_PLAN.md           root cause, what was tried, why this form
+├── RESULTS.md             targeted and regression before/after, diff summary
+└── GATE.md                the gate's verdict, check by check
+
+writable       codeloop/agent/  codeloop/rules/  codeloop/tools/  codeloop/mappers/  prompts/
+sign-off       evals/graders/          (any change routes the task to human review)
+read-only      codeloop/scoring/  codeloop/compliance/  config/  data/  evals/datasets/  findings/
+not mounted    data/sealed/
+network        the model provider only, through an allowlist proxy
+
+make eval-targeted TASK=FIND-DX-0052
+make eval-regression
+make gate TASK=FIND-DX-0052</pre>
+
+<p>The gate is the same for every task: the targeted error rate must fall by at least 25% and rise on no run; regression agreement may drop by at most one point and recall by at most two; scrubber errors may not increase; no new billable element may appear without evidence. The base for every comparison is the previous version's stored drafts for every labeled batch, three seeds each. Failed gate attempts stay in the ledger next to the one that passed.</p>
+
+<h2 id="cycles">Expanding across cycles</h2>
+<p>The same loop ran three times, and each cycle's finding was different in kind, which is what you would hope: fixing one class of error exposes the next.</p>
+
+<table>
+<tr><th>Cycle</th><th>What the coder kept correcting</th><th>What changed</th><th class="num">Targeted error</th><th class="num">Regression agreement</th></tr>
+<tr><td>0 → v1</td><td>Diagnoses documented only outside the assessment and plan (four findings, one cause)</td><td>A deterministic rule, one class per accepted finding</td><td class="num">1.0 → 0.4</td><td class="num">0.685 → 0.720</td></tr>
+<tr><td>1 → v2</td><td>Missed chronic conditions: the lookup dropped the default code</td><td>A second mapping call for uncoded problems</td><td class="num">0.917 → 0.333</td><td class="num">0.741 → 0.735</td></tr>
+<tr><td>2 → v3</td><td>A symptom coded where its documented cause was named</td><td>A cause-term retry, recoding only to a definitive code</td><td class="num">1.0 → 0.75</td><td class="num">0.764 → 0.763</td></tr>
+</table>
+
+<p>Batch 1 corrections were mostly removals of symptom and history codes. Batch 2's were mostly additions of missed chronic conditions. Batch 3's were specificity swaps. Each fix held on the batch that followed it: the four cycle-0 rule classes recurred at 0.25, 0, 0 and 0; the cycle-1 fix left one miss in thirteen.</p>
+
+<p>What made the loop cheap to run was not the agent but the plumbing around it: an append-only event store, a recurrence threshold, a packager that turns a finding into a dataset and two suites, a container that cannot reach what it must not, and a gate whose verdict is a file in the repository. The total model spend across all three cycles, including the failed gate attempts, was about a hundred dollars.</p>
+
+<h2 id="also">What we also checked</h2>
+<p class="note">Before the first cycle, 40 encounters were sealed and never opened; at the end, the coder coded them with no draft in front of him and all four versions were scored against those labels exactly once. On that blind set the versions did not differ from one another. The curve above therefore measures how much of a draft a reviewer accepts, which is what it was designed to measure, and not from-scratch coding accuracy. The full analysis, including why the two measurements differ, is in <a href="../STUDY.md">docs/STUDY.md</a>.</p>
+
+<p class="note">Encounters are scripted or role-played (ACI-Bench); there is no PHI. CPT descriptors are never stored; code numbers only. Every freeze, gate, merge and correction is in <code>ledger.md</code>.</p>
+
+<div class="tip" id="tip" role="status"></div>
+</main>
+
+<script>
+(function(){
+const tip=document.getElementById('tip');
+function showTip(html,x,y){tip.innerHTML=html;tip.style.display='block';const r=tip.getBoundingClientRect();let left=x+14,top=y-r.height-10;if(left+r.width>window.innerWidth-8)left=x-r.width-14;if(top<8)top=y+14;tip.style.left=(left+window.scrollX)+'px';tip.style.top=(top+window.scrollY)+'px';}
+function hideTip(){tip.style.display='none';}
+const CYCLES=['Cycle 0','Cycle 1','Cycle 2'];
+const SUB=['v0 · batch 1','v1 · batch 2','v2 · batch 3'];
+const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML;};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function lineChart(el,series,opts){
+  const W=720,H=300,m={t:16,r:130,b:40,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const x=i=>m.l+iw*(i/(CYCLES.length-1)), y=v=>m.t+ih*(1-v/opts.max);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${el.id}-t"><title id="${el.id}-t">${esc(opts.title)}</title>`;
+  s+='<g class="grid">';for(let g=0;g<=opts.max;g+=opts.step){s+=`<line x1="${m.l}" x2="${m.l+iw}" y1="${y(g)}" y2="${y(g)}"/>`;}s+='</g>';
+  s+='<g class="axis">';for(let g=0;g<=opts.max;g+=opts.step){s+=`<text x="${m.l-8}" y="${y(g)+4}" text-anchor="end">${g}${opts.unit}</text>`;}
+  CYCLES.forEach((c,i)=>{s+=`<text x="${x(i)}" y="${m.t+ih+20}" text-anchor="middle">${c}</text><text x="${x(i)}" y="${m.t+ih+34}" text-anchor="middle" style="font-size:11px">${SUB[i]}</text>`;});s+='</g>';
+  s+='<g class="series">';
+  series.forEach((sr,k)=>{const col=`var(--s${k+1})`;const d=sr.values.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ');
+    s+=`<path d="${d}" stroke="${col}"/>`;sr.values.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="${col}"/>`;});
+    const last=sr.values[sr.values.length-1];s+=`<text class="endlabel" x="${x(CYCLES.length-1)+12}" y="${y(last)+4+(sr.dy||0)}">${last}${opts.unit} ${esc(sr.name)}</text>`;});
+  s+='</g>';
+  s+=`<line id="${el.id}-hair" x1="0" x2="0" y1="${m.t}" y2="${m.t+ih}" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>`;
+  s+=`<rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" id="${el.id}-hit"/></svg>`;
+  el.innerHTML=s;
+  const svg=el.querySelector('svg'),hit=el.querySelector(`#${el.id}-hit`),hair=el.querySelector(`#${el.id}-hair`);
+  hit.addEventListener('mousemove',e=>{const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+    let i=Math.round(((p.x-m.l)/iw)*(CYCLES.length-1));i=Math.max(0,Math.min(CYCLES.length-1,i));hair.setAttribute('x1',x(i));hair.setAttribute('x2',x(i));hair.style.display='block';
+    let html=`<b>${esc(CYCLES[i])}</b> · ${esc(SUB[i])}<br>`;series.forEach((sr,k)=>{html+=`<span class="key" style="background:${css('--s'+(k+1))}"></span><b>${sr.values[i]}${opts.unit}</b> ${esc(sr.name)}<br>`;});
+    showTip(html,e.clientX,e.clientY);});
+  hit.addEventListener('mouseleave',()=>{hair.style.display='none';hideTip();});
+}
+function barChart(el,values,opts){
+  const W=340,H=260,m={t:16,r:12,b:40,l:36},iw=W-m.l-m.r,ih=H-m.t-m.b,n=values.length,bw=iw/n*0.56;
+  const x=i=>m.l+iw*(i+0.5)/n, y=v=>m.t+ih*(1-v/opts.max);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${el.id}-t"><title id="${el.id}-t">${esc(opts.title)}</title>`;
+  s+='<g class="grid">';for(let g=0;g<=opts.max+1e-9;g+=opts.step){s+=`<line x1="${m.l}" x2="${m.l+iw}" y1="${y(g)}" y2="${y(g)}"/>`;}s+='</g>';
+  s+='<g class="axis">';for(let g=0;g<=opts.max+1e-9;g+=opts.step){s+=`<text x="${m.l-8}" y="${y(g)+4}" text-anchor="end">${+g.toFixed(1)}</text>`;}
+  CYCLES.forEach((c,i)=>{s+=`<text x="${x(i)}" y="${m.t+ih+20}" text-anchor="middle">${c}</text>`;});s+='</g>';
+  values.forEach((v,i)=>{const top=y(v),h=m.t+ih-top;s+=`<rect class="bar" x="${x(i)-bw/2}" y="${top}" width="${bw}" height="${h}" fill="var(--s1)" data-i="${i}"/><text class="barlabel" x="${x(i)}" y="${top-7}" text-anchor="middle">${v}</text>`;});
+  s+=`<text class="axis" x="${m.l}" y="${m.t-4}" style="font-size:12px;fill:var(--ink-3)">${esc(opts.label)}</text></svg>`;
+  el.innerHTML=s;
+  el.querySelectorAll('rect.bar').forEach(r=>{r.addEventListener('mousemove',e=>{const i=+r.dataset.i;showTip(`<b>${values[i]}</b> ${esc(opts.label)}<br>${esc(CYCLES[i])} · ${esc(SUB[i])}`,e.clientX,e.clientY);});r.addEventListener('mouseleave',hideTip);});
+}
+lineChart(document.getElementById('tiers'),[
+  {name:'≥75%',values:[51,84,87],dy:-10},
+  {name:'≥90%',values:[29,62,67],dy:0},
+  {name:'100%',values:[29,62,62],dy:14}],{max:100,step:25,unit:'%',title:'Share of drafts at or above each agreement tier, by cycle'});
+barChart(document.getElementById('touches'),[1.82,0.82,0.69],{max:2,step:0.5,label:'touches per encounter',title:'Coder touches per encounter by cycle'});
+barChart(document.getElementById('minutes'),[4.42,4.46,2.72],{max:5,step:1,label:'mean review minutes',title:'Mean review minutes per encounter by cycle'});
+})();
+</script>
+</body>
+</html>

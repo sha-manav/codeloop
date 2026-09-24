@@ -11,7 +11,7 @@ are compared on 40 sealed, blind-coded holdout encounters.
 
 The full specification is `CODELOOP_SPEC.md`; the rules for agents working here are `CLAUDE.md`;
 decisions are `DECISIONS.md` (rendered from `config/project.yaml`); the chronology is `ledger.md`; the
-result is `docs/STUDY.md`.
+result is `docs/STUDY.md`; a blog-style account of the loop is `docs/blog/index.html`.
 
 ## Things to state plainly
 

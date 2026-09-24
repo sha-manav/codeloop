@@ -113,6 +113,8 @@ Either way, the pre-registered inferential claim rests on the holdout, and the h
 
 ## Where things are
 
+- `docs/blog/index.html`: a blog-style account of the loop and the reviewed-label curve, with the blind check stated in one paragraph.
+
 - `reports/holdout.md`, `reports/holdout.json`: the scored holdout and bootstrap intervals; `runs/holdout/`: the
   plaintext export written at scoring time.
 - `reports/index.md`: version by batch table, anchoring table, evidence support and query precision, findings log.
