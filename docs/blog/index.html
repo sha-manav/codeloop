@@ -5,146 +5,293 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a self-improving medical-coding agent | CodeLoop</title>
 <style>
-:root{color-scheme:light;--surface:#fcfcfb;--surface-2:#f3f2ef;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#8a8985;--rule:#e4e2dc;--grid:#ebe9e4;
-  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--accent:#2a78d6}
-@media (prefers-color-scheme: dark){:root:where(:not([data-theme="light"])){color-scheme:dark;--surface:#1a1a19;--surface-2:#232322;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#8f8e86;--rule:#33322f;--grid:#2c2b28;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--accent:#3987e5}}
-:root[data-theme="dark"]{color-scheme:dark;--surface:#1a1a19;--surface-2:#232322;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#8f8e86;--rule:#33322f;--grid:#2c2b28;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--accent:#3987e5}
+:root{color-scheme:light;--surface:#ffffff;--surface-2:#f6f5f2;--surface-3:#ecebe6;--ink:#111110;--ink-2:#4f4e4a;--ink-3:#84837d;--rule:#e2e0da;--grid:#e9e7e1;
+  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--accent:#2a78d6;--good:#008300}
+@media (prefers-color-scheme: dark){:root:where(:not([data-theme="light"])){color-scheme:dark;--surface:#161615;--surface-2:#1f1f1e;--surface-3:#2a2a28;--ink:#f4f3ef;--ink-2:#bdbcb3;--ink-3:#8b8a83;--rule:#33322f;--grid:#2c2b28;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--accent:#3987e5;--good:#3fb950}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--surface);color:var(--ink);font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
-header.top{border-bottom:1px solid var(--rule);padding:14px 24px;font-size:14px;color:var(--ink-2);display:flex;justify-content:space-between}
-main{max-width:760px;margin:0 auto;padding:40px 20px 80px}
-.kicker{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
-h1{font-size:40px;line-height:1.15;margin:8px 0 14px;font-weight:650;letter-spacing:-.01em}
-.byline{color:var(--ink-2);font-size:15px;margin-bottom:34px}
-h2{font-size:26px;margin:44px 0 12px;font-weight:650;letter-spacing:-.01em}
-h3{font-size:19px;margin:28px 0 8px;font-weight:650}
-p{margin:0 0 16px}
-.lede{font-size:20px;line-height:1.5;color:var(--ink)}
-figure{margin:28px 0;padding:18px 18px 12px;background:var(--surface-2);border-radius:12px}
-figure h4{margin:0 0 4px;font-size:16px;font-weight:650}
-figure .sub{margin:0 0 10px;font-size:13.5px;color:var(--ink-2)}
-figcaption{font-size:13.5px;color:var(--ink-2);margin-top:8px}
-.legend{display:flex;gap:18px;font-size:13px;color:var(--ink-2);margin:6px 0 2px;flex-wrap:wrap}
-.legend span::before{content:"";display:inline-block;width:18px;height:2px;vertical-align:middle;margin-right:7px;background:currentColor}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--surface);color:var(--ink);font:17px/1.65 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.top{border-bottom:1px solid var(--rule);padding:14px 28px;font-size:14px;color:var(--ink-2);display:flex;justify-content:space-between;align-items:center}
+.top b{color:var(--ink);font-weight:650}
+.hero{max-width:1120px;margin:0 auto;padding:56px 28px 8px}
+.kicker{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+h1{font-size:52px;line-height:1.08;margin:12px 0 18px;font-weight:650;letter-spacing:-.02em;max-width:900px}
+.dek{font-size:22px;line-height:1.45;color:var(--ink-2);max-width:820px;margin:0 0 18px}
+.byline{color:var(--ink-3);font-size:14.5px;margin-bottom:8px}
+.layout{max-width:1120px;margin:0 auto;padding:24px 28px 96px;display:grid;grid-template-columns:220px minmax(0,720px);gap:60px}
+@media (max-width:1000px){.layout{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;line-height:1.5}
+.toc a{display:block;color:var(--ink-3);text-decoration:none;padding:5px 0 5px 12px;border-left:2px solid var(--rule)}
+.toc a.sub{padding-left:24px;font-size:12.5px}
+.toc a.on{color:var(--ink);border-left-color:var(--ink)}
+article{min-width:0}
+h2{font-size:30px;margin:56px 0 14px;font-weight:650;letter-spacing:-.015em;scroll-margin-top:24px}
+h3{font-size:20px;margin:30px 0 8px;font-weight:650;scroll-margin-top:24px}
+p{margin:0 0 18px}
+p.lede{font-size:19px}
+figure{margin:30px 0;padding:0;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--surface)}
+figure .head{padding:16px 20px 6px}
+figure h4{margin:0 0 3px;font-size:16px;font-weight:650}
+figure .sub{margin:0;font-size:13.5px;color:var(--ink-2)}
+figure .body{padding:8px 20px 14px;overflow-x:auto}
+figure table{font-size:13.5px}
+@media (min-width:1000px){figure.wide{width:calc(100% + 110px)}}
+figcaption{padding:10px 20px 14px;font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--rule);background:var(--surface-2)}
+figcaption b{color:var(--ink);font-weight:650}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--ink-2);margin:6px 0 4px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:7px;background:currentColor}
 .legend .k1{color:var(--s1)}.legend .k2{color:var(--s2)}.legend .k3{color:var(--s3)}
 .legend span b{color:var(--ink-2);font-weight:500}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .grid line{stroke:var(--grid);stroke-width:1}
 .axis text{fill:var(--ink-3);font-size:12px}
-.axis line,.axis path{stroke:var(--rule)}
-.series path{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.axis .lab{font-size:11.5px}
+.series path{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .series circle{stroke:var(--surface);stroke-width:2}
-.endlabel{font-size:12.5px;fill:var(--ink-2);font-weight:600}
+.ptlabel{font-size:12px;fill:var(--ink-2);font-weight:600}
+.endlabel{font-size:12.5px;fill:var(--ink-2);font-weight:650}
 .bar{rx:4}
-.barlabel{font-size:12.5px;fill:var(--ink-2);font-weight:600}
-.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12.5px;padding:8px 10px;border-radius:8px;line-height:1.4;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.barlabel{font-size:12.5px;fill:var(--ink-2);font-weight:650}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12.5px;padding:8px 10px;border-radius:8px;line-height:1.45;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:9}
 .tip b{font-weight:700}
-.tip .key{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:6px}
+.tip .key{display:inline-block;width:12px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
 .wrap{position:relative}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media (max-width:640px){.two{grid-template-columns:1fr}}
-table{border-collapse:collapse;width:100%;font-size:15px;margin:14px 0 22px}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
-th{font-weight:650;color:var(--ink-2);font-size:13.5px}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-pre{background:var(--surface-2);border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.5;overflow:auto;color:var(--ink)}
-.callout{border-left:3px solid var(--accent);padding:4px 16px;margin:22px 0;color:var(--ink-2)}
-ol li,ul li{margin-bottom:8px}
-.toc{font-size:14px;color:var(--ink-2);margin:0 0 30px;padding:14px 18px;background:var(--surface-2);border-radius:12px}
-.toc a{color:inherit;text-decoration:none;display:block;padding:2px 0}
-.toc a:hover{color:var(--ink)}
-a{color:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 6px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--surface-2);border-radius:12px;padding:14px 16px}
+.tile .l{font-size:12.5px;color:var(--ink-2);margin-bottom:6px}
+.tile .v{font-size:32px;font-weight:650;letter-spacing:-.02em;line-height:1.1}
+.tile .d{font-size:12.5px;color:var(--ink-3);margin-top:6px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin:10px 0 6px}
+th.num{white-space:normal}
+td.nw,th.nw{white-space:nowrap}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:650;color:var(--ink-2);font-size:13px}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pass{color:var(--good);font-weight:650}.fail{color:#c4392f;font-weight:650}
+pre{background:var(--surface-2);border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.5;overflow:auto;color:var(--ink);margin:0}
+code{font-size:.92em;background:var(--surface-2);padding:1px 5px;border-radius:5px}
+.callout{border-left:3px solid var(--accent);padding:6px 18px;margin:26px 0;color:var(--ink-2);background:var(--surface-2);border-radius:0 10px 10px 0}
+ol,ul{padding-left:22px}ol li,ul li{margin-bottom:10px}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 8px}
+@media (max-width:760px){.pillars{grid-template-columns:1fr}}
+.pillar{background:var(--surface-2);border-radius:12px;padding:16px 18px;font-size:15px}
+.pillar b{display:block;font-size:16px;margin-bottom:6px}
+.pillar .n{display:inline-block;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--surface);text-align:center;font-weight:700;font-size:14px;line-height:26px;margin-bottom:10px}
+.trace{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0}
+@media (max-width:640px){.trace{grid-template-columns:1fr}}
+.card{background:var(--surface-2);border-radius:12px;padding:14px 16px;font-size:13.5px}
+.card h5{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);font-weight:650}
+.card .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dashed var(--rule)}
+.card .row:last-child{border-bottom:none}
+.card .row span:first-child{color:var(--ink-2)}
+.card .row b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600;font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.chip{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:var(--surface-3);padding:2px 7px;border-radius:6px}
+.chip.hit{background:var(--s3);color:#fff}
+.chip.dim{opacity:.55}
+.verdict{margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--surface-3);font-size:13px}
+.verdict.good{background:color-mix(in oklab,var(--s3) 18%,var(--surface))}
+.verdict.bad{background:color-mix(in oklab,var(--s2) 18%,var(--surface))}
+.flow text{font-size:12.5px;fill:var(--ink)}
+.flow .box{fill:var(--surface-2);stroke:var(--rule)}
+.flow .box.h{fill:color-mix(in oklab,var(--s1) 14%,var(--surface));stroke:var(--s1)}
+.flow .box.g{fill:color-mix(in oklab,var(--s3) 14%,var(--surface));stroke:var(--s3)}
+.flow .box.o{fill:color-mix(in oklab,var(--s2) 14%,var(--surface));stroke:var(--s2)}
+.flow .arrow{stroke:var(--ink-3);stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.flow .small{font-size:11px;fill:var(--ink-2)}
+.funnel .lab{font-size:13px;fill:var(--ink)}
+.funnel .val{font-size:13px;fill:var(--ink-2);font-weight:650}
+.funnel rect{fill:var(--s1);rx:4}
 .note{font-size:14.5px;color:var(--ink-2)}
-.sr{position:absolute;left:-9999px}
+footer{max-width:1120px;margin:0 auto;padding:20px 28px 60px;border-top:1px solid var(--rule);font-size:13.5px;color:var(--ink-3)}
+a{color:var(--accent)}
 </style>
 </head>
 <body>
-<header class="top"><span>CodeLoop</span><span>Engineering · September 2026</span></header>
-<main>
+<div class="top"><b>CodeLoop</b><span>Engineering · September 2026</span></div>
+
+<div class="hero">
 <div class="kicker">Engineering</div>
 <h1>Building a self-improving medical-coding agent</h1>
-<div class="byline">How a certified coder's corrections became findings, findings became evals, and an improvement agent climbed them inside a gated loop, three cycles, one repository, every step in a ledger.</div>
+<p class="dek">How a certified coder's corrections became findings, findings became evals, and an improvement agent climbed them inside a gated loop: three cycles, four frozen versions, one repository, every step in a ledger.</p>
+<div class="byline">Built with a certified professional coder (CPC) on 175 scripted outpatient encounters · 3,021 review events · 103 findings · 3 gated merges · about $100 of model calls</div>
+</div>
 
+<div class="layout">
 <nav class="toc" aria-label="Contents">
 <a href="#measurable">Measurable self-improvement</a>
 <a href="#problem">The problem</a>
 <a href="#approach">Our approach: a three-part loop</a>
 <a href="#example">Missed-diabetes example</a>
+<a href="#ex1" class="sub">1. A correction reveals a failure</a>
+<a href="#ex2" class="sub">2. Traces turn corrections into evals</a>
+<a href="#ex3" class="sub">3. The finding becomes a hill to climb</a>
 <a href="#build">How the loop is built</a>
 <a href="#cycles">Expanding across cycles</a>
 <a href="#also">What we also checked</a>
 </nav>
 
-<p class="lede">Real-world coding systems fail in ways that are hard to anticipate. A draft that looks complete to an engineer is wrong to a coder for reasons that only show up once someone who bills for a living corrects it. CodeLoop is an outpatient professional-coding agent wrapped in a harness that turns those corrections into evidence, evidence into targeted evals, and evals into bounded engineering tasks for an improvement agent. Merges happen only through a gate, and a human approves each one.</p>
+<article>
+<p class="lede">Real-world coding systems fail in ways that are hard to anticipate before deployment. A draft that looks complete to an engineer is wrong to a coder for reasons that only surface once someone who bills for a living corrects it. Teams typically discover those failures after launch, then spend weeks reading traces, adjusting prompts, and translating feedback into durable fixes. The loop is manual and slow, and it only moves when an engineer moves it.</p>
 
-<p>The agent reads the visit transcript and the clinical note and drafts a coding package: ICD-10-CM diagnoses with specificity, laterality and active-versus-historical status, in-scope imaging lines with modifiers and diagnosis pointers, and an evidence span for every field. A certified professional coder (CPC) reviews each draft in a web tool. Over three cycles the harness produced three frozen versions, v1 through v3, from the original v0, and the drafts the coder had to change shrank with each one.</p>
+<p>CodeLoop is an outpatient professional-coding agent wrapped in a harness that turns a coder's corrections into structured evidence, evidence into targeted evals, and evals into bounded engineering tasks for an improvement agent. The agent reads the visit transcript and the clinical note and drafts a coding package: ICD-10-CM diagnoses with specificity, laterality and active-versus-historical status, in-scope imaging lines with modifiers, units and diagnosis pointers, and an evidence span for every field. A CPC reviews each draft in a web tool. Changes to the pipeline merge only through a gate, and a human approves each one.</p>
+
+<p>Over three cycles the harness produced three new frozen versions, v1 through v3, from the original v0. Each cycle's version drafted a fresh batch of 45 encounters, the coder reviewed all 45, and the drafts he had to change shrank with each version.</p>
 
 <h2 id="measurable">Measurable self-improvement</h2>
-<p>We measure a draft by how much of it the coder keeps. Each cycle's version drafted a fresh batch of 45 encounters; the coder reviewed every draft; and we score the share of encounters whose fields were at least 75%, at least 90%, or 100% in agreement with the label the coder approved. These tiers give a practical view of how much follow-up a draft still needs.</p>
-<p>At cycle 0, half of the drafts cleared the 75% tier and under a third were fully correct. Two cycles later, 87% cleared 75% and 62% needed no change at all.</p>
+<p>We quantify a draft by how much of it the coder keeps. After review, every field of the approved label is compared with the draft, and we report the share of encounters whose fields were at least 75%, at least 90%, or 100% in agreement. The thresholds give a practical view of how much follow-up a draft still needs: an encounter at 100% needed no correction at all.</p>
+
+<div class="tiles">
+<div class="tile"><div class="l">Encounters ≥75% correct</div><div class="v">87%</div><div class="d">from 51% at cycle 0</div></div>
+<div class="tile"><div class="l">Encounters 100% correct</div><div class="v">62%</div><div class="d">from 29% at cycle 0</div></div>
+<div class="tile"><div class="l">Coder touches per encounter</div><div class="v">0.69</div><div class="d">from 1.82, a 62% drop</div></div>
+<div class="tile"><div class="l">Mean review minutes</div><div class="v">2.7</div><div class="d">from 4.4, a 38% drop</div></div>
+</div>
+
+<p>At cycle 0, half of the drafts cleared the 75% tier and under a third were fully correct. By cycle 2, 87% cleared 75% and 62% needed no change. The 90% and 100% tiers moved fastest, from 29% to 67% and 62%.</p>
 
 <figure>
-<h4>Drafts the coder kept, by cycle</h4>
-<p class="sub">Share of the 45 encounters in each cycle's live batch at or above the agreement tier, against the coder's reviewed label.</p>
+<div class="head"><h4>Figure 1 · Draft agreement with the coder's reviewed label accelerated across cycles</h4><p class="sub">Share of the 45 encounters in each cycle's live batch at or above each agreement tier.</p></div>
+<div class="body">
 <div class="legend"><span class="k1"><b>≥75% agreement</b></span><span class="k2"><b>≥90% agreement</b></span><span class="k3"><b>100% agreement</b></span></div>
 <div class="wrap" id="tiers"></div>
-<figcaption>v0 on batch 1, v1 on batch 2, v2 on batch 3: each version scored on the batch it drafted for review. The ≥90% and 100% tiers coincide at cycles 0 and 1, so their lines overlap there. Hover for values.</figcaption>
+</div>
+<figcaption><b>Each version is scored on the batch it drafted for review:</b> v0 on batch 1, v1 on batch 2, v2 on batch 3. The ≥90% and 100% tiers coincide at cycles 0 and 1 (the same encounters), so their lines overlap there. Hover for values.</figcaption>
 </figure>
 
-<p>The coder's effort moved the same way. Touches per encounter, the edits, additions and removals he made to a draft, fell from 1.82 to 0.69. Zero-touch encounters went from 13 of 45 to 28 of 45.</p>
+<p>The coder's effort moved the same way. A touch is one edit, addition or removal he made to a draft; touches per encounter fell from 1.82 to 0.69, and zero-touch encounters went from 13 of 45 to 28 of 45. Mean review time fell from 4.4 to 2.7 minutes per encounter.</p>
 
 <figure>
-<h4>Coder effort per encounter, by cycle</h4>
-<p class="sub">Left: corrections the coder made per draft. Right: mean review minutes per encounter.</p>
-<div class="two"><div class="wrap" id="touches"></div><div class="wrap" id="minutes"></div></div>
-<figcaption>Review minutes are measured from the event log with a 120-second idle cap, so they undercount reading time; the trend is what matters.</figcaption>
+<div class="head"><h4>Figure 2 · Coder effort per encounter fell with each version</h4><p class="sub">Left: corrections the coder made per draft. Right: mean review minutes per encounter.</p></div>
+<div class="body"><div class="two"><div class="wrap" id="touches"></div><div class="wrap" id="minutes"></div></div></div>
+<figcaption>Review minutes come from the event log with a 120-second idle cap, so they undercount uninterrupted reading; the direction, not the level, is the point.</figcaption>
+</figure>
+
+<p>What the coder corrected also changed in kind from cycle to cycle, which is what you want from a loop: fixing one class of error exposes the next.</p>
+
+<figure>
+<div class="head"><h4>Figure 3 · The error profile shifted as each cycle's fix landed</h4><p class="sub">Effective corrections per batch, by what the coder did to the draft.</p></div>
+<div class="body">
+<div class="legend"><span class="k2"><b>Removed a drafted field</b></span><span class="k1"><b>Added a missing field</b></span><span class="k3"><b>Edited a field</b></span></div>
+<div class="wrap" id="mix"></div>
+</div>
+<figcaption><b>Batch 1</b> was dominated by removals: 56 of 86 corrections took out a symptom or history code the coder does not code under his guidelines. <b>Batch 2</b>, after that rule shipped, was dominated by additions of missed chronic conditions (20 of 37). <b>Batch 3</b>, after the lookup fix, was mostly specificity swaps (14 of 31).</figcaption>
 </figure>
 
 <h2 id="problem">The problem</h2>
-<p>Early on, most correction was invisible to engineering. The coder could fix a draft, but a changed code might mean a genuine miss, a lookup problem, a guideline the pipeline did not know, or the coder's own judgment call. Sorting those apart still needed an engineer reading traces one encounter at a time. The signal to pick the right hill to climb did not exist.</p>
-<p>The harder question was structural: could the product make its own failures visible, grouped and actionable, so that a coding agent could act on them without an engineer in the middle of every fix?</p>
+<p>In the first cycle, most of the correction signal was invisible to engineering. The coder could fix a draft, but a changed code might mean a genuine miss, a candidate-lookup gap, a coding guideline the pipeline did not encode, or the coder's own judgment call. A removed code might be wrong, or unbillable, or simply not something this coder codes for this kind of visit. Sorting those apart still required an engineer reading traces one encounter at a time.</p>
+<p>The harder question was structural: could the product make its own failures visible, grouped and actionable, so that a coding agent could act on them without an engineer standing in the middle of every fix? We did not have the signal to identify the right hill to climb.</p>
 
 <h2 id="approach">Our approach: a three-part loop</h2>
-<ol>
-<li><b>Stay close to the practitioner.</b> The coder's corrections steer what the product learns. His guidelines, not ours, define what a visit is coded for, and when a pattern was ambiguous the question went back to him rather than through the loop.</li>
-<li><b>Build the product so review creates evidence.</b> Every action in the review tool is an append-only event with the field, the before and after values and a reason: <em>missed</em>, <em>unsupported</em>, <em>specificity</em>, <em>wrong value</em>, <em>guideline</em>, or <em>judgment</em>. Labels are rebuilt by replaying events, so nothing is lost and nothing can be quietly changed.</li>
-<li><b>Create an agent-driven improvement loop.</b> Corrections that recur become findings; findings become targeted evals with representative encounters and expected fields; an improvement agent investigates inside a bounded task environment, changes the pipeline, validates against the targeted and regression suites, and surfaces a pull request. A gate decides what may merge; a human merges.</li>
-</ol>
+<div class="pillars">
+<div class="pillar"><span class="n">1</span><b>Stay close to the practitioner</b>The coder's corrections steer what the product learns. His guidelines, not ours, define what a visit is coded for. When a pattern was ambiguous, the question went back to him rather than through the loop.</div>
+<div class="pillar"><span class="n">2</span><b>Build the product so review creates evidence</b>Every action in the review tool is an append-only event with the field, the before and after values and a reason: <em>missed</em>, <em>unsupported</em>, <em>specificity</em>, <em>wrong value</em>, <em>guideline</em>, or <em>judgment</em>. Labels are rebuilt by replaying events, so nothing is lost and nothing can be quietly changed.</div>
+<div class="pillar"><span class="n">3</span><b>Create an agent-driven improvement loop</b>Recurring corrections become findings; findings become targeted evals; an improvement agent investigates inside a bounded task environment, changes the pipeline, validates against targeted and regression suites, and opens a pull request. A gate decides what may merge. A human merges.</div>
+</div>
+
+<figure>
+<div class="head"><h4>Figure 4 · The end-to-end loop</h4><p class="sub">From a drafted encounter to a frozen version, and back around.</p></div>
+<div class="body"><div id="loop"></div></div>
+<figcaption>Production review produces events; recurring corrections become findings; findings become evals and a bounded task; the improvement agent's change must pass the gate and a human merge before it is frozen as the next version and drafts the next batch. Ambiguous findings route to the coder as a question instead.</figcaption>
+</figure>
 
 <h2 id="example">Missed-diabetes example</h2>
-<p>Type 2 diabetes is one of the most common chronic conditions in these visits. The task is simple to describe and easy to get wrong: find the condition in the note, pick the right ICD-10-CM code from several hundred candidates, and keep enough evidence that a coder can approve or correct it.</p>
+<p>Type 2 diabetes is among the most common chronic conditions in these visits. Coding it is simple to describe and easy to get wrong: find the condition in the note, choose the right ICD-10-CM code from a category with dozens of complication-specific members, and keep enough evidence that a coder can approve or correct the choice. The example below walks one correction through the loop.</p>
 
-<h3>1. A practitioner correction reveals a failure</h3>
-<p>In cycle 1, the coder added the type 2 diabetes code E11.9 to four drafts that did not have it. Each of the four notes named the condition. Four of the same correction across a batch of 45 clears the recurrence threshold, so the harness raised a finding: <code>FIND-DX-0052</code>, <em>missed corrections on diagnosis fields, E11</em>.</p>
+<h3 id="ex1">1. A practitioner correction reveals a failure</h3>
+<p>In cycle 1 the coder added the type 2 diabetes code E11.9 to four drafts that did not have it, each with the reason <em>missed</em>. All four notes named the condition. A difference between draft and label can mean many things, so the harness does not act on one correction; a pattern must recur in at least three encounters of a batch, or two if it was seen in an earlier batch, before it becomes a finding. Four of the same correction cleared the threshold, and the harness raised <code>FIND-DX-0052</code>: <em>missed corrections on diagnosis fields, E11</em>.</p>
 
-<h3>2. Product traces turn corrections into evals</h3>
-<p>Every draft carries a full trace: what the extractor listed as problems, which candidate codes the lookup offered for each, what the mapper selected and why. The finding was packaged into a targeted eval: the four encounters, the coder's labels as gold, and the field <code>dx:E119</code> as the thing that must be right. Alongside it, a regression suite of every labeled encounter so far, three seeded runs each, scores whether anything else moves.</p>
+<h3 id="ex2">2. Product traces turn corrections into evals</h3>
+<p>Every draft carries a full trace: what the extractor listed as problems, which candidate codes the lookup offered for each, what the mapper selected and the rationale it gave. That makes it possible to locate a failure rather than guess at it. To turn corrections into an evaluation target the harness works in three steps:</p>
+<ul>
+<li><b>Capture the difference.</b> Each edit, addition or removal is one event with the field reference, before and after values, and the coder's reason. No-op edits, where the coder pressed Edit without changing anything, are detected by replay and excluded.</li>
+<li><b>Group related failures.</b> Events are grouped by reason, field type and ICD-10-CM category. Self-corrections, like a code added then removed a minute later, are noted at triage so they do not count as product failures.</li>
+<li><b>Turn repeated patterns into eval targets.</b> An accepted finding is packaged into a targeted dataset (its encounters, the coder's labels as gold, and the exact fields that must be right) plus a regression suite of every labeled encounter so far, three seeded runs each.</li>
+</ul>
 
-<h3>3. The finding becomes a hill to climb</h3>
-<p>The improvement agent works inside a container that mounts the repository with the sealed data absent, the scorer and config read-only, and network egress only to the model provider. It read the four traces and found the cause in the lookup step, not the model. The extractor had listed the diabetes problem every time, but the candidate search ran on the whole description, and a phrase such as <em>"diabetes, currently under control"</em> pulled in gestational-diabetes codes on the word <em>control</em> while E11.9 never made the list. The mapper is instructed to choose only from the list, so it returned nothing. Its own cached rationale said so in each case.</p>
-<p>The fix that passed the gate leaves the first mapping call exactly as it was and adds a second, small call only for problems the mapper left uncoded, offering candidates for the head of the phrase, here just <em>diabetes</em>. A first attempt that lengthened every candidate list was rejected by the gate: it re-sampled decisions that were already right and cost regression agreement.</p>
+<figure>
+<div class="head"><h4>Figure 5 · What the trace showed for one of the four encounters</h4><p class="sub">The extractor found the problem; the candidate lookup never offered the right code; the mapper, told to choose only from the list, returned nothing.</p></div>
+<div class="body">
+<div class="trace">
+<div class="card"><h5>Before · v1</h5>
+<div class="row"><span>Extracted problem</span><b>"Diabetes, currently under control"</b></div>
+<div class="row"><span>Status</span><b>active</b></div>
+<div class="row"><span>Note evidence</span><b>3 spans, assessment and plan</b></div>
+<div class="row"><span>Candidates offered</span><span></span></div>
+<div class="chips"><span class="chip">O24.419</span><span class="chip">O24.439</span><span class="chip">O24.429</span><span class="chip dim">Z62.0</span><span class="chip dim">F31.70</span><span class="chip dim">Z00.6</span><span class="chip dim">Z00.110</span><span class="chip dim">Z52.810</span><span class="chip dim">T71.111S</span><span class="chip dim">…</span></div>
+<div class="row" style="margin-top:8px"><span>Mapper selection</span><b>null</b></div>
+<div class="verdict bad">Rationale, paraphrased: no candidate represents diabetes mellitus; the options are gestational diabetes or unrelated codes.</div>
+</div>
+<div class="card"><h5>After · v2</h5>
+<div class="row"><span>First mapping call</span><b>unchanged</b></div>
+<div class="row"><span>Retry trigger</span><b>active problem left uncoded, note evidence present</b></div>
+<div class="row"><span>Head term</span><b>"Diabetes"</b></div>
+<div class="row"><span>Retry candidates</span><span></span></div>
+<div class="chips"><span class="chip dim">P70.2</span><span class="chip dim">N25.1</span><span class="chip hit">E11.9</span><span class="chip">Z83.3</span><span class="chip">O24.92</span><span class="chip">Z13.1</span><span class="chip">E13.9</span><span class="chip">E11.42</span></div>
+<div class="row" style="margin-top:8px"><span>Mapper selection</span><b>E11.9</b></div>
+<div class="verdict good">Coded on retry. The coder's label for this encounter: E11.9 present, first-listed unchanged.</div>
+</div>
+</div>
+</div>
+<figcaption><b>Why the lookup failed:</b> the candidate search runs full-text ranking over every word of the problem description. "Control" matched gestational-diabetes codes ("unspecified control"), and E11.9, "type 2 diabetes mellitus without complications", never entered the list of twelve to eighteen candidates. The extracted description is model output; no note text appears here.</figcaption>
+</figure>
 
+<h3 id="ex3">3. The finding becomes a hill to climb</h3>
+<p>The improvement agent works inside a container that mounts the repository with the sealed data absent, the scorer, compliance rules and configuration read-only, and network egress only to the model provider through an allowlist proxy. It can read code, prompts and traces, run the two suites, and change a defined set of files. It cannot edit the tests, the datasets, or the findings.</p>
+<p>It read the four traces and located the cause in the lookup step, not in the model. Then it worked the hill in three attempts, each recorded in the ledger:</p>
+
+<figure class="wide">
+<div class="head"><h4>Figure 6 · Three gate attempts for FIND-DX-0052</h4><p class="sub">Every attempt is scored against v1's stored drafts on all 90 labeled encounters, three seeds each.</p></div>
+<div class="body">
 <table>
-<tr><th>Gate check</th><th class="num">Before (v1)</th><th class="num">After (v2)</th></tr>
-<tr><td>Targeted error rate, the four E11.9 fields</td><td class="num">0.917</td><td class="num">0.333</td></tr>
-<tr><td>Regression mean agreement, 90 encounters</td><td class="num">0.741</td><td class="num">0.735</td></tr>
-<tr><td>Diagnosis recall</td><td class="num">0.833</td><td class="num">0.867</td></tr>
-<tr><td>Scrubber errors per run</td><td class="num">1.667</td><td class="num">0.0</td></tr>
-<tr><td>Compliance escalation failures</td><td class="num">—</td><td class="num">0</td></tr>
+<tr><th class="nw">#</th><th style="min-width:190px">Change</th><th class="num">Targeted error</th><th class="num">Regression</th><th class="num">Scrubber</th><th class="nw">Verdict</th></tr>
+<tr><td>1</td><td>Append head-term hits and category default codes to every candidate list</td><td class="num">0.917 → 0.333</td><td class="num">0.741 → 0.702</td><td class="num">1.67 → 1.0</td><td class="nw"><span class="fail">FAIL</span><br>agreement,<br>escalation</td></tr>
+<tr><td>2</td><td>Leave the first call unchanged; retry only uncoded problems with head-term candidates</td><td class="num">0.917 → 0.333</td><td class="num">0.741 → 0.732</td><td class="num">1.67 → 1.67</td><td class="nw"><span class="fail">FAIL</span><br>escalation (2)</td></tr>
+<tr><td>3</td><td>Retry after line mapping; wider net for a line's uncoded indication; no pointer-less lines</td><td class="num">0.917 → 0.333</td><td class="num">0.741 → 0.735</td><td class="num">1.67 → 0.0</td><td class="nw"><span class="pass">PASS</span></td></tr>
 </table>
+</div>
+<figcaption><b>Attempt 1</b> fixed the target but lengthened the candidate list on every problem, which changed the mapping prompt for whole encounters and re-sampled decisions that were already right. <b>Attempt 2</b> kept the first call byte-identical and passed every check but one: two encounters gained a correct diagnosis while carrying a pre-existing v1 defect, an imaging line with no diagnosis pointer, and the compliance check refuses any new billable element in an encounter with a scrubber error. <b>Attempt 3</b> also repaired those lines.</figcaption>
+</figure>
 
-<p>On the next batch the miss essentially stopped: one E11 code added by the coder against thirteen drafted and kept. The finding was marked resolved with its before, after and next-batch error rates.</p>
+<p>The gate's full verdict for the passing attempt, check by check:</p>
 
-<div class="callout">If the evidence is ambiguous, the case routes back to a human. In cycle 2 the only eligible finding was set aside because the coder had both kept and replaced the same symptom code in the same batch. It went to him as a question, he stated the rule he follows, and only then did it become a task.</div>
+<figure>
+<div class="head"><h4>Figure 7 · Gate verdict, FIND-DX-0052, base v1 → head</h4><p class="sub">Thresholds are fixed for every task and recorded in the project's decisions file.</p></div>
+<div class="body">
+<table>
+<tr><th>Check</th><th>Rule</th><th class="num">Base</th><th class="num">Head</th><th></th></tr>
+<tr><td>Paths</td><td>only permitted files changed</td><td class="num">—</td><td class="num">2 files</td><td class="pass">pass</td></tr>
+<tr><td>Targeted error rate</td><td>falls ≥25% relative; rises on no run</td><td class="num">0.917</td><td class="num">0.333</td><td class="pass">pass</td></tr>
+<tr><td>Regression mean agreement</td><td>drops ≤1.0 point</td><td class="num">0.7407</td><td class="num">0.7348</td><td class="pass">pass</td></tr>
+<tr><td>Diagnosis recall</td><td>drops ≤2.0 points</td><td class="num">0.833</td><td class="num">0.867</td><td class="pass">pass</td></tr>
+<tr><td>Line recall</td><td>drops ≤2.0 points</td><td class="num">0.988</td><td class="num">0.988</td><td class="pass">pass</td></tr>
+<tr><td>Scrubber errors per run</td><td>non-increasing</td><td class="num">1.667</td><td class="num">0.0</td><td class="pass">pass</td></tr>
+<tr><td>Compliance escalation</td><td>no new billable element without evidence or with a scrubber error</td><td class="num">—</td><td class="num">0 failures</td><td class="pass">pass</td></tr>
+</table>
+</div>
+<figcaption>Over the three seeds the head added 71 diagnoses and removed none. On the next batch the diabetes miss essentially stopped: one E11 code added by the coder against thirteen drafted and kept, a next-batch error rate of 0.07.</figcaption>
+</figure>
+
+<div class="callout">If the evidence is ambiguous, the case routes back to a human. In cycle 2 the only eligible finding was set aside because the coder had both kept and replaced the same symptom code in the same batch, with the same documentation shape. It went to him as a plain question. He answered, "I usually code the cause if the cause is documented," and only then did the finding become a task.</div>
 
 <h2 id="build">How the loop is built</h2>
-<p>A finding does not become a task automatically. A correction may be a miss, a lookup gap, a guideline the pipeline does not encode, or the coder's judgment. Only after repeated corrections have been grouped and triaged does the harness produce a bounded task with a clear success condition. For the improvement agent, the result is not an alert but a scoped engineering task with evidence, editable surfaces and explicit validation gates:</p>
+<p>A correction does not become a task automatically. It may be a miss, a lookup gap, a guideline the pipeline does not encode, or the coder's judgment. Only after repeated corrections have been grouped and triaged does the harness produce a bounded task with a clear success condition. For the improvement agent, the result is not a vague alert but a scoped engineering task with evidence, editable surfaces and explicit validation gates:</p>
 
-<pre>tasks/FIND-DX-0052/
+<figure>
+<div class="head"><h4>Figure 8 · A bounded task environment</h4><p class="sub">What the improvement agent sees for one finding.</p></div>
+<div class="body"><pre>tasks/FIND-DX-0052/
 ├── task.yaml              finding, base commit, writable paths, success criteria
 ├── EXEC_PLAN.md           root cause, what was tried, why this form
 ├── RESULTS.md             targeted and regression before/after, diff summary
 └── GATE.md                the gate's verdict, check by check
+
+evals/datasets/FIND-DX-0052.yaml            4 encounters, gold labels, the fields that must be right
+evals/suites/targeted-FIND-DX-0052.yaml     3 seeded runs
+evals/suites/regression-through-batch2.yaml every labeled encounter so far
 
 writable       codeloop/agent/  codeloop/rules/  codeloop/tools/  codeloop/mappers/  prompts/
 sign-off       evals/graders/          (any change routes the task to human review)
@@ -154,31 +301,52 @@ network        the model provider only, through an allowlist proxy
 
 make eval-targeted TASK=FIND-DX-0052
 make eval-regression
-make gate TASK=FIND-DX-0052</pre>
+make gate TASK=FIND-DX-0052</pre></div>
+<figcaption>The writable surface is the agent's pipeline code and prompts. The scorer, the compliance rules, the datasets and the findings are read-only, so a task cannot pass by moving the goalposts. Grader changes are allowed but force human review.</figcaption>
+</figure>
 
-<p>The gate is the same for every task: the targeted error rate must fall by at least 25% and rise on no run; regression agreement may drop by at most one point and recall by at most two; scrubber errors may not increase; no new billable element may appear without evidence. The base for every comparison is the previous version's stored drafts for every labeled batch, three seeds each. Failed gate attempts stay in the ledger next to the one that passed.</p>
+<p>Three conventions kept the loop honest at low cost:</p>
+<ul>
+<li><b>The base is stored, not re-run.</b> Every version's drafts for every labeled batch are committed for three seeds, so a gate compares the head against fixed numbers. When a version was frozen with only one seed stored, the missing seeds were run at the tag and committed before gating.</li>
+<li><b>Failed attempts stay in the ledger.</b> Ten gate runs are recorded across the three cycles, including the two that failed and one that was void because the base was mis-packaged; the fix to the packager is itself a commit.</li>
+<li><b>Nothing merges without a person.</b> The improvement agent opens the pull request; the owner merges it; the version is frozen with a tag and the ledger records the hashes.</li>
+</ul>
 
 <h2 id="cycles">Expanding across cycles</h2>
-<p>The same loop ran three times, and each cycle's finding was different in kind, which is what you would hope: fixing one class of error exposes the next.</p>
+<p>The same loop ran three times. Each cycle's finding was different in kind, and each fix held on the batch that followed it.</p>
 
+<figure class="wide">
+<div class="head"><h4>Figure 9 · Three cycles, three merged changes</h4><p class="sub">Gate results against the previous version's stored drafts; next-batch error rate measured on the following batch.</p></div>
+<div class="body">
 <table>
-<tr><th>Cycle</th><th>What the coder kept correcting</th><th>What changed</th><th class="num">Targeted error</th><th class="num">Regression agreement</th></tr>
-<tr><td>0 → v1</td><td>Diagnoses documented only outside the assessment and plan (four findings, one cause)</td><td>A deterministic rule, one class per accepted finding</td><td class="num">1.0 → 0.4</td><td class="num">0.685 → 0.720</td></tr>
-<tr><td>1 → v2</td><td>Missed chronic conditions: the lookup dropped the default code</td><td>A second mapping call for uncoded problems</td><td class="num">0.917 → 0.333</td><td class="num">0.741 → 0.735</td></tr>
-<tr><td>2 → v3</td><td>A symptom coded where its documented cause was named</td><td>A cause-term retry, recoding only to a definitive code</td><td class="num">1.0 → 0.75</td><td class="num">0.764 → 0.763</td></tr>
+<tr><th class="nw">Cycle</th><th style="min-width:190px">What the coder kept correcting</th><th style="min-width:150px">What merged</th><th class="num">Targeted</th><th class="num">Regression</th><th class="num">Next batch</th></tr>
+<tr><td class="nw">0 → v1</td><td>Diagnoses documented only outside the assessment and plan: joint symptoms beside the diagnosis that explains them, review-of-systems positives, weight-change symptoms, personal history that is merely recorded (four findings, one cause)</td><td>A deterministic rule after line mapping, one class per accepted finding, guarded so no billed line loses its pointer</td><td class="num">1.0 → 0.4<br>0.58 → 0.17<br>0.89 → 0.22<br>1.0 → 0.0</td><td class="num">0.685 → 0.720</td><td class="num">0.25<br>0<br>0<br>0</td></tr>
+<tr><td class="nw">1 → v2</td><td>Missed chronic conditions: the candidate lookup dropped the condition's default code whenever the description carried qualifiers</td><td>A second, small mapping call for uncoded problems with head-term candidates; no pointer-less lines</td><td class="num">0.917 → 0.333</td><td class="num">0.741 → 0.735</td><td class="num">0.07</td></tr>
+<tr><td class="nw">2 → v3</td><td>A symptom coded where its documented cause was named ("nasal congestion attributed to seasonal allergies" drafted as the symptom, coded by the CPC as allergic rhinitis)</td><td>A cause-term retry: candidates for the named cause, recoding only to a definitive condition code</td><td class="num">1.0 → 0.75</td><td class="num">0.764 → 0.763</td><td class="num">—</td></tr>
 </table>
+</div>
+<figcaption>Cycle 0's four findings were gated separately against the same head. Cycle 2's targeted reduction met the 25% threshold exactly; two of its four target fields were a specificity edit between two rhinitis codes that the change does not address. v3 was the last version, so it has no following batch.</figcaption>
+</figure>
 
-<p>Batch 1 corrections were mostly removals of symptom and history codes. Batch 2's were mostly additions of missed chronic conditions. Batch 3's were specificity swaps. Each fix held on the batch that followed it: the four cycle-0 rule classes recurred at 0.25, 0, 0 and 0; the cycle-1 fix left one miss in thirteen.</p>
+<p>Across the three cycles the coder's 3,021 review events contained 154 effective corrections. Grouping produced 103 findings; seven cleared the recurrence threshold; six were accepted and resolved, and one was rejected after the coder's own labels showed he codes the examination finding in question consistently.</p>
 
-<p>What made the loop cheap to run was not the agent but the plumbing around it: an append-only event store, a recurrence threshold, a packager that turns a finding into a dataset and two suites, a container that cannot reach what it must not, and a gate whose verdict is a file in the repository. The total model spend across all three cycles, including the failed gate attempts, was about a hundred dollars.</p>
+<figure>
+<div class="head"><h4>Figure 10 · From review events to merged changes</h4><p class="sub">Counts across all three cycles.</p></div>
+<div class="body"><div id="funnel"></div></div>
+<figcaption>Most findings are single occurrences and stay candidates by design; the threshold exists so that the loop acts on patterns, not on one coder's one-off judgment. The six resolved findings shipped as three merged pull requests.</figcaption>
+</figure>
+
+<p>What made the loop cheap to run was not the agent but the plumbing around it: an append-only event store, a recurrence threshold, a packager that turns a finding into a dataset and two suites, a container that cannot reach what it must not, and a gate whose verdict is a file in the repository. Model spend across the three cycles, including the failed gate attempts and the sealed predictions for four versions, was about $100 by the ledger's own estimates, and less in practice because repeated runs hit the cache.</p>
 
 <h2 id="also">What we also checked</h2>
-<p class="note">Before the first cycle, 40 encounters were sealed and never opened; at the end, the coder coded them with no draft in front of him and all four versions were scored against those labels exactly once. On that blind set the versions did not differ from one another. The curve above therefore measures how much of a draft a reviewer accepts, which is what it was designed to measure, and not from-scratch coding accuracy. The full analysis, including why the two measurements differ, is in <a href="../STUDY.md">docs/STUDY.md</a>.</p>
+<p class="note">Before the first cycle, 40 encounters were sealed and never opened; at the end, the coder coded them with no draft in front of him, and all four versions were scored against those labels exactly once. On that blind set the versions did not differ from one another. The curve in Figure 1 therefore measures how much of a draft a reviewer accepts, which is what it was designed to measure, not from-scratch coding accuracy. The full analysis, including why the two measurements differ, is in <a href="../STUDY.md">the study note</a>.</p>
 
-<p class="note">Encounters are scripted or role-played (ACI-Bench); there is no PHI. CPT descriptors are never stored; code numbers only. Every freeze, gate, merge and correction is in <code>ledger.md</code>.</p>
+<p class="note">Encounters are scripted or role-played (ACI-Bench); there is no PHI. CPT descriptors are never stored; code numbers only. Every freeze, gate, merge and correction is recorded in <code>ledger.md</code> with hashes.</p>
+</article>
+</div>
 
+<footer>CodeLoop · an outpatient professional-coding agent and self-improvement harness · agent versions v0–v3 · certified professional coder cpc1 · 2026</footer>
 <div class="tip" id="tip" role="status"></div>
-</main>
 
 <script>
 (function(){
@@ -191,16 +359,18 @@ const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.inn
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 function lineChart(el,series,opts){
-  const W=720,H=300,m={t:16,r:130,b:40,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const W=720,H=330,m={t:22,r:140,b:48,l:52},iw=W-m.l-m.r,ih=H-m.t-m.b;
   const x=i=>m.l+iw*(i/(CYCLES.length-1)), y=v=>m.t+ih*(1-v/opts.max);
   let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${el.id}-t"><title id="${el.id}-t">${esc(opts.title)}</title>`;
   s+='<g class="grid">';for(let g=0;g<=opts.max;g+=opts.step){s+=`<line x1="${m.l}" x2="${m.l+iw}" y1="${y(g)}" y2="${y(g)}"/>`;}s+='</g>';
-  s+='<g class="axis">';for(let g=0;g<=opts.max;g+=opts.step){s+=`<text x="${m.l-8}" y="${y(g)+4}" text-anchor="end">${g}${opts.unit}</text>`;}
-  CYCLES.forEach((c,i)=>{s+=`<text x="${x(i)}" y="${m.t+ih+20}" text-anchor="middle">${c}</text><text x="${x(i)}" y="${m.t+ih+34}" text-anchor="middle" style="font-size:11px">${SUB[i]}</text>`;});s+='</g>';
+  s+='<g class="axis">';for(let g=0;g<=opts.max;g+=opts.step){s+=`<text x="${m.l-10}" y="${y(g)+4}" text-anchor="end">${g}${opts.unit}</text>`;}
+  s+=`<text class="lab" x="${m.l}" y="${m.t-9}" style="fill:var(--ink-3)">% of encounters</text>`;
+  CYCLES.forEach((c,i)=>{s+=`<text x="${x(i)}" y="${m.t+ih+22}" text-anchor="middle" style="fill:var(--ink)">${c}</text><text class="lab" x="${x(i)}" y="${m.t+ih+38}" text-anchor="middle">${SUB[i]}</text>`;});s+='</g>';
   s+='<g class="series">';
   series.forEach((sr,k)=>{const col=`var(--s${k+1})`;const d=sr.values.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ');
-    s+=`<path d="${d}" stroke="${col}"/>`;sr.values.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="${col}"/>`;});
-    const last=sr.values[sr.values.length-1];s+=`<text class="endlabel" x="${x(CYCLES.length-1)+12}" y="${y(last)+4+(sr.dy||0)}">${last}${opts.unit} ${esc(sr.name)}</text>`;});
+    s+=`<path d="${d}" stroke="${col}"/>`;sr.values.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="5" fill="${col}"/>`;
+      const lab=sr.labels&&sr.labels[i]; if(lab!==null){const dy=(lab&&lab.dy)||-12,dx=(lab&&lab.dx)||(i===0?10:0),anc=i===0?'start':'middle';s+=`<text class="ptlabel" x="${x(i)+dx}" y="${y(v)+dy}" text-anchor="${anc}">${v}${opts.unit}</text>`;}});
+    const last=sr.values[sr.values.length-1];s+=`<text class="endlabel" x="${x(CYCLES.length-1)+14}" y="${y(last)+4+(sr.dy||0)}">${esc(sr.name)}</text>`;});
   s+='</g>';
   s+=`<line id="${el.id}-hair" x1="0" x2="0" y1="${m.t}" y2="${m.t+ih}" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>`;
   s+=`<rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" id="${el.id}-hit"/></svg>`;
@@ -213,23 +383,82 @@ function lineChart(el,series,opts){
   hit.addEventListener('mouseleave',()=>{hair.style.display='none';hideTip();});
 }
 function barChart(el,values,opts){
-  const W=340,H=260,m={t:16,r:12,b:40,l:36},iw=W-m.l-m.r,ih=H-m.t-m.b,n=values.length,bw=iw/n*0.56;
+  const W=340,H=280,m={t:26,r:12,b:44,l:40},iw=W-m.l-m.r,ih=H-m.t-m.b,n=values.length,bw=iw/n*0.56;
   const x=i=>m.l+iw*(i+0.5)/n, y=v=>m.t+ih*(1-v/opts.max);
   let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${el.id}-t"><title id="${el.id}-t">${esc(opts.title)}</title>`;
   s+='<g class="grid">';for(let g=0;g<=opts.max+1e-9;g+=opts.step){s+=`<line x1="${m.l}" x2="${m.l+iw}" y1="${y(g)}" y2="${y(g)}"/>`;}s+='</g>';
   s+='<g class="axis">';for(let g=0;g<=opts.max+1e-9;g+=opts.step){s+=`<text x="${m.l-8}" y="${y(g)+4}" text-anchor="end">${+g.toFixed(1)}</text>`;}
-  CYCLES.forEach((c,i)=>{s+=`<text x="${x(i)}" y="${m.t+ih+20}" text-anchor="middle">${c}</text>`;});s+='</g>';
+  CYCLES.forEach((c,i)=>{s+=`<text x="${x(i)}" y="${m.t+ih+20}" text-anchor="middle" style="fill:var(--ink)">${c}</text><text class="lab" x="${x(i)}" y="${m.t+ih+35}" text-anchor="middle">${SUB[i]}</text>`;});
+  s+=`<text class="lab" x="${m.l}" y="${m.t-10}" style="fill:var(--ink-3)">${esc(opts.label)}</text></g>`;
   values.forEach((v,i)=>{const top=y(v),h=m.t+ih-top;s+=`<rect class="bar" x="${x(i)-bw/2}" y="${top}" width="${bw}" height="${h}" fill="var(--s1)" data-i="${i}"/><text class="barlabel" x="${x(i)}" y="${top-7}" text-anchor="middle">${v}</text>`;});
-  s+=`<text class="axis" x="${m.l}" y="${m.t-4}" style="font-size:12px;fill:var(--ink-3)">${esc(opts.label)}</text></svg>`;
-  el.innerHTML=s;
+  s+='</svg>';el.innerHTML=s;
   el.querySelectorAll('rect.bar').forEach(r=>{r.addEventListener('mousemove',e=>{const i=+r.dataset.i;showTip(`<b>${values[i]}</b> ${esc(opts.label)}<br>${esc(CYCLES[i])} · ${esc(SUB[i])}`,e.clientX,e.clientY);});r.addEventListener('mouseleave',hideTip);});
 }
+function stackedBars(el,rows,keys,opts){
+  const W=720,H=210,m={t:10,r:60,b:30,l:120},iw=W-m.l-m.r,ih=H-m.t-m.b,n=rows.length,bh=ih/n*0.5,gap=2;
+  const y=i=>m.t+ih*(i+0.5)/n, x=v=>m.l+iw*(v/opts.max);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${el.id}-t"><title id="${el.id}-t">${esc(opts.title)}</title>`;
+  s+='<g class="grid">';for(let g=0;g<=opts.max+1e-9;g+=opts.step){s+=`<line y1="${m.t}" y2="${m.t+ih}" x1="${x(g)}" x2="${x(g)}"/>`;}s+='</g>';
+  s+='<g class="axis">';for(let g=0;g<=opts.max+1e-9;g+=opts.step){s+=`<text x="${x(g)}" y="${m.t+ih+18}" text-anchor="middle">${g}</text>`;}s+='</g>';
+  rows.forEach((r,i)=>{let acc=0;s+=`<text x="${m.l-12}" y="${y(i)-2}" text-anchor="end" style="font-size:13px;fill:var(--ink)">${esc(r.name)}</text><text x="${m.l-12}" y="${y(i)+13}" text-anchor="end" class="axis"><tspan class="lab" style="fill:var(--ink-3);font-size:11.5px">${esc(r.sub)}</tspan></text>`;
+    keys.forEach((k,j)=>{const v=r.values[j];if(!v)return;const x0=x(acc)+(acc?gap:0),w=Math.max(0,x(acc+v)-x0);s+=`<rect x="${x0}" y="${y(i)-bh/2}" width="${w}" height="${bh}" rx="3" fill="var(--s${k.slot})" data-r="${i}" data-j="${j}"/>`;if(w>22)s+=`<text x="${x0+w/2}" y="${y(i)+4.5}" text-anchor="middle" style="font-size:12px;fill:#fff;font-weight:650">${v}</text>`;acc+=v;});
+    s+=`<text class="barlabel" x="${x(acc)+8}" y="${y(i)+4.5}">${acc}</text>`;});
+  s+='</svg>';el.innerHTML=s;
+  el.querySelectorAll('rect').forEach(r=>{r.addEventListener('mousemove',e=>{const i=+r.dataset.r,j=+r.dataset.j;showTip(`<b>${rows[i].values[j]}</b> ${esc(keys[j].name)}<br>${esc(rows[i].name)} · ${esc(rows[i].sub)}`,e.clientX,e.clientY);});r.addEventListener('mouseleave',hideTip);});
+}
+function funnel(el,steps){
+  const W=720,rowH=44,H=steps.length*rowH+10,m={l:250,r:80},iw=W-m.l-m.r,max=steps[0].v;
+  const sc=v=>Math.max(6,iw*Math.sqrt(v/max));
+  let s=`<svg class="funnel" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${el.id}-t"><title id="${el.id}-t">From review events to merged changes</title>`;
+  steps.forEach((st,i)=>{const y=6+i*rowH;s+=`<text class="lab" x="${m.l-14}" y="${y+21}" text-anchor="end">${esc(st.name)}</text><rect x="${m.l}" y="${y+4}" width="${sc(st.v)}" height="26"/><text class="val" x="${m.l+sc(st.v)+10}" y="${y+22}">${st.v.toLocaleString()}</text>`;});
+  s+='</svg>';el.innerHTML=s;
+}
+function loop(el){
+  function box(x,y,w,h,cls,t1,t2){return `<rect class="box ${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="9"/><text x="${x+w/2}" y="${y+23}" text-anchor="middle" style="font-weight:650">${t1}</text><text class="small" x="${x+w/2}" y="${y+41}" text-anchor="middle">${t2}</text>`;}
+  const W=165,G=17,X=[30,30+W+G,30+2*(W+G),30+3*(W+G)];
+  const s=`<svg class="flow" viewBox="0 0 768 330" role="img" aria-labelledby="loop-t"><title id="loop-t">The end-to-end improvement loop</title>
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--ink-3)"/></marker></defs>
+  ${box(X[0],24,W,58,'h','Version vK drafts','a batch of 45 encounters')}
+  ${box(X[1],24,W,58,'','CPC reviews in the UI','append-only events with reasons')}
+  ${box(X[2],24,W,58,'','Recurring corrections','findings at ≥3 encounters')}
+  ${box(X[3],24,W,58,'','Triage','accept · reject · ask the coder')}
+  ${box(X[3],150,W,58,'','Targeted eval','+ regression suite, 3 seeds')}
+  ${box(X[2],150,W,58,'g','Improvement agent','bounded task environment')}
+  ${box(X[1],150,W,58,'o','Gate','7 checks vs the stored base')}
+  ${box(X[0],150,W,58,'','Human merges','pull request → tag vK+1')}
+  ${box(X[0],262,W,50,'h','Freeze vK+1','sealed holdout predictions')}
+  ${box(X[2],262,2*W+G,50,'','Ambiguous finding → a question to the coder','the answer is recorded; only then does it become a task')}
+  <path class="arrow" d="M${X[0]+W} 53H${X[1]-2}"/><path class="arrow" d="M${X[1]+W} 53H${X[2]-2}"/><path class="arrow" d="M${X[2]+W} 53H${X[3]-2}"/>
+  <path class="arrow" d="M${X[3]+W/2} 82V148"/>
+  <path class="arrow" d="M${X[3]} 179H${X[2]+W+2}"/><path class="arrow" d="M${X[2]} 179H${X[1]+W+2}"/><path class="arrow" d="M${X[1]} 179H${X[0]+W+2}"/>
+  <path class="arrow" d="M${X[0]+W/2} 208V260"/>
+  <path class="arrow" d="M${X[0]} 287H14V53H${X[0]-2}"/>
+  <path class="arrow" d="M${X[1]+W/2} 150V118H${X[2]+W/2}V148"/>
+  <text class="small" x="${(X[1]+X[2]+W)/2}" y="112" text-anchor="middle">gate fails → back to the agent with the verdict</text>
+  <path class="arrow" d="M${X[3]+W} 53H752V287H${X[2]+2*W+G+2}"/>
+  <text class="small" x="${X[3]+W-14}" y="118" text-anchor="start" style="display:none"></text>
+  </svg>`;
+  el.innerHTML=s;
+}
 lineChart(document.getElementById('tiers'),[
-  {name:'≥75%',values:[51,84,87],dy:-10},
-  {name:'≥90%',values:[29,62,67],dy:0},
-  {name:'100%',values:[29,62,62],dy:14}],{max:100,step:25,unit:'%',title:'Share of drafts at or above each agreement tier, by cycle'});
+  {name:'≥75%',values:[51,84,87],labels:[{dy:-12},{dy:-12},{dy:-12}],dy:-4},
+  {name:'≥90%',values:[29,62,67],labels:[null,null,{dy:-12}],dy:2},
+  {name:'100%',values:[29,62,62],labels:[{dy:22},{dy:22},{dy:22}],dy:14}],{max:100,step:20,unit:'%',title:'Share of drafts at or above each agreement tier, by cycle'});
 barChart(document.getElementById('touches'),[1.82,0.82,0.69],{max:2,step:0.5,label:'touches per encounter',title:'Coder touches per encounter by cycle'});
 barChart(document.getElementById('minutes'),[4.42,4.46,2.72],{max:5,step:1,label:'mean review minutes',title:'Mean review minutes per encounter by cycle'});
+stackedBars(document.getElementById('mix'),[
+  {name:'Batch 1',sub:'reviewing v0',values:[68,5,13]},
+  {name:'Batch 2',sub:'reviewing v1',values:[9,21,7]},
+  {name:'Batch 3',sub:'reviewing v2',values:[10,16,5]}],
+  [{name:'removed',slot:2},{name:'added',slot:1},{name:'edited',slot:3}],{max:90,step:15,title:'Effective corrections per batch by type'});
+funnel(document.getElementById('funnel'),[
+  {name:'Review events recorded',v:3021},{name:'Effective corrections (add, edit, remove)',v:154},{name:'Findings grouped',v:103},
+  {name:'Cleared the recurrence threshold',v:7},{name:'Accepted and resolved',v:6},{name:'Merged pull requests',v:3}]);
+loop(document.getElementById('loop'));
+// TOC highlight
+const links=[...document.querySelectorAll('.toc a')];const heads=links.map(a=>document.querySelector(a.getAttribute('href')));
+function onScroll(){let cur=0;heads.forEach((h,i)=>{if(h&&h.getBoundingClientRect().top<120)cur=i;});links.forEach((a,i)=>a.classList.toggle('on',i===cur));}
+document.addEventListener('scroll',onScroll,{passive:true});onScroll();
 })();
 </script>
 </body>
