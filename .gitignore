@@ -29,3 +29,4 @@ data/tables/*.building
 
 # staging dir of `make fly-deploy-holdout` (sealed ciphertext copied for the image build, removed after)
 .holdout-build/
+.blog-build/

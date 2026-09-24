@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: install test lint ui-e2e fly-deploy-holdout fly-pull-holdout seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events fly-pull-events-exec
+.PHONY: install test lint ui-e2e fly-deploy-holdout fly-pull-holdout fly-deploy-blog seal data leakage decisions tables eval-targeted eval-regression gate task-env fly-deploy-audit fly-deploy-review fly-pull-audit fly-pull-events fly-pull-events-exec
 
 install:            ## create .venv and install codeloop with dev tools
 	$(UV) sync --group dev
@@ -80,4 +80,10 @@ fly-deploy-holdout: ui-e2e  ## Phase 9: deploy the holdout-labeling app (holds t
 
 fly-pull-holdout:   ## Phase 9: copy the encrypted holdout labels and the event store off the holdout app's volume (checksum-verified)
 	$(UV) run python scripts/fly_pull_holdout.py
+
+fly-deploy-blog:    ## publish docs/blog/index.html (+ docs/STUDY.md as text) on the static app codeloop-blog
+	rm -rf .blog-build && mkdir -p .blog-build
+	sed 's|href="../STUDY.md"|href="STUDY.md"|' docs/blog/index.html > .blog-build/index.html
+	cp docs/STUDY.md deploy/blog/Dockerfile deploy/blog/nginx.conf .blog-build/
+	$(FLY) deploy .blog-build -c $(CURDIR)/fly.blog.toml; status=$$?; rm -rf .blog-build; exit $$status
 

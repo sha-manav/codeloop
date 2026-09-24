@@ -1,0 +1,19 @@
+# Fly.io app for the public write-up (docs/blog/index.html + docs/STUDY.md as text). No data, no auth, no secrets.
+# Deploy with `make fly-deploy-blog`; the machine stops when idle and starts on the first request.
+app = "codeloop-blog"
+primary_region = "iad"
+
+[build]
+  dockerfile = ".blog-build/Dockerfile"   # staged by `make fly-deploy-blog`
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
