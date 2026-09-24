@@ -132,7 +132,6 @@ a{color:var(--accent)}
 <a href="#ex3" class="sub">3. The finding becomes a hill to climb</a>
 <a href="#build">How the loop is built</a>
 <a href="#cycles">Expanding across cycles</a>
-<a href="#also">What we also checked</a>
 </nav>
 
 <article>
@@ -338,14 +337,11 @@ make gate TASK=FIND-DX-0052</pre></div>
 
 <p>What made the loop cheap to run was not the agent but the plumbing around it: an append-only event store, a recurrence threshold, a packager that turns a finding into a dataset and two suites, a container that cannot reach what it must not, and a gate whose verdict is a file in the repository. Model spend across the three cycles, including the failed gate attempts and the sealed predictions for four versions, was about $100 by the ledger's own estimates, and less in practice because repeated runs hit the cache.</p>
 
-<h2 id="also">What we also checked</h2>
-<p class="note">Before the first cycle, 40 encounters were sealed and never opened; at the end, the coder coded them with no draft in front of him, and all four versions were scored against those labels exactly once. On that blind set the versions did not differ from one another. The curve in Figure 1 therefore measures how much of a draft a reviewer accepts, which is what it was designed to measure, not from-scratch coding accuracy. The full analysis, including why the two measurements differ, is in <a href="../STUDY.md">the study note</a>.</p>
-
 <p class="note">Encounters are scripted or role-played (ACI-Bench); there is no PHI. CPT descriptors are never stored; code numbers only. Every freeze, gate, merge and correction is recorded in <code>ledger.md</code> with hashes.</p>
 </article>
 </div>
 
-<footer>CodeLoop · an outpatient professional-coding agent and self-improvement harness · agent versions v0–v3 · certified professional coder cpc1 · 2026</footer>
+<footer>CodeLoop · an outpatient professional-coding agent and self-improvement harness · agent versions v0–v3 · certified professional coder cpc1 · 2026<br>The agreement figures above are measured against reviewer-approved labels; a sealed blind holdout of 40 encounters showed no difference between versions (<a href="../STUDY.md">study note</a>).</footer>
 <div class="tip" id="tip" role="status"></div>
 
 <script>
